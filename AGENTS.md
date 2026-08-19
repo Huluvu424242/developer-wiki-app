@@ -152,6 +152,45 @@ Wenn der Benutzer die Umsetzung einer Story beauftragt, ist grundsätzlich folge
     - Die durchgeführten Prüfungen nennen.
     - Auf offene Punkte oder notwendige lokale Prüfungen hinweisen.
 
+## Rebase und Aktualisierung von Arbeitsbranches
+
+Rebase darf verwendet werden, um einen Story-, Bugfix- oder sonstigen Arbeitsbranch vor dem Merge auf den aktuellen Stand von `master` zu bringen. Dabei gelten folgende Regeln:
+
+1. `master` selbst wird niemals rebased oder anderweitig durch History-Rewriting verändert.
+    - Rebase findet ausschließlich auf Arbeitsbranches statt.
+    - Ein bereits gemergter Branch wird nicht nachträglich rebased.
+
+2. Vor einem Rebase den aktuellen Zielstand und den Branch-Kontext prüfen.
+    - Zuerst den aktuellen Stand von `master` abrufen und sicherstellen, dass der richtige Arbeitsbranch aktiv ist.
+    - Prüfen, ob der Branch ausschließlich zu dem eigenen Pull Request gehört oder von anderen Personen bzw. Automationen mitverwendet wird.
+    - Einen geteilten oder von anderen aktiv verwendeten Branch nicht ohne ausdrückliche Zustimmung rebasen, da Rebase die Commit-Historie umschreibt.
+
+3. Rebase bevorzugen, wenn ein Arbeitsbranch vor dem Merge hinter `master` liegt und eine lineare Historie sinnvoll ist.
+    - Den Arbeitsbranch auf den aktuellen `master` rebasen, statt unnötige Merge-Commits nur zur Branch-Aktualisierung zu erzeugen.
+    - Rebase nicht als Selbstzweck verwenden; wenn kein Aktualisierungsbedarf besteht, ist kein Rebase erforderlich.
+
+4. Konflikte bewusst und nachvollziehbar auflösen.
+    - Bei jedem Konflikt prüfen, welche Änderung fachlich erhalten bleiben muss.
+    - Konflikte nicht pauschal mit `ours` oder `theirs` auflösen, wenn dadurch fachliche Änderungen verloren gehen könnten.
+    - Wenn die korrekte Auflösung unklar ist, Rebase abbrechen statt zu raten.
+    - Nach Konfliktauflösung den Rebase vollständig abschließen und sicherstellen, dass keine Konfliktmarker im Repository verbleiben.
+
+5. Nach einem Rebase die betroffenen Prüfungen erneut ausführen.
+    - Mindestens die für die Story oder den Bugfix relevanten Tests und statischen Prüfungen wiederholen.
+    - Bei Flutter-Änderungen insbesondere `dart format`, `flutter analyze` und die relevanten Tests erneut ausführen, sofern sie durch die Änderung betroffen sein können.
+    - Der Pull Request darf nach einem Rebase erst als mergefähig betrachtet werden, wenn diese Prüfungen wieder erfolgreich sind.
+
+6. Einen bereits veröffentlichten Arbeitsbranch nur kontrolliert aktualisieren.
+    - Da Rebase Commit-SHAs verändert, darf ein bereits gepushter Branch nur mit einem sicheren Lease aktualisiert werden.
+    - Dafür ausschließlich `git push --force-with-lease` verwenden.
+    - `git push --force` ist für Arbeitsbranches dieses Projekts nicht zulässig.
+    - Wenn `--force-with-lease` wegen zwischenzeitlicher fremder Änderungen fehlschlägt, diese Änderungen zuerst prüfen und nicht durch einen erzwungenen Push überschreiben.
+
+7. Rebase und Branchschutz müssen zusammenpassen.
+    - Der geschützte `master` wird ausschließlich über Pull Requests verändert.
+    - Force Pushes auf `master` bleiben durch das Ruleset verboten.
+    - History-Rewriting ist nur auf dem zugehörigen Arbeitsbranch und nur nach den oben genannten Regeln zulässig.
+
 ## Architekturleitplanken
 
 Für die Weiterentwicklung der App gelten zusätzlich folgende Leitplanken:
