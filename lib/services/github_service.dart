@@ -10,11 +10,13 @@ class GitHubService {
     this.token, {
     this.owner = 'Huluvu424242',
     this.repo = 'Developer-Wiki',
-  });
+    http.Client? client,
+  }) : _client = client ?? http.Client();
 
   final String token;
   final String owner;
   final String repo;
+  final http.Client _client;
 
   Map<String, String> get _headers => {
         'Accept': 'application/vnd.github+json',
@@ -26,7 +28,7 @@ class GitHubService {
     required String title,
     required String body,
   }) async {
-    final response = await http.post(
+    final response = await _client.post(
       Uri.parse('https://api.github.com/repos/$owner/$repo/issues'),
       headers: {..._headers, 'Content-Type': 'application/json'},
       body: jsonEncode({
@@ -46,7 +48,7 @@ class GitHubService {
   }
 
   Future<String> login() async {
-    final response = await http.get(
+    final response = await _client.get(
       Uri.parse('https://api.github.com/user'),
       headers: _headers,
     );
@@ -59,7 +61,7 @@ class GitHubService {
 
   Future<String> verifyRepositoryAccess() async {
     final loginName = await login();
-    final response = await http.get(
+    final response = await _client.get(
       Uri.parse('https://api.github.com/repos/$owner/$repo'),
       headers: _headers,
     );
