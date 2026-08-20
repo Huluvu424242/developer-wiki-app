@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 
 import '../models/created_issue.dart';
 import '../models/source_template.dart';
+import '../models/workflow_run.dart';
 
 class GitHubService {
   GitHubService(
@@ -51,10 +52,7 @@ class GitHubService {
     required String workflow,
     String ref = 'master',
   }) async {
-    final workflowId = Uri.encodeComponent(workflow.trim());
-    if (workflowId.isEmpty) {
-      throw const FormatException('Import-Workflow fehlt.');
-    }
+    final workflowId = _workflowId(workflow);
     final response = await _client.post(
       Uri.parse(
         'https://api.github.com/repos/$owner/$repo/actions/workflows/'
@@ -66,6 +64,46 @@ class GitHubService {
     if (response.statusCode != 204) {
       throw Exception(_message(response));
     }
+  }
+
+  Future<WorkflowRun?> latestWorkflowRun({
+    required String workflow,
+    DateTime? notBefore,
+  }) async {
+    final workflowId = _workflowId(workflow);
+    final uri = Uri.parse(
+      'https://api.github.com/repos/$owner/$repo/actions/workflows/'
+      '$workflowId/runs',
+    ).replace(
+      queryParameters: const {
+        'event': 'workflow_dispatch',
+        'per_page': '10',
+      },
+    );
+    final response = await _client.get(uri, headers: _headers);
+    if (response.statusCode != 200) {
+      throw Exception(_message(response));
+    }
+
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    final runs = data['workflow_runs'] as List<dynamic>? ?? const [];
+    for (final rawRun in runs) {
+      final run = rawRun as Map<String, dynamic>;
+      final createdAt = DateTime.parse(run['created_at'] as String).toUtc();
+      if (notBefore != null && createdAt.isBefore(notBefore.toUtc())) {
+        continue;
+      }
+      return WorkflowRun(
+        id: run['id'] as int,
+        url: run['html_url'] as String,
+        state: _workflowRunState(
+          run['status']?.toString(),
+          run['conclusion']?.toString(),
+        ),
+        createdAt: createdAt,
+      );
+    }
+    return null;
   }
 
   Future<String> login() async {
@@ -103,6 +141,29 @@ class GitHubService {
                 '### ${field.label}\n\n${values[field.id]!.trim()}',
           )
           .join('\n\n');
+
+  static String _workflowId(String workflow) {
+    final trimmed = workflow.trim();
+    if (trimmed.isEmpty) {
+      throw const FormatException('Import-Workflow fehlt.');
+    }
+    return Uri.encodeComponent(trimmed);
+  }
+
+  static WorkflowRunState _workflowRunState(
+    String? status,
+    String? conclusion,
+  ) {
+    if (status == 'completed') {
+      return conclusion == 'success'
+          ? WorkflowRunState.successful
+          : WorkflowRunState.failed;
+    }
+    if (status == 'in_progress') {
+      return WorkflowRunState.running;
+    }
+    return WorkflowRunState.queued;
+  }
 
   static String _message(http.Response response) {
     try {
