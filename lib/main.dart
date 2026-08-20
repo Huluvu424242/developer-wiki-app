@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'models/shared_content.dart';
 import 'models/wiki_configuration.dart';
 import 'screens/home_screen.dart';
 import 'screens/settings_screen.dart';
 import 'services/configuration_service.dart';
+import 'services/share_intent_service.dart';
 
 void main() => runApp(const WikiSourceApp());
 
@@ -16,12 +18,29 @@ class WikiSourceApp extends StatefulWidget {
 
 class _WikiSourceAppState extends State<WikiSourceApp> {
   final _configurationService = ConfigurationService();
+  final _shareIntentService = ShareIntentService();
   late Future<WikiConfiguration> _configuration;
+  SharedContent? _sharedContent;
 
   @override
   void initState() {
     super.initState();
     _reloadConfiguration();
+    _initializeShareIntents();
+  }
+
+  Future<void> _initializeShareIntents() async {
+    final initial = await _shareIntentService.initialize(_handleSharedContent);
+    if (initial != null) {
+      _handleSharedContent(initial);
+    }
+  }
+
+  void _handleSharedContent(SharedContent content) {
+    if (!mounted) {
+      return;
+    }
+    setState(() => _sharedContent = content);
   }
 
   void _reloadConfiguration() {
@@ -59,7 +78,7 @@ class _WikiSourceAppState extends State<WikiSourceApp> {
             );
           }
           if (snapshot.data?.isComplete == true) {
-            return const HomeScreen();
+            return HomeScreen(sharedContent: _sharedContent);
           }
           return SettingsScreen(
             isSetup: true,
