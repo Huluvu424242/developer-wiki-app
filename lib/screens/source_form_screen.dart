@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../models/created_issue.dart';
 import '../models/source_template.dart';
+import '../models/wiki_configuration.dart';
+import '../services/configuration_service.dart';
+import '../services/external_url_service.dart';
 import '../services/github_service.dart';
 import 'settings_screen.dart';
 
@@ -20,12 +23,13 @@ class SourceFormScreen extends StatefulWidget {
 class _SourceFormScreenState extends State<SourceFormScreen> {
   final key = GlobalKey<FormState>();
   final title = TextEditingController();
-  final storage = const FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-  );
+  final _configurationService = ConfigurationService();
+  final _externalUrlService = ExternalUrlService();
   late SourceTemplate template;
   final values = <String, TextEditingController>{};
   bool busy = false;
+  CreatedIssue? _createdIssue;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -42,50 +46,79 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     for (final field in next.fields) {
       values[field.id] = TextEditingController(text: field.initialValue);
     }
+    _createdIssue = null;
+    _errorMessage = null;
   }
 
   Future<void> submit() async {
     if (!key.currentState!.validate()) {
       return;
     }
-    final token = await storage.read(key: 'github_pat');
-    if (token == null || token.isEmpty) {
-      if (mounted) {
-        await Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const SettingsScreen()),
-        );
-      }
-      return;
-    }
-    setState(() => busy = true);
+
+    setState(() {
+      busy = true;
+      _errorMessage = null;
+    });
     try {
+      final configuration = await _configurationService.load();
+      final repository = _repositoryFrom(configuration);
       final map = values.map((key, value) => MapEntry(key, value.text));
-      final url = await GitHubService(token).createIssue(
+      final issue = await GitHubService(
+        configuration.token,
+        owner: repository.owner,
+        repo: repository.name,
+      ).createIssue(
         title: '${template.titlePrefix}${title.text.trim()}',
         body: GitHubService.issueBody(template, map),
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Issue erstellt: $url')),
-        );
-        title.clear();
-        for (final field in template.fields) {
-          values[field.id]!.text = field.initialValue;
-        }
-        setState(() {});
+        setState(() => _createdIssue = issue);
       }
     } catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Fehler: $error')),
-        );
+        setState(() {
+          _errorMessage = 'Quelle konnte nicht erstellt werden: $error';
+        });
       }
     } finally {
       if (mounted) {
         setState(() => busy = false);
       }
     }
+  }
+
+  GitHubRepository _repositoryFrom(WikiConfiguration configuration) {
+    if (!configuration.isComplete) {
+      throw const FormatException(
+        'Wiki-Konfiguration ist unvollständig. Einstellungen prüfen.',
+      );
+    }
+    return GitHubRepository.parse(configuration.repositoryUrl);
+  }
+
+  Future<void> _openCreatedIssue() async {
+    final issue = _createdIssue;
+    if (issue == null) {
+      return;
+    }
+    try {
+      await _externalUrlService.open(issue.url);
+    } catch (error) {
+      if (mounted) {
+        setState(() => _errorMessage = 'Issue konnte nicht geöffnet werden: $error');
+      }
+    }
+  }
+
+  void _startNewSource() {
+    title.clear();
+    for (final field in template.fields) {
+      values[field.id]!.text = field.initialValue;
+    }
+    setState(() {
+      _createdIssue = null;
+      _errorMessage = null;
+    });
   }
 
   @override
@@ -129,18 +162,23 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
                     ),
                   )
                   .toList(),
-              onChanged: (selected) {
-                if (selected != null) {
-                  setState(() => _select(selected));
-                }
-              },
+              onChanged: busy
+                  ? null
+                  : (selected) {
+                      if (selected != null) {
+                        setState(() => _select(selected));
+                      }
+                    },
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: Text(template.description),
             ),
+            if (_createdIssue != null) _successCard(_createdIssue!),
+            if (_errorMessage != null) _errorCard(_errorMessage!),
             TextFormField(
               controller: title,
+              enabled: !busy,
               decoration: InputDecoration(
                 labelText: 'Issue-Titel',
                 prefixText: template.titlePrefix,
@@ -154,13 +192,60 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
             FilledButton.icon(
               onPressed: busy ? null : submit,
               icon: const Icon(Icons.cloud_upload),
-              label: Text(
-                busy
-                    ? 'Wird erstellt …'
-                    : 'Issue mit Label „quelle“ erstellen',
-              ),
+              label: Text(busy ? 'Wird erstellt …' : 'Quelle speichern'),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _successCard(CreatedIssue issue) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Quelle erstellt – Issue #${issue.number}',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: _openCreatedIssue,
+                  icon: const Icon(Icons.open_in_new),
+                  label: const Text('Issue öffnen'),
+                ),
+                FilledButton.tonalIcon(
+                  onPressed: _startNewSource,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Neue Quelle'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _errorCard(String message) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Semantics(
+          liveRegion: true,
+          child: Text(
+            message,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
         ),
       ),
     );
@@ -185,7 +270,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
                 ),
               )
               .toList(),
-          onChanged: (value) => controller.text = value ?? '',
+          onChanged: busy ? null : (value) => controller.text = value ?? '',
           validator: (value) =>
               field.required && value == null ? 'Pflichtfeld' : null,
         ),
@@ -195,6 +280,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
         controller: controller,
+        enabled: !busy,
         minLines: field.kind == FieldKind.textarea ? 3 : 1,
         maxLines: field.kind == FieldKind.textarea ? 8 : 1,
         decoration: InputDecoration(
