@@ -83,6 +83,64 @@ class GitHubService {
         .toList();
   }
 
+  Future<void> dispatchWorkflow({
+    required String workflow,
+    String ref = 'master',
+  }) async {
+    final workflowId = _workflowId(workflow);
+    final response = await _client.post(
+      Uri.parse(
+        'https://api.github.com/repos/$owner/$repo/actions/workflows/'
+        '$workflowId/dispatches',
+      ),
+      headers: {..._headers, 'Content-Type': 'application/json'},
+      body: jsonEncode({'ref': ref}),
+    );
+    if (response.statusCode != 204) {
+      throw Exception(_message(response));
+    }
+  }
+
+  Future<WorkflowRun?> latestWorkflowRun({
+    required String workflow,
+    DateTime? notBefore,
+  }) async {
+    final workflowId = _workflowId(workflow);
+    final uri = Uri.parse(
+      'https://api.github.com/repos/$owner/$repo/actions/workflows/'
+      '$workflowId/runs',
+    ).replace(
+      queryParameters: const {
+        'event': 'workflow_dispatch',
+        'per_page': '10',
+      },
+    );
+    final response = await _client.get(uri, headers: _headers);
+    if (response.statusCode != 200) {
+      throw Exception(_message(response));
+    }
+
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    final runs = data['workflow_runs'] as List<dynamic>? ?? const [];
+    for (final rawRun in runs) {
+      final run = rawRun as Map<String, dynamic>;
+      final createdAt = DateTime.parse(run['created_at'] as String).toUtc();
+      if (notBefore != null && createdAt.isBefore(notBefore.toUtc())) {
+        continue;
+      }
+      return WorkflowRun(
+        id: run['id'] as int,
+        url: run['html_url'] as String,
+        state: _workflowRunState(
+          run['status']?.toString(),
+          run['conclusion']?.toString(),
+        ),
+        createdAt: createdAt,
+      );
+    }
+    return null;
+  }
+
   Future<String> login() async {
     final response = await _client.get(
       Uri.parse('https://api.github.com/user'),
