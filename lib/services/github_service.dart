@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../models/created_issue.dart';
 import '../models/source_template.dart';
 
 class GitHubService {
@@ -21,7 +22,7 @@ class GitHubService {
         'X-GitHub-Api-Version': '2022-11-28',
       };
 
-  Future<String> createIssue({
+  Future<CreatedIssue> createIssue({
     required String title,
     required String body,
   }) async {
@@ -37,8 +38,11 @@ class GitHubService {
     if (response.statusCode != 201) {
       throw Exception(_message(response));
     }
-    return (jsonDecode(response.body) as Map<String, dynamic>)['html_url']
-        as String;
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    return CreatedIssue(
+      number: data['number'] as int,
+      url: data['html_url'] as String,
+    );
   }
 
   Future<String> login() async {
