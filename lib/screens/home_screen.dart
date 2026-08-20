@@ -1,15 +1,28 @@
 import 'package:flutter/material.dart';
 
 import '../models/source_template.dart';
+import '../models/wiki_configuration.dart';
+import '../services/configuration_service.dart';
+import '../services/github_service.dart';
 import 'settings_screen.dart';
 import 'source_form_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.onImportRequested});
 
   final VoidCallback? onImportRequested;
 
-  void _openSource(BuildContext context, SourceTemplate template) {
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final _configurationService = ConfigurationService();
+  bool _importBusy = false;
+  String? _importStatus;
+  bool _importFailed = false;
+
+  void _openSource(SourceTemplate template) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -18,23 +31,88 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void _openSettings(BuildContext context) {
+  void _openSettings() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const SettingsScreen()),
     );
   }
 
-  void _requestImport(BuildContext context) {
-    if (onImportRequested != null) {
-      onImportRequested!();
-      return;
-    }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Der Wiki-Import wird in Story #21 umgesetzt.'),
+  Future<void> _requestImport() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Quellenimport starten?'),
+        content: const Text(
+          'Der Import-Workflow des verbundenen Wikis wird jetzt gestartet.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Abbrechen'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Starten'),
+          ),
+        ],
       ),
     );
+    if (confirmed != true || !mounted) {
+      return;
+    }
+
+    if (widget.onImportRequested != null) {
+      widget.onImportRequested!();
+      return;
+    }
+    await _dispatchImport();
+  }
+
+  Future<void> _dispatchImport() async {
+    setState(() {
+      _importBusy = true;
+      _importStatus = 'Import wird auf GitHub gestartet …';
+      _importFailed = false;
+    });
+    try {
+      final configuration = await _configurationService.load();
+      final repository = _repositoryFrom(configuration);
+      await GitHubService(
+        configuration.token,
+        owner: repository.owner,
+        repo: repository.name,
+      ).dispatchWorkflow(workflow: configuration.workflowFile);
+      if (mounted) {
+        setState(() {
+          _importStatus = 'Import gestartet.';
+          _importFailed = false;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          _importStatus = 'Import konnte nicht gestartet werden: $error';
+          _importFailed = true;
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _importBusy = false);
+      }
+    }
+  }
+
+  GitHubRepository _repositoryFrom(WikiConfiguration configuration) {
+    if (!configuration.isComplete) {
+      throw const FormatException(
+        'Wiki-Konfiguration ist unvollständig. Einstellungen prüfen.',
+      );
+    }
+    if (configuration.workflowFile.trim().isEmpty) {
+      throw const FormatException('Import-Workflow ist nicht konfiguriert.');
+    }
+    return GitHubRepository.parse(configuration.repositoryUrl);
   }
 
   @override
@@ -45,7 +123,7 @@ class HomeScreen extends StatelessWidget {
         actions: [
           IconButton(
             tooltip: 'Einstellungen öffnen',
-            onPressed: () => _openSettings(context),
+            onPressed: _openSettings,
             icon: const Icon(Icons.settings),
           ),
         ],
@@ -69,17 +147,35 @@ class HomeScreen extends StatelessWidget {
                   title: Text(template.name),
                   subtitle: Text(template.description),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _openSource(context, template),
+                  onTap: () => _openSource(template),
                 ),
               ),
             ),
           ),
           const Divider(height: 32),
           FilledButton.tonalIcon(
-            onPressed: () => _requestImport(context),
+            onPressed: _importBusy ? null : _requestImport,
             icon: const Icon(Icons.sync),
-            label: const Text('Quellen ins Wiki importieren'),
+            label: Text(
+              _importBusy
+                  ? 'Import wird gestartet …'
+                  : 'Quellen ins Wiki importieren',
+            ),
           ),
+          if (_importStatus != null) ...[
+            const SizedBox(height: 12),
+            Semantics(
+              liveRegion: true,
+              child: Text(
+                _importStatus!,
+                style: TextStyle(
+                  color: _importFailed
+                      ? Theme.of(context).colorScheme.error
+                      : null,
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
