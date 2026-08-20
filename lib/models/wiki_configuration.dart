@@ -2,13 +2,16 @@ class WikiConfiguration {
   const WikiConfiguration({
     required this.repositoryUrl,
     required this.token,
+    this.workflowFile = defaultWorkflowFile,
   });
 
   static const defaultRepositoryUrl =
       'https://github.com/Huluvu424242/Developer-Wiki';
+  static const defaultWorkflowFile = 'import-source-issues.yml';
 
   final String repositoryUrl;
   final String token;
+  final String workflowFile;
 
   bool get isComplete =>
       repositoryUrl.trim().isNotEmpty && token.trim().isNotEmpty;
@@ -35,10 +38,12 @@ class GitHubRepository {
       throw const FormatException('Bitte ein GitHub-Repository angeben.');
     }
 
-    final segments = uri.pathSegments.where((segment) => segment.isNotEmpty).toList();
+    final segments =
+        uri.pathSegments.where((segment) => segment.isNotEmpty).toList();
     if (segments.length != 2) {
       throw const FormatException(
-          'Repository als https://github.com/owner/repo oder owner/repo angeben.');
+        'Repository als https://github.com/owner/repo oder owner/repo angeben.',
+      );
     }
 
     return GitHubRepository(owner: segments[0], name: segments[1]);
