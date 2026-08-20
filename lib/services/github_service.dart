@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../models/created_issue.dart';
+import '../models/source_issue_summary.dart';
 import '../models/source_template.dart';
 
 class GitHubService {
@@ -45,6 +46,40 @@ class GitHubService {
       number: data['number'] as int,
       url: data['html_url'] as String,
     );
+  }
+
+  Future<List<SourceIssueSummary>> listRecentSourceIssues({
+    int limit = 10,
+  }) async {
+    final uri = Uri.parse(
+      'https://api.github.com/repos/$owner/$repo/issues',
+    ).replace(
+      queryParameters: {
+        'state': 'all',
+        'labels': 'quelle',
+        'per_page': limit.toString(),
+        'sort': 'created',
+        'direction': 'desc',
+      },
+    );
+    final response = await _client.get(uri, headers: _headers);
+    if (response.statusCode != 200) {
+      throw Exception(_message(response));
+    }
+
+    final data = jsonDecode(response.body) as List<dynamic>;
+    return data
+        .cast<Map<String, dynamic>>()
+        .where((issue) => !issue.containsKey('pull_request'))
+        .map(
+          (issue) => SourceIssueSummary(
+            number: issue['number'] as int,
+            title: issue['title'] as String,
+            isOpen: issue['state'] == 'open',
+            url: issue['html_url'] as String,
+          ),
+        )
+        .toList();
   }
 
   Future<String> login() async {
