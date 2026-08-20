@@ -21,6 +21,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _repositoryController = TextEditingController();
   final _tokenController = TextEditingController();
+  final _workflowController = TextEditingController();
   final _configurationService = ConfigurationService();
 
   bool _busy = false;
@@ -44,6 +45,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     _repositoryController.text = configuration.repositoryUrl;
     _tokenController.text = configuration.token;
+    _workflowController.text = configuration.workflowFile;
   }
 
   void _invalidateVerification() {
@@ -111,8 +113,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _save() async {
     if (!_connectionVerified) {
-      _setStatus('Bitte die Verbindung vor dem Speichern erfolgreich testen.',
-          isError: true);
+      _setStatus(
+        'Bitte die Verbindung vor dem Speichern erfolgreich testen.',
+        isError: true,
+      );
+      return;
+    }
+    if (_workflowController.text.trim().isEmpty) {
+      _setStatus('Bitte einen Import-Workflow angeben.', isError: true);
       return;
     }
 
@@ -123,6 +131,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         WikiConfiguration(
           repositoryUrl: repository.url,
           token: _tokenController.text.trim(),
+          workflowFile: _workflowController.text.trim(),
         ),
       );
       if (!mounted) {
@@ -163,6 +172,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _tokenController
       ..removeListener(_invalidateVerification)
       ..dispose();
+    _workflowController.dispose();
     super.dispose();
   }
 
@@ -171,7 +181,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: !widget.isSetup,
-        title: Text(widget.isSetup ? 'Developer Wiki – Einrichtung' : 'Einstellungen'),
+        title: Text(
+          widget.isSetup ? 'Developer Wiki – Einrichtung' : 'Einstellungen',
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -195,12 +207,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
             autocorrect: false,
             decoration: InputDecoration(
               labelText: 'Fine-grained PAT',
-              helperText: 'Das Token wird nur im geschützten lokalen Speicher abgelegt.',
+              helperText:
+                  'Das Token wird nur im geschützten lokalen Speicher abgelegt.',
               suffixIcon: IconButton(
                 tooltip: _obscure ? 'Token anzeigen' : 'Token ausblenden',
-                onPressed: _busy ? null : () => setState(() => _obscure = !_obscure),
-                icon: Icon(_obscure ? Icons.visibility : Icons.visibility_off),
+                onPressed:
+                    _busy ? null : () => setState(() => _obscure = !_obscure),
+                icon: Icon(
+                  _obscure ? Icons.visibility : Icons.visibility_off,
+                ),
               ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _workflowController,
+            enabled: !_busy,
+            decoration: const InputDecoration(
+              labelText: 'Import-Workflow',
+              helperText: 'Dateiname des per workflow_dispatch startbaren Workflows',
             ),
           ),
           const SizedBox(height: 20),
