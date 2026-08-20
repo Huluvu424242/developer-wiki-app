@@ -11,6 +11,7 @@ class ConfigurationService {
 
   static const _tokenKey = 'github_pat';
   static const _repositoryKey = 'wiki_repository_url';
+  static const _workflowKey = 'wiki_import_workflow';
 
   final FlutterSecureStorage _storage;
 
@@ -18,7 +19,13 @@ class ConfigurationService {
     final token = await _storage.read(key: _tokenKey) ?? '';
     final repositoryUrl = await _storage.read(key: _repositoryKey) ??
         WikiConfiguration.defaultRepositoryUrl;
-    return WikiConfiguration(repositoryUrl: repositoryUrl, token: token);
+    final workflowFile = await _storage.read(key: _workflowKey) ??
+        WikiConfiguration.defaultWorkflowFile;
+    return WikiConfiguration(
+      repositoryUrl: repositoryUrl,
+      token: token,
+      workflowFile: workflowFile,
+    );
   }
 
   Future<void> save(WikiConfiguration configuration) async {
@@ -29,6 +36,10 @@ class ConfigurationService {
     await _storage.write(
       key: _tokenKey,
       value: configuration.token.trim(),
+    );
+    await _storage.write(
+      key: _workflowKey,
+      value: configuration.workflowFile.trim(),
     );
   }
 }
