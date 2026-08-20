@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:developer_wiki_source_capture/models/source_template.dart';
+import 'package:developer_wiki_source_capture/models/workflow_run.dart';
 import 'package:developer_wiki_source_capture/services/github_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -75,5 +76,78 @@ void main() {
       jsonDecode(capturedRequest.body),
       {'ref': 'master'},
     );
+  });
+
+  test('latestWorkflowRun maps matching successful dispatch', () async {
+    late http.Request capturedRequest;
+    final client = MockClient((request) async {
+      capturedRequest = request;
+      return http.Response(
+        jsonEncode({
+          'workflow_runs': [
+            {
+              'id': 77,
+              'html_url': 'https://github.com/example/wiki/actions/runs/77',
+              'status': 'completed',
+              'conclusion': 'success',
+              'created_at': '2026-08-20T20:00:00Z',
+            },
+          ],
+        }),
+        200,
+      );
+    });
+    final service = GitHubService(
+      'secret',
+      owner: 'example',
+      repo: 'wiki',
+      client: client,
+    );
+
+    final run = await service.latestWorkflowRun(
+      workflow: 'import-source-issues.yml',
+      notBefore: DateTime.parse('2026-08-20T19:59:00Z'),
+    );
+
+    expect(run, isNotNull);
+    expect(run!.id, 77);
+    expect(run.state, WorkflowRunState.successful);
+    expect(
+      capturedRequest.url.queryParameters['event'],
+      'workflow_dispatch',
+    );
+    expect(capturedRequest.url.queryParameters['per_page'], '10');
+  });
+
+  test('latestWorkflowRun ignores runs older than dispatch', () async {
+    final client = MockClient((request) async {
+      return http.Response(
+        jsonEncode({
+          'workflow_runs': [
+            {
+              'id': 76,
+              'html_url': 'https://github.com/example/wiki/actions/runs/76',
+              'status': 'in_progress',
+              'conclusion': null,
+              'created_at': '2026-08-20T19:58:00Z',
+            },
+          ],
+        }),
+        200,
+      );
+    });
+    final service = GitHubService(
+      'secret',
+      owner: 'example',
+      repo: 'wiki',
+      client: client,
+    );
+
+    final run = await service.latestWorkflowRun(
+      workflow: 'import-source-issues.yml',
+      notBefore: DateTime.parse('2026-08-20T19:59:00Z'),
+    );
+
+    expect(run, isNull);
   });
 }
