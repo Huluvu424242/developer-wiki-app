@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../models/created_issue.dart';
+import '../models/source_issue_summary.dart';
 import '../models/source_template.dart';
 import '../models/workflow_run.dart';
 
@@ -48,36 +49,18 @@ class GitHubService {
     );
   }
 
-  Future<void> dispatchWorkflow({
-    required String workflow,
-    String ref = 'master',
+  Future<List<SourceIssueSummary>> listRecentSourceIssues({
+    int limit = 10,
   }) async {
-    final workflowId = _workflowId(workflow);
-    final response = await _client.post(
-      Uri.parse(
-        'https://api.github.com/repos/$owner/$repo/actions/workflows/'
-        '$workflowId/dispatches',
-      ),
-      headers: {..._headers, 'Content-Type': 'application/json'},
-      body: jsonEncode({'ref': ref}),
-    );
-    if (response.statusCode != 204) {
-      throw Exception(_message(response));
-    }
-  }
-
-  Future<WorkflowRun?> latestWorkflowRun({
-    required String workflow,
-    DateTime? notBefore,
-  }) async {
-    final workflowId = _workflowId(workflow);
     final uri = Uri.parse(
-      'https://api.github.com/repos/$owner/$repo/actions/workflows/'
-      '$workflowId/runs',
+      'https://api.github.com/repos/$owner/$repo/issues',
     ).replace(
-      queryParameters: const {
-        'event': 'workflow_dispatch',
-        'per_page': '10',
+      queryParameters: {
+        'state': 'all',
+        'labels': 'quelle',
+        'per_page': limit.toString(),
+        'sort': 'created',
+        'direction': 'desc',
       },
     );
     final response = await _client.get(uri, headers: _headers);
@@ -85,25 +68,19 @@ class GitHubService {
       throw Exception(_message(response));
     }
 
-    final data = jsonDecode(response.body) as Map<String, dynamic>;
-    final runs = data['workflow_runs'] as List<dynamic>? ?? const [];
-    for (final rawRun in runs) {
-      final run = rawRun as Map<String, dynamic>;
-      final createdAt = DateTime.parse(run['created_at'] as String).toUtc();
-      if (notBefore != null && createdAt.isBefore(notBefore.toUtc())) {
-        continue;
-      }
-      return WorkflowRun(
-        id: run['id'] as int,
-        url: run['html_url'] as String,
-        state: _workflowRunState(
-          run['status']?.toString(),
-          run['conclusion']?.toString(),
-        ),
-        createdAt: createdAt,
-      );
-    }
-    return null;
+    final data = jsonDecode(response.body) as List<dynamic>;
+    return data
+        .cast<Map<String, dynamic>>()
+        .where((issue) => !issue.containsKey('pull_request'))
+        .map(
+          (issue) => SourceIssueSummary(
+            number: issue['number'] as int,
+            title: issue['title'] as String,
+            isOpen: issue['state'] == 'open',
+            url: issue['html_url'] as String,
+          ),
+        )
+        .toList();
   }
 
   Future<String> login() async {
