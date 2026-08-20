@@ -1,3 +1,4 @@
+import 'package:developer_wiki_source_capture/models/shared_content.dart';
 import 'package:developer_wiki_source_capture/models/source_template.dart';
 import 'package:developer_wiki_source_capture/screens/home_screen.dart';
 import 'package:flutter/material.dart';
@@ -44,5 +45,32 @@ void main() {
 
     expect(find.text('Wiki-Quelle erfassen'), findsOneWidget);
     expect(find.text(template.description), findsOneWidget);
+  });
+
+  testWidgets('shared content is forwarded to the selected source form',
+      (tester) async {
+    const sharedContent = SharedContent(
+      kind: SharedContentKind.link,
+      text: 'https://example.org/source',
+    );
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: HomeScreen(sharedContent: sharedContent),
+      ),
+    );
+
+    expect(find.text('Geteilten Inhalt erfassen'), findsOneWidget);
+    expect(find.text('Welche Quellenart ist das?'), findsOneWidget);
+
+    final template = sourceTemplates.first;
+    await tester.tap(find.text(template.name));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Geteilten Inhalt erfassen'), findsOneWidget);
+    expect(
+      find.text('Geteilter Inhalt wurde vorausgefüllt und kann bearbeitet werden.'),
+      findsOneWidget,
+    );
   });
 }
