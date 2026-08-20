@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'models/wiki_configuration.dart';
+import 'screens/home_screen.dart';
 import 'screens/settings_screen.dart';
-import 'screens/source_form_screen.dart';
 import 'services/configuration_service.dart';
 
 void main() => runApp(const WikiSourceApp());
@@ -59,7 +59,7 @@ class _WikiSourceAppState extends State<WikiSourceApp> {
             );
           }
           if (snapshot.data?.isComplete == true) {
-            return const SourceFormScreen();
+            return const HomeScreen();
           }
           return SettingsScreen(
             isSetup: true,
