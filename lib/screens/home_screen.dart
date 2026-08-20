@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../models/shared_content.dart';
 import '../models/source_template.dart';
 import '../models/wiki_configuration.dart';
+import '../models/workflow_run.dart';
 import '../services/configuration_service.dart';
+import '../services/external_url_service.dart';
 import '../services/github_service.dart';
 import 'settings_screen.dart';
 import 'source_form_screen.dart';
@@ -28,9 +30,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _configurationService = ConfigurationService();
+  final _externalUrlService = ExternalUrlService();
   bool _importBusy = false;
-  String? _importStatus;
+  bool _statusBusy = false;
+  String? _importMessage;
   bool _importFailed = false;
+  DateTime? _lastDispatchAt;
+  WorkflowRun? _workflowRun;
 
   void _openSource(SourceTemplate template) {
     Navigator.push(
@@ -83,10 +89,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _dispatchImport() async {
+    final dispatchStartedAt = DateTime.now().toUtc();
     setState(() {
       _importBusy = true;
-      _importStatus = 'Import wird auf GitHub gestartet …';
+      _importMessage = 'Import wird auf GitHub gestartet …';
       _importFailed = false;
+      _workflowRun = null;
     });
     try {
       final configuration = await _configurationService.load();
@@ -98,20 +106,82 @@ class _HomeScreenState extends State<HomeScreen> {
       ).dispatchWorkflow(workflow: configuration.workflowFile);
       if (mounted) {
         setState(() {
-          _importStatus = 'Import gestartet.';
+          _lastDispatchAt = dispatchStartedAt.subtract(const Duration(seconds: 5));
+          _importMessage = 'Import gestartet. Status kann aktualisiert werden.';
           _importFailed = false;
         });
       }
     } catch (error) {
       if (mounted) {
         setState(() {
-          _importStatus = 'Import konnte nicht gestartet werden: $error';
+          _importMessage = 'Import konnte nicht gestartet werden: $error';
           _importFailed = true;
         });
       }
     } finally {
       if (mounted) {
         setState(() => _importBusy = false);
+      }
+    }
+  }
+
+  Future<void> _refreshImportStatus() async {
+    final notBefore = _lastDispatchAt;
+    if (notBefore == null) {
+      return;
+    }
+    setState(() {
+      _statusBusy = true;
+      _importMessage = null;
+      _importFailed = false;
+    });
+    try {
+      final configuration = await _configurationService.load();
+      final repository = _repositoryFrom(configuration);
+      final run = await GitHubService(
+        configuration.token,
+        owner: repository.owner,
+        repo: repository.name,
+      ).latestWorkflowRun(
+        workflow: configuration.workflowFile,
+        notBefore: notBefore,
+      );
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _workflowRun = run;
+        _importMessage = run == null
+            ? 'Noch kein passender Workflow-Lauf gefunden.'
+            : null;
+      });
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          _importMessage = 'Importstatus konnte nicht geladen werden: $error';
+          _importFailed = true;
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _statusBusy = false);
+      }
+    }
+  }
+
+  Future<void> _openWorkflowRun() async {
+    final run = _workflowRun;
+    if (run == null) {
+      return;
+    }
+    try {
+      await _externalUrlService.open(run.url);
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          _importMessage = 'Workflow-Lauf konnte nicht geöffnet werden: $error';
+          _importFailed = true;
+        });
       }
     }
   }
@@ -180,12 +250,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   : 'Quellen ins Wiki importieren',
             ),
           ),
-          if (_importStatus != null) ...[
+          if (_lastDispatchAt != null) ...[
+            const SizedBox(height: 16),
+            _importStatusCard(),
+          ],
+          if (_importMessage != null) ...[
             const SizedBox(height: 12),
             Semantics(
               liveRegion: true,
               child: Text(
-                _importStatus!,
+                _importMessage!,
                 style: TextStyle(
                   color: _importFailed
                       ? Theme.of(context).colorScheme.error
@@ -195,6 +269,47 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _importStatusCard() {
+    final run = _workflowRun;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Letzter gestarteter Import',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(run?.label ?? 'gestartet / wartet'),
+            if (run != null) Text('GitHub Actions #${run.id}'),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: _statusBusy ? null : _refreshImportStatus,
+                  icon: const Icon(Icons.refresh),
+                  label: Text(
+                    _statusBusy ? 'Wird aktualisiert …' : 'Status aktualisieren',
+                  ),
+                ),
+                if (run != null)
+                  OutlinedButton.icon(
+                    onPressed: _openWorkflowRun,
+                    icon: const Icon(Icons.open_in_new),
+                    label: const Text('Auf GitHub öffnen'),
+                  ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
