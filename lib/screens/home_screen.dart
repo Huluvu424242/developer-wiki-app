@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(
         builder: (_) => SourceFormScreen(
           initialTemplate: template,
-          sharedContent: sharedContent,
+          sharedContent: widget.sharedContent,
         ),
       ),
     );
@@ -126,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isShared = sharedContent != null;
+    final isShared = widget.sharedContent != null;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Developer Wiki'),
