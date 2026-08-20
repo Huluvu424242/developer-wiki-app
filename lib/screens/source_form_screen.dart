@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
 
 import '../models/created_issue.dart';
+import '../models/shared_content.dart';
 import '../models/source_template.dart';
 import '../models/wiki_configuration.dart';
 import '../services/configuration_service.dart';
 import '../services/external_url_service.dart';
 import '../services/github_service.dart';
+import '../services/source_prefill_service.dart';
 import 'settings_screen.dart';
 
 class SourceFormScreen extends StatefulWidget {
   const SourceFormScreen({
     super.key,
     this.initialTemplate,
+    this.sharedContent,
   });
 
   final SourceTemplate? initialTemplate;
+  final SharedContent? sharedContent;
 
   @override
   State<SourceFormScreen> createState() => _SourceFormScreenState();
@@ -25,9 +29,11 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
   final title = TextEditingController();
   final _configurationService = ConfigurationService();
   final _externalUrlService = ExternalUrlService();
+  final _prefillService = SourcePrefillService();
   late SourceTemplate template;
   final values = <String, TextEditingController>{};
   bool busy = false;
+  bool _useSharedContent = true;
   CreatedIssue? _createdIssue;
   String? _errorMessage;
 
@@ -45,6 +51,13 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     values.clear();
     for (final field in next.fields) {
       values[field.id] = TextEditingController(text: field.initialValue);
+    }
+    final sharedContent = widget.sharedContent;
+    if (_useSharedContent && sharedContent != null) {
+      final prefilled = _prefillService.valuesFor(next, sharedContent);
+      for (final entry in prefilled.entries) {
+        values[entry.key]?.text = entry.value;
+      }
     }
     _createdIssue = null;
     _errorMessage = null;
@@ -105,12 +118,15 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
       await _externalUrlService.open(issue.url);
     } catch (error) {
       if (mounted) {
-        setState(() => _errorMessage = 'Issue konnte nicht geöffnet werden: $error');
+        setState(
+          () => _errorMessage = 'Issue konnte nicht geöffnet werden: $error',
+        );
       }
     }
   }
 
   void _startNewSource() {
+    _useSharedContent = false;
     title.clear();
     for (final field in template.fields) {
       values[field.id]!.text = field.initialValue;
@@ -132,9 +148,14 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final sharedContent = widget.sharedContent;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Wiki-Quelle erfassen'),
+        title: Text(
+          sharedContent == null
+              ? 'Wiki-Quelle erfassen'
+              : 'Geteilten Inhalt erfassen',
+        ),
         actions: [
           IconButton(
             tooltip: 'Einstellungen öffnen',
@@ -151,6 +172,10 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            if (sharedContent != null) ...[
+              const Text('Geteilter Inhalt wurde vorausgefüllt und kann bearbeitet werden.'),
+              const SizedBox(height: 12),
+            ],
             DropdownButtonFormField<SourceTemplate>(
               value: template,
               decoration: const InputDecoration(labelText: 'Quellentyp'),
