@@ -50,4 +50,53 @@ void main() {
     expect(issue.number, 123);
     expect(issue.url, 'https://github.com/example/wiki/issues/123');
   });
+
+  test('listRecentSourceIssues loads source issues and excludes pull requests',
+      () async {
+    late http.Request capturedRequest;
+    final client = MockClient((request) async {
+      capturedRequest = request;
+      return http.Response(
+        jsonEncode([
+          {
+            'number': 42,
+            'title': 'Neue Quelle',
+            'state': 'open',
+            'html_url': 'https://github.com/example/wiki/issues/42',
+          },
+          {
+            'number': 41,
+            'title': 'Verarbeitete Quelle',
+            'state': 'closed',
+            'html_url': 'https://github.com/example/wiki/issues/41',
+          },
+          {
+            'number': 40,
+            'title': 'Pull Request',
+            'state': 'open',
+            'html_url': 'https://github.com/example/wiki/pull/40',
+            'pull_request': {'url': 'https://api.github.com/example'},
+          },
+        ]),
+        200,
+      );
+    });
+    final service = GitHubService(
+      'secret',
+      owner: 'example',
+      repo: 'wiki',
+      client: client,
+    );
+
+    final issues = await service.listRecentSourceIssues();
+
+    expect(capturedRequest.url.queryParameters['labels'], 'quelle');
+    expect(capturedRequest.url.queryParameters['state'], 'all');
+    expect(capturedRequest.url.queryParameters['direction'], 'desc');
+    expect(issues, hasLength(2));
+    expect(issues.first.number, 42);
+    expect(issues.first.title, 'Neue Quelle');
+    expect(issues.first.isOpen, isTrue);
+    expect(issues[1].isOpen, isFalse);
+  });
 }
