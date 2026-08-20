@@ -47,6 +47,27 @@ class GitHubService {
     );
   }
 
+  Future<void> dispatchWorkflow({
+    required String workflow,
+    String ref = 'master',
+  }) async {
+    final workflowId = Uri.encodeComponent(workflow.trim());
+    if (workflowId.isEmpty) {
+      throw const FormatException('Import-Workflow fehlt.');
+    }
+    final response = await _client.post(
+      Uri.parse(
+        'https://api.github.com/repos/$owner/$repo/actions/workflows/'
+        '$workflowId/dispatches',
+      ),
+      headers: {..._headers, 'Content-Type': 'application/json'},
+      body: jsonEncode({'ref': ref}),
+    );
+    if (response.statusCode != 204) {
+      throw Exception(_message(response));
+    }
+  }
+
   Future<String> login() async {
     final response = await _client.get(
       Uri.parse('https://api.github.com/user'),
