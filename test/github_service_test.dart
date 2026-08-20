@@ -50,4 +50,30 @@ void main() {
     expect(issue.number, 123);
     expect(issue.url, 'https://github.com/example/wiki/issues/123');
   });
+
+  test('dispatchWorkflow uses configured workflow and master ref', () async {
+    late http.Request capturedRequest;
+    final client = MockClient((request) async {
+      capturedRequest = request;
+      return http.Response('', 204);
+    });
+    final service = GitHubService(
+      'secret',
+      owner: 'example',
+      repo: 'wiki',
+      client: client,
+    );
+
+    await service.dispatchWorkflow(workflow: 'import-source-issues.yml');
+
+    expect(
+      capturedRequest.url.toString(),
+      'https://api.github.com/repos/example/wiki/actions/workflows/'
+      'import-source-issues.yml/dispatches',
+    );
+    expect(
+      jsonDecode(capturedRequest.body),
+      {'ref': 'master'},
+    );
+  });
 }
