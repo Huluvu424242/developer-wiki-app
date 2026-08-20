@@ -10,11 +10,27 @@ void main() {
     );
 
     expect(find.text('Neue Quelle erfassen'), findsOneWidget);
-    expect(find.text('Quellen ins Wiki importieren'), findsOneWidget);
     expect(find.byIcon(Icons.settings), findsOneWidget);
+
+    final scrollable = find.byType(Scrollable);
+
     for (final template in sourceTemplates) {
+      await tester.scrollUntilVisible(
+        find.text(template.name),
+        200,
+        scrollable: scrollable,
+      );
+
       expect(find.text(template.name), findsOneWidget);
     }
+
+    await tester.scrollUntilVisible(
+      find.text('Quellen ins Wiki importieren'),
+      200,
+      scrollable: scrollable,
+    );
+
+    expect(find.text('Quellen ins Wiki importieren'), findsOneWidget);
   });
 
   testWidgets('selected source opens matching form', (tester) async {
