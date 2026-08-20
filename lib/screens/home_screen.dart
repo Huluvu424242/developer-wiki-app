@@ -1,19 +1,28 @@
 import 'package:flutter/material.dart';
 
+import '../models/shared_content.dart';
 import '../models/source_template.dart';
 import 'settings_screen.dart';
 import 'source_form_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key, this.onImportRequested});
+  const HomeScreen({
+    super.key,
+    this.onImportRequested,
+    this.sharedContent,
+  });
 
   final VoidCallback? onImportRequested;
+  final SharedContent? sharedContent;
 
   void _openSource(BuildContext context, SourceTemplate template) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => SourceFormScreen(initialTemplate: template),
+        builder: (_) => SourceFormScreen(
+          initialTemplate: template,
+          sharedContent: sharedContent,
+        ),
       ),
     );
   }
@@ -39,6 +48,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isShared = sharedContent != null;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Developer Wiki'),
@@ -54,11 +64,15 @@ class HomeScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           Text(
-            'Neue Quelle erfassen',
+            isShared ? 'Geteilten Inhalt erfassen' : 'Neue Quelle erfassen',
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
-          const Text('Wähle die passende Quellenart aus.'),
+          Text(
+            isShared
+                ? 'Welche Quellenart ist das?'
+                : 'Wähle die passende Quellenart aus.',
+          ),
           const SizedBox(height: 16),
           ...sourceTemplates.map(
             (template) => Padding(
