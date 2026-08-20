@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/source_template.dart';
+import 'recent_sources_screen.dart';
 import 'settings_screen.dart';
 import 'source_form_screen.dart';
 
@@ -15,6 +16,13 @@ class HomeScreen extends StatelessWidget {
       MaterialPageRoute(
         builder: (_) => SourceFormScreen(initialTemplate: template),
       ),
+    );
+  }
+
+  void _openRecentSources(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const RecentSourcesScreen()),
     );
   }
 
@@ -75,6 +83,12 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           const Divider(height: 32),
+          OutlinedButton.icon(
+            onPressed: () => _openRecentSources(context),
+            icon: const Icon(Icons.history),
+            label: const Text('Letzte Quellen'),
+          ),
+          const SizedBox(height: 12),
           FilledButton.tonalIcon(
             onPressed: () => _requestImport(context),
             icon: const Icon(Icons.sync),
