@@ -1,115 +1,117 @@
-# Developer Wiki Source Capture
+# developer-wiki-app
 
-Flutter-App für Android, mit der die vier Quellen-Issue-Formulare des privaten Repositories `Huluvu424242/Developer-Wiki` mobil erfasst werden können.
+App zum Erfassen von Quellen für das Developer Wiki
 
-## Funktionsumfang
+Die Flutter-App erfasst strukturierte Quellen mobil und legt sie als GitHub-Issues im konfigurierten persönlichen Developer-Wiki an. Zusätzlich kann sie den zugehörigen Import-Workflow starten und dessen Status anzeigen. Sie besitzt keinen eigenen Server und sendet keine Telemetrie.
 
-- vier Quelltypen entsprechend dem Stand der GitHub-Issue-Templates vom 16.08.2026
-- gleiche Pflichtfelder, Auswahlwerte, Titelpräfixe und Promptergänzungen
-- Erzeugung einer GitHub-kompatiblen Markdown-Issue-Beschreibung
-- Erstellung des Issues über die GitHub REST API mit Label `quelle`
-- Prüfung des PAT gegen `/user`
-- verschlüsselte Speicherung über Android EncryptedSharedPreferences/Keystore
-- keine Telemetrie und kein eigener Server
+Der Flutter-Paketname lautet aus historischen Gründen `developer_wiki_source_capture`; das Repository und die Anwendung werden als `developer-wiki-app` geführt.
 
-## PAT einrichten
+## Inhaltsverzeichnis
 
-Auf GitHub ein **Fine-grained personal access token** erstellen, nur für das Repository `Developer-Wiki`. Als Repository-Berechtigung genügt **Issues: Read and write**. Das Token ausschließlich in den App-Einstellungen eingeben; niemals in Quellcode, Screenshots oder Issues ablegen.
+- [Sicherheit](#sicherheit)
+- [Hintergrund](#hintergrund)
+- [Installation](#installation)
+- [Nutzung](#nutzung)
+- [Dokumentation](#dokumentation)
+- [Entwicklung](#entwicklung)
+- [Android-Release](#android-release)
+- [Mitwirken](#mitwirken)
+- [Lizenz](#lizenz)
 
-## Starten
+## Sicherheit
 
-Flutter installieren, einmal die versionspassenden Android-Wrapperdateien ergänzen,
-ein Android-Gerät oder einen Emulator verbinden und ausführen:
+Für den Zugriff auf GitHub wird ein **Fine-grained personal access token** verwendet. Für den aktuellen Funktionsumfang sollte das Token auf das Ziel-Wiki beschränkt werden und nur folgende Repository-Berechtigungen besitzen:
+
+- `Actions`: Read and write
+- `Issues`: Read and write
+- `Metadata`: Read-only
+
+Zusätzliche Account Permissions sind für den aktuellen Funktionsumfang nicht erforderlich. Das Token ausschließlich in den App-Einstellungen eingeben und niemals in Quellcode, Screenshots, Issues oder Logs ablegen. Die App speichert es über den geschützten lokalen Plattform-Speicher.
+
+Release-Keystores und daraus erzeugte Base64-Dateien dürfen ebenfalls nicht ins Repository eingecheckt werden.
+
+## Hintergrund
+
+Die App ist ein Client des persönlichen Developer-Wikis. Sie übernimmt die mobile Erfassung und GitHub-Interaktion; Importlogik, Archivierung und Wissensaufbereitung verbleiben im Wiki-Repository.
+
+Der aktuelle Funktionsumfang umfasst unter anderem:
+
+- Quellenarten mit Pflichtfeldern, Auswahlwerten, Titelpräfixen und Promptergänzungen,
+- GitHub-kompatible Markdown-Issue-Beschreibungen,
+- Erstellung von Issues mit dem Label `quelle`,
+- Prüfung der Wiki-Verbindung und des PAT,
+- Start und Statusabfrage des konfigurierten GitHub-Actions-Workflows,
+- geschützte lokale Speicherung der Konfiguration,
+- Android-Share als zusätzlicher Einstieg in die Quellenerfassung.
+
+Die Quellenformulare sind derzeit versioniert in `lib/models/source_template.dart` enthalten. Dadurch bleibt die App offline startbar und externe Template-Änderungen beeinflussen UI und Requests nicht ungeprüft. Eine spätere Version kann Templates lesend aus dem Wiki laden und eine geprüfte lokale Fallback-Version behalten.
+
+## Installation
+
+Vorausgesetzt werden Flutter mit passender Android-Toolchain sowie ein Android-Gerät oder Emulator. Repository klonen und Abhängigkeiten laden:
+
+```bash
+git clone https://github.com/Huluvu424242/developer-wiki-app.git
+cd developer-wiki-app
+flutter pub get
+```
+
+Falls generierte Flutter-Plattformdateien bewusst neu aufgebaut werden müssen, kann Flutter sie ergänzen:
 
 ```bash
 flutter create . --platforms android --org de.huluvu
-flutter pub get
+```
+
+Danach den Diff prüfen, damit Paket-ID und bewusst gepflegte Android-Konfiguration erhalten bleiben.
+
+## Nutzung
+
+Ein verbundenes Android-Gerät oder einen Emulator auswählen und die App starten:
+
+```bash
 flutter run
 ```
 
-`flutter create` ergänzt nur generierte Plattformdateien. Vor dem Commit sollte
-der Diff geprüft werden, damit die bewusst gesetzte Paket-ID erhalten bleibt.
+Beim ersten Start das Ziel-Wiki, das Fine-grained PAT und den per `workflow_dispatch` startbaren Import-Workflow konfigurieren. Anschließend können Quellen erfasst und als Issues im Wiki gespeichert werden.
 
-Tests:
+## Dokumentation
+
+Die weiterführende Projektdokumentation liegt unter [`docs/`](docs/README.md):
+
+- [Architektur nach dem C4-Modell](docs/architecture.md)
+- [Signierter Android-Release über GitHub Actions](docs/android-release.md)
+
+Änderungen an Features, Bugfixes oder technischer Infrastruktur aktualisieren die betroffenen Dokumentationsartefakte im selben Pull Request. Das [CHANGELOG](CHANGELOG.md) wird nach Keep a Changelog gepflegt.
+
+## Entwicklung
+
+Vor einem Pull Request mindestens die statische Analyse und Tests ausführen:
 
 ```bash
+flutter analyze
 flutter test
 ```
 
-Release-APK:
+Für einen lokalen Release-Build:
 
 ```bash
 flutter build apk --release
 ```
 
-Für veröffentlichte APKs sollte die unten beschriebene stabile Android-Signatur verwendet werden.
+Die verbindlichen Arbeits-, Architektur-, Test- und Dokumentationsregeln für Implementierungen stehen in [`AGENTS.md`](AGENTS.md).
 
-## Android-Release per GitHub Actions
+## Android-Release
 
-Für reproduzierbare, installierbare APKs gibt es den manuell startbaren Workflow **Android Release APK** unter `.github/workflows/android-release.yml`.
+Veröffentlichte APKs werden über den manuell startbaren GitHub-Actions-Workflow **Android Release APK** mit einem stabilen Keystore signiert. Der Workflow prüft Version, Analyse und Tests, erzeugt APK und SHA-256-Prüfsumme und veröffentlicht beides als GitHub Release.
 
-Der Workflow:
+Die vollständige Einrichtung des Keystores, die vier benötigten GitHub Actions Secrets und die Ausführung des Workflows sind in der [Android-Release-Dokumentation](docs/android-release.md) beschrieben.
 
-- prüft, dass `release_version` exakt der Version in `pubspec.yaml` entspricht,
-- führt `flutter analyze` und `flutter test` aus,
-- lädt einen stabilen Android-Keystore ausschließlich aus GitHub Actions Secrets,
-- baut eine signierte Release-APK,
-- erzeugt eine SHA-256-Prüfsumme,
-- veröffentlicht APK und Prüfsumme als GitHub Release `v<release_version>`.
+## Mitwirken
 
-### Warum ein stabiler Keystore notwendig ist
+Fragen und Fehler können über die [GitHub Issues](https://github.com/Huluvu424242/developer-wiki-app/issues) eingebracht werden. Pull Requests sind willkommen, sollen sich auf ein klar abgegrenztes Issue bzw. eine Story beziehen und die Regeln aus [`AGENTS.md`](AGENTS.md) einhalten.
 
-Android-APKs müssen signiert sein. Für spätere Updates muss außerdem immer derselbe Signaturschlüssel verwendet werden. Der private Keystore darf deshalb nicht in das Repository eingecheckt werden, sondern wird GitHub Actions verschlüsselt als Secret bereitgestellt.
+Insbesondere müssen relevante Tests sowie `flutter analyze` erfolgreich sein. Bei Source-Änderungen ist außerdem zu prüfen, ob `CHANGELOG.md`, `README.md`, Dateien unter `docs/` oder Architekturdiagramme aktualisiert werden müssen.
 
-Wenn bereits eine APK mit einem anderen Schlüssel installiert wurde, kann Android das Update verweigern. In diesem Fall muss die alte Installation einmalig deinstalliert werden. Danach funktionieren Updates, solange derselbe Release-Keystore weiterverwendet wird.
+## Lizenz
 
-### Keystore unter Windows/PowerShell erzeugen
-
-Beispiel:
-
-```powershell
-keytool -genkeypair `
-  -v `
-  -keystore developer-wiki-app-release.jks `
-  -keyalg RSA `
-  -keysize 2048 `
-  -validity 10000 `
-  -alias developer-wiki-app
-```
-
-Den Keystore danach als Base64-String für GitHub Actions kodieren:
-
-```powershell
-[Convert]::ToBase64String([IO.File]::ReadAllBytes("developer-wiki-app-release.jks")) | Set-Clipboard
-```
-
-Optional zusätzlich in eine Datei schreiben:
-
-```powershell
-[Convert]::ToBase64String([IO.File]::ReadAllBytes("developer-wiki-app-release.jks")) | Set-Content -NoNewline "developer-wiki-app-release.jks.base64.txt"
-```
-
-### Benötigte GitHub Actions Secrets
-
-Unter **Settings → Secrets and variables → Actions → New repository secret** folgende Secrets anlegen:
-
-- `ANDROID_KEYSTORE_BASE64`: Base64-Inhalt der `.jks`-Datei
-- `ANDROID_KEYSTORE_PASSWORD`: Passwort des Keystores
-- `ANDROID_KEY_ALIAS`: Alias, z. B. `developer-wiki-app`
-- `ANDROID_KEY_PASSWORD`: Passwort des Schlüssels
-
-### Release ausführen
-
-1. `pubspec.yaml` auf eine neue Version im Format `MAJOR.MINOR.PATCH+BUILD` setzen, z. B. `0.1.1+2`.
-2. Änderung mergen.
-3. In GitHub **Actions → Android Release APK → Run workflow** öffnen.
-4. `release_version` exakt wie in `pubspec.yaml` eintragen.
-5. Optional Release Notes in Markdown erfassen.
-6. Workflow starten.
-7. Nach erfolgreichem Lauf das erzeugte GitHub Release öffnen und die APK herunterladen.
-
-Die Gradle-Konfiguration liest die Signing-Daten nur aus Umgebungsvariablen bzw. Gradle-Properties. Lokale Release-Builds ohne diese Werte behalten die Debug-Signatur als Fallback; veröffentlichte Builds über GitHub Actions verwenden dagegen zwingend den stabilen Release-Keystore.
-
-## Architekturentscheidung
-
-Die Formulare sind derzeit versioniert in `lib/models/source_template.dart` enthalten. Das macht die App offline startbar und verhindert, dass ein kompromittiertes Template ungeprüft UI und Request-Inhalt verändert. Bei Änderungen an den GitHub-Templates müssen die Definitionen bewusst synchronisiert und getestet werden. Eine spätere Version kann Templates lesend von GitHub laden und eine geprüfte lokale Fallback-Version behalten.
+MIT © 2026 Thomas Schubert. Siehe [LICENSE](LICENSE).
