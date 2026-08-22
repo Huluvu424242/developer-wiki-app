@@ -24,13 +24,15 @@ Wenn der Benutzer einen Fehler meldet und um Behebung bittet, ist grundsätzlich
     - Nur Änderungen vornehmen, die zur Behebung des Fehlers erforderlich sind.
     - Bestehendes Verhalten soweit möglich unverändert lassen.
     - Geeignete Tests oder Prüfungen ergänzen bzw. ausführen.
+    - Die Dokumentationspflichten aus dem Abschnitt `Dokumentationspflege bei Änderungen` einhalten.
 
 4. Einen Pull Request erstellen.
    Der PR soll:
     - auf das zuvor erstellte Issue verweisen,
     - Ursache und Lösung kurz erklären,
     - die durchgeführten Prüfungen nennen,
-    - verbleibende Unsicherheiten ausdrücklich erwähnen.
+    - verbleibende Unsicherheiten ausdrücklich erwähnen,
+    - angeben, welche Dokumentationsartefakte aktualisiert wurden oder warum keine Aktualisierung erforderlich war.
 
 5. Dem Benutzer anschließend den Pull Request verlinken.
    Zusätzlich kurz mitteilen:
@@ -140,17 +142,43 @@ Wenn der Benutzer die Umsetzung einer Story beauftragt, ist grundsätzlich folge
     - `flutter analyze` ausführen und keine neuen Fehler oder Warnungen hinterlassen.
     - Geeignete Unit-, Widget- oder Integrationstests ergänzen bzw. ausführen, soweit dies für die Story sinnvoll ist.
     - Fachliche Logik möglichst durch Unit Tests, relevante UI-Verhalten durch Widget Tests und wichtige Integrationspfade durch geeignete Integrationstests absichern.
+    - Die Dokumentationspflichten aus dem Abschnitt `Dokumentationspflege bei Änderungen` prüfen und erfüllen.
 
 9. Einen Pull Request erstellen.
     - Der PR verweist auf die Story.
     - Der PR beschreibt kurz Umsetzung, wesentliche Architekturentscheidungen und durchgeführte Prüfungen.
     - Abweichungen von Akzeptanzkriterien oder verbleibende Unsicherheiten ausdrücklich nennen.
     - Keine Story als vollständig umgesetzt darstellen, wenn Akzeptanzkriterien noch offen sind.
+    - Der PR nennt explizit, welche Dokumentationsartefakte aktualisiert wurden oder warum keine Aktualisierung notwendig war.
 
 10. Dem Benutzer anschließend den Pull Request verlinken.
     - Kurz erläutern, was umgesetzt wurde.
     - Die durchgeführten Prüfungen nennen.
     - Auf offene Punkte oder notwendige lokale Prüfungen hinweisen.
+
+## Dokumentationspflege bei Änderungen
+
+Diese Regeln gelten verbindlich für Features, Bugfixes und sonstige Anpassungen an den Sourcen oder der technischen Infrastruktur:
+
+1. `CHANGELOG.md` in der Projektroot nach [Keep a Changelog 1.1.0](https://keepachangelog.com/de/1.1.0/) pflegen.
+    - Nutzer- oder maintainerrelevante Änderungen unter `Unreleased` eintragen.
+    - Passende Kategorien wie `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed` und `Security` verwenden.
+    - Keine Commit-Historie als Changelog wiederholen; Änderungen menschenlesbar beschreiben.
+    - Releases in umgekehrt chronologischer Reihenfolge mit ISO-Datum dokumentieren und Vergleichslinks soweit sinnvoll pflegen.
+
+2. `README.md` nach der [Standard-Readme-Spezifikation](https://github.com/RichardLitt/standard-readme/blob/main/spec.md) pflegen.
+    - README aktualisieren, wenn Einstieg, Installation, Nutzung, Sicherheit, Release oder Navigation in die Dokumentation betroffen sind.
+    - Die README bleibt die kompakte Einstiegsseite und verlinkt direkt auf die weiterführende Dokumentation unter `docs/`.
+
+3. Weiterführende Projektdokumentation unter `docs/` pflegen.
+    - Markdown ist das Standardformat.
+    - Geeignete Diagramme bevorzugt als Mermaid versionieren; SVG ist für Diagramme und Grafiken zulässig, wenn Mermaid nicht zweckmäßig ist.
+    - Architekturübersichten und Architekturdiagramme nach dem C4-Modell strukturieren.
+    - Nur Dokumentation und Diagramme anlegen, die einen konkreten aktuellen Nutzen haben; keine Architektur auf Vorrat dokumentieren.
+
+4. Bei jeder Änderung prüfen, ob bestehende Dokumentation betroffen ist.
+    - Änderungen an Architektur, Integrationen, Persistenz, Abläufen oder externen Schnittstellen aktualisieren die zugehörigen Markdown-, Mermaid-, SVG- und C4-Artefakte im selben Pull Request.
+    - Wenn keine Dokumentationsaktualisierung erforderlich ist, muss der Pull Request dies kurz begründen.
 
 ## Rebase und Aktualisierung von Arbeitsbranches
 
@@ -218,4 +246,4 @@ Analyse → Story-Schnitt → Milestones → Stories mit Akzeptanzkriterien und 
 
 Die Umsetzung einer Story erfolgt grundsätzlich in dieser Reihenfolge:
 
-Story prüfen → Branch → Implementierung entlang der Architekturleitplanken → Tests und Analyse → Pull Request → Rückmeldung
+Story prüfen → Branch → Implementierung entlang der Architekturleitplanken → Tests, Analyse und Dokumentationspflege → Pull Request → Rückmeldung
