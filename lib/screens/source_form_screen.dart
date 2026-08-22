@@ -25,6 +25,8 @@ class SourceFormScreen extends StatefulWidget {
 }
 
 class _SourceFormScreenState extends State<SourceFormScreen> {
+  static const _bottomClearance = 64.0;
+
   final key = GlobalKey<FormState>();
   final title = TextEditingController();
   final _configurationService = ConfigurationService();
@@ -65,6 +67,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
 
   Future<void> submit() async {
     if (!key.currentState!.validate()) {
+      _showValidationHint();
       return;
     }
 
@@ -98,6 +101,18 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
         setState(() => busy = false);
       }
     }
+  }
+
+  void _showValidationHint() {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: Text('Bitte markierte Pflichtfelder prüfen.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
   }
 
   GitHubRepository _repositoryFrom(WikiConfiguration configuration) {
@@ -149,6 +164,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
   @override
   Widget build(BuildContext context) {
     final sharedContent = widget.sharedContent;
+    final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -173,7 +189,9 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             if (sharedContent != null) ...[
-              const Text('Geteilter Inhalt wurde vorausgefüllt und kann bearbeitet werden.'),
+              const Text(
+                'Geteilter Inhalt wurde vorausgefüllt und kann bearbeitet werden.',
+              ),
               const SizedBox(height: 12),
             ],
             DropdownButtonFormField<SourceTemplate>(
@@ -201,15 +219,19 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
             ),
             if (_createdIssue != null) _successCard(_createdIssue!),
             if (_errorMessage != null) _errorCard(_errorMessage!),
-            TextFormField(
-              controller: title,
-              enabled: !busy,
-              decoration: InputDecoration(
-                labelText: 'Issue-Titel',
-                prefixText: template.titlePrefix,
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: title,
+              builder: (context, value, _) => TextFormField(
+                controller: title,
+                enabled: !busy,
+                decoration: InputDecoration(
+                  labelText: 'Issue-Titel',
+                  prefixText: template.titlePrefix,
+                  suffixIcon: _clearButton(title, hasValue: value.text.isNotEmpty),
+                ),
+                validator: (value) =>
+                    (value ?? '').trim().isEmpty ? 'Pflichtfeld' : null,
               ),
-              validator: (value) =>
-                  (value ?? '').trim().isEmpty ? 'Pflichtfeld' : null,
             ),
             const SizedBox(height: 12),
             ...template.fields.map(_field),
@@ -219,9 +241,27 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
               icon: const Icon(Icons.cloud_upload),
               label: Text(busy ? 'Wird erstellt …' : 'Quelle speichern'),
             ),
+            SizedBox(
+              key: const Key('source-form-bottom-clearance'),
+              height: _bottomClearance + bottomInset,
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget? _clearButton(
+    TextEditingController controller, {
+    required bool hasValue,
+  }) {
+    if (!hasValue) {
+      return null;
+    }
+    return IconButton(
+      tooltip: 'Feld leeren',
+      onPressed: busy ? null : controller.clear,
+      icon: const Icon(Icons.clear),
     );
   }
 
@@ -281,42 +321,57 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     if (field.kind == FieldKind.dropdown) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 12),
-        child: DropdownButtonFormField<String>(
-          initialValue: controller.text.isEmpty ? null : controller.text,
-          decoration: InputDecoration(
-            labelText: field.label,
-            helperText: field.description,
+        child: ValueListenableBuilder<TextEditingValue>(
+          valueListenable: controller,
+          builder: (context, value, _) => DropdownButtonFormField<String>(
+            key: ValueKey('${field.id}:${value.text}'),
+            initialValue: value.text.isEmpty ? null : value.text,
+            decoration: InputDecoration(
+              labelText: field.label,
+              helperText: field.description,
+              suffixIcon: _clearButton(
+                controller,
+                hasValue: value.text.isNotEmpty,
+              ),
+            ),
+            items: field.options
+                .map(
+                  (option) => DropdownMenuItem(
+                    value: option,
+                    child: Text(option),
+                  ),
+                )
+                .toList(),
+            onChanged: busy ? null : (selected) => controller.text = selected ?? '',
+            validator: (selected) =>
+                field.required && selected == null ? 'Pflichtfeld' : null,
           ),
-          items: field.options
-              .map(
-                (option) => DropdownMenuItem(
-                  value: option,
-                  child: Text(option),
-                ),
-              )
-              .toList(),
-          onChanged: busy ? null : (value) => controller.text = value ?? '',
-          validator: (value) =>
-              field.required && value == null ? 'Pflichtfeld' : null,
         ),
       );
     }
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: TextFormField(
-        controller: controller,
-        enabled: !busy,
-        minLines: field.kind == FieldKind.textarea ? 3 : 1,
-        maxLines: field.kind == FieldKind.textarea ? 8 : 1,
-        decoration: InputDecoration(
-          labelText: field.label,
-          helperText: field.description,
-          hintText: field.placeholder,
-          alignLabelWithHint: true,
+      child: ValueListenableBuilder<TextEditingValue>(
+        valueListenable: controller,
+        builder: (context, value, _) => TextFormField(
+          controller: controller,
+          enabled: !busy,
+          minLines: field.kind == FieldKind.textarea ? 3 : 1,
+          maxLines: field.kind == FieldKind.textarea ? 8 : 1,
+          decoration: InputDecoration(
+            labelText: field.label,
+            helperText: field.description,
+            hintText: field.placeholder,
+            alignLabelWithHint: true,
+            suffixIcon: _clearButton(
+              controller,
+              hasValue: value.text.isNotEmpty,
+            ),
+          ),
+          validator: (value) => field.required && (value ?? '').trim().isEmpty
+              ? 'Pflichtfeld'
+              : null,
         ),
-        validator: (value) => field.required && (value ?? '').trim().isEmpty
-            ? 'Pflichtfeld'
-            : null,
       ),
     );
   }
