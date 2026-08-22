@@ -29,7 +29,11 @@ void main() {
     );
 
     final saveButton = find.byKey(const Key('source-form-save-button'));
-    await tester.ensureVisible(saveButton);
+    await tester.scrollUntilVisible(
+      saveButton,
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(saveButton);
 
     final validationHint = find.text('Bitte markierte Pflichtfelder prüfen.');
