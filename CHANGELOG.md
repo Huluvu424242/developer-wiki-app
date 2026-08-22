@@ -16,5 +16,6 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 ### Changed
 
 - README nach der Struktur von Standard Readme neu gegliedert und mit der weiterführenden Dokumentation verknüpft.
+- Quellenformular ergonomischer gestaltet: zusätzlicher Abstand unter dem Speichern-Button, temporärer Validierungshinweis und Löschaktionen für befüllte Eingabefelder.
 
 [Unreleased]: https://github.com/Huluvu424242/developer-wiki-app/compare/v0.1.0...HEAD
