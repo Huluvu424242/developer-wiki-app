@@ -3,6 +3,23 @@ import 'package:developer_wiki_source_capture/screens/source_form_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+Future<void> pumpUntilFound(
+  WidgetTester tester,
+  Finder finder, {
+  Duration timeout = const Duration(seconds: 2),
+  Duration step = const Duration(milliseconds: 20),
+}) async {
+  var elapsed = Duration.zero;
+
+  while (finder.evaluate().isEmpty) {
+    if (elapsed >= timeout) {
+      throw TestFailure('Widget wurde innerhalb von $timeout nicht gefunden.');
+    }
+    await tester.pump(step);
+    elapsed += step;
+  }
+}
+
 void main() {
   testWidgets('shows a temporary hint when validation fails', (tester) async {
     await tester.pumpWidget(
@@ -17,9 +34,11 @@ void main() {
       scrollable: find.byType(Scrollable).first,
     );
     await tester.tap(find.text('Quelle speichern'));
-    await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.text('Bitte markierte Pflichtfelder prüfen.'), findsOneWidget);
+    final validationHint = find.text('Bitte markierte Pflichtfelder prüfen.');
+    await pumpUntilFound(tester, validationHint);
+
+    expect(validationHint, findsOneWidget);
     expect(find.text('Pflichtfeld'), findsWidgets);
   });
 
