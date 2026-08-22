@@ -18,7 +18,7 @@ val hasReleaseSigningConfig = listOf(
 
 android {
     namespace = "de.huluvu.developer_wiki_source_capture"
-    compileSdk = 35
+    compileSdk = 36
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
