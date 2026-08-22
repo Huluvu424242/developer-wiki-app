@@ -142,6 +142,7 @@ Wenn der Benutzer die Umsetzung einer Story beauftragt, ist grundsätzlich folge
     - `flutter analyze` ausführen und keine neuen Fehler oder Warnungen hinterlassen.
     - Geeignete Unit-, Widget- oder Integrationstests ergänzen bzw. ausführen, soweit dies für die Story sinnvoll ist.
     - Fachliche Logik möglichst durch Unit Tests, relevante UI-Verhalten durch Widget Tests und wichtige Integrationspfade durch geeignete Integrationstests absichern.
+    - Tests nicht durch beliebige feste Wartezeiten synchronisieren. Wenn möglich auf das Erscheinen oder Verschwinden des erwarteten Zustands bzw. Widgets warten. Feste Zeitwerte nur als begrenzendes Timeout oder als kleine Polling-Schritte verwenden, nicht als eigentliche Erfolgsbedingung des Tests.
     - Die Dokumentationspflichten aus dem Abschnitt `Dokumentationspflege bei Änderungen` prüfen und erfüllen.
 
 9. Einen Pull Request erstellen.
