@@ -12,6 +12,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 - Verbindliche Projektdokumentation unter `docs/` mit C4-orientierter Architekturübersicht.
 - Dokumentationsregeln für Changelog, README und technische Dokumentation im Implementierungsworkflow.
 - Direkt in den Einstellungen aufrufbare Hilfe zum Erstellen eines Fine-grained GitHub PAT mit den benötigten Least-Privilege-Berechtigungen.
+- Dokumentierter Prozess für die menschliche PR-Abnahme und das schrittweise Prüfen und Rebasen gestapelter Branches.
 
 ### Changed
 
