@@ -24,5 +24,6 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 ### Fixed
 
 - Widget-Test für den Validierungshinweis wartet zustandsbasiert auf die Snackbar statt auf eine feste Verzögerung.
+- Widget-Test adressiert den Speichern-Button über einen stabilen Key statt über die konkrete Button-Implementierung.
 
 [Unreleased]: https://github.com/Huluvu424242/developer-wiki-app/compare/v0.1.0...HEAD
