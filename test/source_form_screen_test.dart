@@ -28,7 +28,7 @@ void main() {
       ),
     );
 
-    final saveButton = find.widgetWithText(FilledButton, 'Quelle speichern');
+    final saveButton = find.byKey(const Key('source-form-save-button'));
     await tester.ensureVisible(saveButton);
     await tester.tap(saveButton);
 
