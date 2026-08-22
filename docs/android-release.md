@@ -61,5 +61,42 @@ Unter **Settings → Secrets and variables → Actions → New repository secret
 5. Optional Release Notes in Markdown erfassen.
 6. Workflow starten.
 7. Nach erfolgreichem Lauf das erzeugte GitHub Release öffnen und die APK herunterladen.
+8. Anschließend vom erzeugten Release-Tag den produktiven Release-Branch gemäß dem folgenden Abschnitt anlegen.
+
+## Produktiver Release-Branch nach erfolgreichem Release
+
+Nach einem erfolgreich gebauten und veröffentlichten Release wird vom zugehörigen Release-Tag ein eigener produktiver Wartungsbranch erstellt. Der Branchname folgt verbindlich dem Schema:
+
+```text
+release/<tagname>
+```
+
+Erzeugt der Workflow beispielsweise den Tag `v0.1.1+2`, wird daraus der Branch:
+
+```text
+release/v0.1.1+2
+```
+
+Der Branch muss **vom Release-Tag** und damit exakt von dem Commit ausgehen, aus dem die veröffentlichte APK gebaut wurde. Er darf nicht nachträglich vom aktuellen `master` erzeugt werden, wenn dieser bereits weitere Änderungen enthält.
+
+Beispiel mit Git:
+
+```powershell
+git fetch origin --tags
+git branch release/v0.1.1+2 v0.1.1+2
+git push origin release/v0.1.1+2
+```
+
+Der Release-Branch repräsentiert ab diesem Zeitpunkt die produktiv eingesetzte Release-Linie. Für ihn gelten andere Änderungsregeln als für `master`:
+
+- **Keine neuen Features:** Neue Funktionen und fachliche Erweiterungen werden ausschließlich auf Basis von `master` entwickelt und nicht auf einen bestehenden Release-Branch aufgenommen.
+- **Bugfixes:** Fehler, die den produktiven Release betreffen, dürfen auf dem zugehörigen Release-Branch behoben werden.
+- **Security Updates:** Sicherheitsrelevante Korrekturen und notwendige Dependency-Updates dürfen auf dem Release-Branch durchgeführt werden.
+- **Lifecycle- und Wartungsmaßnahmen:** Technisch notwendige Anpassungen zur weiteren Betriebsfähigkeit, Kompatibilität oder Wartbarkeit des produktiven Releases sind zulässig, sofern sie keine neuen Features einführen.
+- **Rückübernahme nach `master`:** Bugfixes, Security Updates und Lifecycle-Maßnahmen sollen, soweit sie für die aktuelle Weiterentwicklung noch relevant sind, auch auf `master` übernommen werden. Dadurch wird verhindert, dass ein bereits behobener Fehler in einer späteren Version erneut auftritt.
+
+Änderungen an einem Release-Branch werden wie andere produktive Änderungen über einen Pull Request geprüft. Der Branch ist kein alternativer Entwicklungszweig, sondern ausschließlich eine stabilisierte Wartungslinie für den bereits veröffentlichten Stand.
+
+Wenn für einen bestehenden Release-Branch ein korrigierter Build veröffentlicht werden muss, wird dessen Versionsnummer entsprechend erhöht und erneut über den vorgesehenen Release-Prozess gebaut. Für jeden neu veröffentlichten Release-Tag wird wiederum ein eigener `release/<tagname>`-Branch angelegt.
 
 Die Gradle-Konfiguration liest die Signing-Daten nur aus Umgebungsvariablen bzw. Gradle-Properties. Lokale Release-Builds ohne diese Werte behalten die Debug-Signatur als Fallback; veröffentlichte Builds über GitHub Actions verwenden dagegen zwingend den stabilen Release-Keystore.
