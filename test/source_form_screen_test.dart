@@ -28,12 +28,9 @@ void main() {
       ),
     );
 
-    await tester.scrollUntilVisible(
-      find.text('Quelle speichern'),
-      300,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.tap(find.text('Quelle speichern'));
+    final saveButton = find.widgetWithText(FilledButton, 'Quelle speichern');
+    await tester.ensureVisible(saveButton);
+    await tester.tap(saveButton);
 
     final validationHint = find.text('Bitte markierte Pflichtfelder prüfen.');
     await pumpUntilFound(tester, validationHint);
