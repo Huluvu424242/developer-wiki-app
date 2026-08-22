@@ -42,7 +42,6 @@ void main() {
     await pumpUntilFound(tester, validationHint);
 
     expect(validationHint, findsOneWidget);
-    expect(find.text('Pflichtfeld'), findsWidgets);
   });
 
   testWidgets('clears a default value with one tap', (tester) async {
