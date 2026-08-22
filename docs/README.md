@@ -6,6 +6,7 @@ Diese Dokumentation ergänzt die kompakte Projektübersicht in der Root-`README.
 
 - [Architektur](architecture.md) – Systemkontext und Container-Sicht nach dem C4-Modell.
 - [Android-Release](android-release.md) – reproduzierbarer, signierter APK-Release über GitHub Actions.
+- [Menschliche PR-Abnahme](human-review.md) – lokale Prüfung, Rebase-Merge und Vorgehen bei gestapelten Branches.
 
 ## Dokumentationsregeln
 
