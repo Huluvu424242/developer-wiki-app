@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/wiki_configuration.dart';
 import '../services/configuration_service.dart';
 import '../services/github_service.dart';
+import '../widgets/pat_help_button.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
@@ -209,13 +210,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
               labelText: 'Fine-grained PAT',
               helperText:
                   'Das Token wird nur im geschützten lokalen Speicher abgelegt.',
-              suffixIcon: IconButton(
-                tooltip: _obscure ? 'Token anzeigen' : 'Token ausblenden',
-                onPressed:
-                    _busy ? null : () => setState(() => _obscure = !_obscure),
-                icon: Icon(
-                  _obscure ? Icons.visibility : Icons.visibility_off,
-                ),
+              suffixIcon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const PatHelpButton(),
+                  IconButton(
+                    tooltip: _obscure ? 'Token anzeigen' : 'Token ausblenden',
+                    onPressed: _busy
+                        ? null
+                        : () => setState(() => _obscure = !_obscure),
+                    icon: Icon(
+                      _obscure ? Icons.visibility : Icons.visibility_off,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
