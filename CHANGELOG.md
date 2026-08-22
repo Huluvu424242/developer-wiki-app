@@ -13,6 +13,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 - Dokumentationsregeln für Changelog, README und technische Dokumentation im Implementierungsworkflow.
 - Direkt in den Einstellungen aufrufbare Hilfe zum Erstellen eines Fine-grained GitHub PAT mit den benötigten Least-Privilege-Berechtigungen.
 - Dokumentierter Prozess für die menschliche PR-Abnahme und das schrittweise Prüfen und Rebasen gestapelter Branches.
+- Verbindliche PR-Regel zur Verknüpfung vollständig erledigter Stories und Bugs mit GitHub-Closing-Keywords.
 
 ### Changed
 
