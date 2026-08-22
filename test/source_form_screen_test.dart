@@ -34,6 +34,8 @@ void main() {
       300,
       scrollable: find.byType(Scrollable).first,
     );
+    await tester.ensureVisible(saveButton);
+    await tester.pump();
     await tester.tap(saveButton);
 
     final validationHint = find.text('Bitte markierte Pflichtfelder prüfen.');
