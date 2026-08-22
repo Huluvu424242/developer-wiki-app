@@ -27,5 +27,6 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 - Widget-Test adressiert den Speichern-Button über einen stabilen Key statt über die konkrete Button-Implementierung.
 - Widget-Test scrollt bis zum lazily aufgebauten Speichern-Button, bevor er ihn antippt.
 - Widget-Test stabilisiert nach dem Scrollen die Sichtbarkeit und das Layout des Speichern-Buttons vor dem Tap.
+- Pflichtfelder werden beim Speichern unabhängig von ihrer aktuellen Sichtbarkeit im scrollbaren Quellenformular geprüft.
 
 [Unreleased]: https://github.com/Huluvu424242/developer-wiki-app/compare/v0.1.0...HEAD
