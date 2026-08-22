@@ -26,7 +26,7 @@ Für den Zugriff auf GitHub wird ein **Fine-grained personal access token** verw
 - `Issues`: Read and write
 - `Metadata`: Read-only
 
-Zusätzliche Account Permissions sind für den aktuellen Funktionsumfang nicht erforderlich. Das Token ausschließlich in den App-Einstellungen eingeben und niemals in Quellcode, Screenshots, Issues oder Logs ablegen. Die App speichert es über den geschützten lokalen Plattform-Speicher. Direkt am PAT-Feld kann eine Hilfe mit den benötigten Berechtigungen und den GitHub-Schritten zur Token-Erstellung geöffnet werden.
+Zusätzliche Account Permissions sind für den aktuellen Funktionsumfang nicht erforderlich. Das Token ausschließlich in den App-Einstellungen eingeben und niemals in Quellcode, Screenshots, Issues oder Logs ablegen. Die App speichert es über den geschützten lokalen Plattform-Speicher. Direkt am PAT-Feld kann über das Hilfe-Symbol eine Schritt-für-Schritt-Anleitung zur Erstellung und Berechtigung des Tokens geöffnet werden.
 
 Release-Keystores und daraus erzeugte Base64-Dateien dürfen ebenfalls nicht ins Repository eingecheckt werden.
 
