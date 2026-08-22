@@ -16,7 +16,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 ### Changed
 
 - README nach der Struktur von Standard Readme neu gegliedert und mit der weiterführenden Dokumentation verknüpft.
-- Quellenformular für kleine Displays verbessert: zusätzlicher Abstand unter `Quelle speichern`, temporärer Validierungshinweis und Löschaktionen für befüllte Felder.
+- Quellenformular ergonomischer gestaltet: zusätzlicher Abstand unter dem Speichern-Button, temporärer Validierungshinweis und Löschaktionen für befüllte Eingabefelder.
 
 ### Fixed
 
