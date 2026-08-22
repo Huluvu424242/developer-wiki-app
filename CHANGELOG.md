@@ -16,6 +16,10 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 ### Changed
 
 - README nach der Struktur von Standard Readme neu gegliedert und mit der weiterführenden Dokumentation verknüpft.
-- Quellenformular ergonomischer gestaltet: zusätzlicher Abstand unter dem Speichern-Button, temporärer Validierungshinweis und Löschaktionen für befüllte Eingabefelder.
+- Quellenformular für kleine Displays verbessert: zusätzlicher Abstand unter `Quelle speichern`, temporärer Validierungshinweis und Löschaktionen für befüllte Felder.
+
+### Fixed
+
+- Widget-Test für den Validierungshinweis wartet zustandsbasiert auf die Snackbar statt auf eine feste Verzögerung.
 
 [Unreleased]: https://github.com/Huluvu424242/developer-wiki-app/compare/v0.1.0...HEAD
