@@ -1,0 +1,147 @@
+name: Android Release APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: "Full Flutter version from pubspec.yaml, e.g. 0.1.0+1"
+        required: true
+        type: string
+      release_notes:
+        description: "Optional Markdown release notes"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-release-${{ inputs.release_version }}
+  cancel-in-progress: false
+
+jobs:
+  release-apk:
+    name: Build and publish Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify release version
+        env:
+          RELEASE_VERSION: ${{ inputs.release_version }}
+        run: |
+          set -euo pipefail
+          pubspec_version="$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -n 1)"
+          if [ -z "${pubspec_version}" ]; then
+            echo "No version found in pubspec.yaml." >&2
+            exit 1
+          fi
+          if [ "${pubspec_version}" != "${RELEASE_VERSION}" ]; then
+            echo "release_version (${RELEASE_VERSION}) must match pubspec.yaml (${pubspec_version})." >&2
+            exit 1
+          fi
+          release_tag="v${RELEASE_VERSION}"
+          if git show-ref --tags --verify --quiet "refs/tags/${release_tag}"; then
+            echo "Release tag ${release_tag} already exists. Increase pubspec.yaml's version first." >&2
+            exit 1
+          fi
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Decode Android release keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          set -euo pipefail
+          if [ -z "${ANDROID_KEYSTORE_BASE64}" ]; then
+            echo "ANDROID_KEYSTORE_BASE64 secret is required for release signing. See README.md#android-release-per-github-actions." >&2
+            exit 1
+          fi
+          mkdir -p "$RUNNER_TEMP/android-signing"
+          printf '%s' "${ANDROID_KEYSTORE_BASE64}" | base64 --decode > "$RUNNER_TEMP/android-signing/release.jks"
+
+      - name: Build Android release APK
+        env:
+          RELEASE_VERSION: ${{ inputs.release_version }}
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/android-signing/release.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for secret_name in ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [ -z "${!secret_name}" ]; then
+              echo "${secret_name} secret is required for release signing. See README.md#android-release-per-github-actions." >&2
+              exit 1
+            fi
+          done
+          build_name="${RELEASE_VERSION%%+*}"
+          build_number="${RELEASE_VERSION##*+}"
+          flutter build apk --release --build-name "${build_name}" --build-number "${build_number}"
+
+      - name: Prepare release files
+        env:
+          RELEASE_VERSION: ${{ inputs.release_version }}
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          apk_name="developer-wiki-app-${RELEASE_VERSION}.apk"
+          cp build/app/outputs/flutter-apk/app-release.apk "release/${apk_name}"
+          (cd release && sha256sum "${apk_name}" > "${apk_name}.sha256")
+
+      - name: Write release notes
+        env:
+          RELEASE_VERSION: ${{ inputs.release_version }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text(encoding="utf-8"))
+          notes = event.get("inputs", {}).get("release_notes", "").strip()
+          if not notes:
+              version = os.environ["RELEASE_VERSION"]
+              notes = (
+                  f"Android release {version}\n\n"
+                  "- Built from the manually triggered GitHub Actions release workflow.\n"
+                  "- APK and SHA-256 checksum are attached below.\n"
+              )
+          Path("release-notes.md").write_text(notes + "\n", encoding="utf-8")
+          PY
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ inputs.release_version }}
+        run: |
+          set -euo pipefail
+          gh release create "v${RELEASE_VERSION}" \
+            release/* \
+            --title "Developer Wiki App ${RELEASE_VERSION}" \
+            --notes-file release-notes.md \
+            --latest
