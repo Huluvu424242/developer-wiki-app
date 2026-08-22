@@ -66,7 +66,8 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
   }
 
   Future<void> submit() async {
-    if (!key.currentState!.validate()) {
+    final formIsValid = key.currentState?.validate() ?? false;
+    if (!formIsValid || _hasMissingRequiredValues()) {
       _showValidationHint();
       return;
     }
@@ -101,6 +102,15 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
         setState(() => busy = false);
       }
     }
+  }
+
+  bool _hasMissingRequiredValues() {
+    if (title.text.trim().isEmpty) {
+      return true;
+    }
+    return template.fields.any(
+      (field) => field.required && values[field.id]!.text.trim().isEmpty,
+    );
   }
 
   void _showValidationHint() {
