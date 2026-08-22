@@ -28,7 +28,7 @@ Wenn der Benutzer einen Fehler meldet und um Behebung bittet, ist grundsätzlich
 
 4. Einen Pull Request erstellen.
    Der PR soll:
-    - auf das zuvor erstellte Issue verweisen,
+    - auf das zuvor erstellte Issue verweisen und die Regeln aus `Verknüpfung von Pull Requests mit Stories und Bugs` einhalten,
     - Ursache und Lösung kurz erklären,
     - die durchgeführten Prüfungen nennen,
     - verbleibende Unsicherheiten ausdrücklich erwähnen,
@@ -146,7 +146,7 @@ Wenn der Benutzer die Umsetzung einer Story beauftragt, ist grundsätzlich folge
     - Die Dokumentationspflichten aus dem Abschnitt `Dokumentationspflege bei Änderungen` prüfen und erfüllen.
 
 9. Einen Pull Request erstellen.
-    - Der PR verweist auf die Story.
+    - Der PR verweist auf die Story und hält die Regeln aus `Verknüpfung von Pull Requests mit Stories und Bugs` ein.
     - Der PR beschreibt kurz Umsetzung, wesentliche Architekturentscheidungen und durchgeführte Prüfungen.
     - Abweichungen von Akzeptanzkriterien oder verbleibende Unsicherheiten ausdrücklich nennen.
     - Keine Story als vollständig umgesetzt darstellen, wenn Akzeptanzkriterien noch offen sind.
@@ -156,6 +156,28 @@ Wenn der Benutzer die Umsetzung einer Story beauftragt, ist grundsätzlich folge
     - Kurz erläutern, was umgesetzt wurde.
     - Die durchgeführten Prüfungen nennen.
     - Auf offene Punkte oder notwendige lokale Prüfungen hinweisen.
+
+## Verknüpfung von Pull Requests mit Stories und Bugs
+
+Für jeden Pull Request, der eine Story umsetzt oder einen Bug behebt, gelten folgende Regeln verbindlich:
+
+1. Der Pull Request muss alle Stories und Bugs explizit referenzieren, die durch seine Änderungen umgesetzt oder behoben werden.
+    - Die Referenzen gehören in die Pull-Request-Beschreibung und müssen die konkreten Issue-Nummern enthalten.
+    - Bei mehreren betroffenen Issues müssen alle relevanten Issues aufgeführt werden.
+
+2. Vollständig erledigte Issues müssen beim Merge automatisch geschlossen werden.
+    - Für jedes durch den Pull Request vollständig erledigte Issue muss ein von GitHub unterstütztes Closing-Keyword verwendet werden, zum Beispiel `Closes #123`, `Fixes #123` oder `Resolves #123`.
+    - Wenn mehrere Issues vollständig erledigt werden, muss jedes dieser Issues mit einem Closing-Keyword referenziert werden.
+    - Das Closing-Keyword muss in der Pull-Request-Beschreibung stehen, damit GitHub die Verknüpfung sichtbar macht und das Issue beim Merge automatisch schließen kann.
+
+3. Closing-Keywords dürfen nur bei vollständiger Erledigung verwendet werden.
+    - Wenn eine Story oder ein Bug durch den Pull Request nur teilweise umgesetzt bzw. behoben wird, darf dafür kein Closing-Keyword verwendet werden.
+    - Solche teilweise betroffenen Issues müssen dennoch normal referenziert werden, zum Beispiel mit `Related to #123` oder `Part of #123`.
+    - Sobald ein späterer Pull Request die verbleibenden Akzeptanzkriterien bzw. den Bug vollständig erledigt, muss dieser Pull Request das Closing-Keyword enthalten.
+
+4. Vor dem Erstellen oder Aktualisieren eines Pull Requests ist die Issue-Verknüpfung zu prüfen.
+    - Es darf kein Pull Request als bereit gemeldet werden, wenn vollständig erledigte Stories oder Bugs nicht mit einem Closing-Keyword verknüpft sind.
+    - Bei gestapelten Pull Requests gilt die Regel für jedes Issue in dem Pull Request, in dem es fachlich vollständig erledigt wird; ein Eltern- oder Folge-PR darf dasselbe Issue nicht irrtümlich erneut schließen.
 
 ## Dokumentationspflege bei Änderungen
 
