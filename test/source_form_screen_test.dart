@@ -17,7 +17,7 @@ void main() {
       scrollable: find.byType(Scrollable).first,
     );
     await tester.tap(find.text('Quelle speichern'));
-    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.text('Bitte markierte Pflichtfelder prüfen.'), findsOneWidget);
     expect(find.text('Pflichtfeld'), findsWidgets);
