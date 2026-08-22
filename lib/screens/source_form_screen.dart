@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 
+import '../models/created_issue.dart';
+import '../models/shared_content.dart';
 import '../models/source_template.dart';
+import '../models/wiki_configuration.dart';
+import '../services/configuration_service.dart';
+import '../services/external_url_service.dart';
 import '../services/github_service.dart';
-import '../services/settings_service.dart';
-import '../share/shared_content.dart';
+import '../services/source_prefill_service.dart';
 import 'settings_screen.dart';
 
 class SourceFormScreen extends StatefulWidget {
   const SourceFormScreen({
     super.key,
-    required this.githubService,
-    required this.settingsService,
+    this.initialTemplate,
     this.sharedContent,
   });
 
-  final GitHubService githubService;
-  final SettingsService settingsService;
+  final SourceTemplate? initialTemplate;
   final SharedContent? sharedContent;
 
   @override
@@ -25,18 +27,114 @@ class SourceFormScreen extends StatefulWidget {
 class _SourceFormScreenState extends State<SourceFormScreen> {
   final key = GlobalKey<FormState>();
   final title = TextEditingController();
-  final values = <String, TextEditingController>{};
+  final _configurationService = ConfigurationService();
+  final _externalUrlService = ExternalUrlService();
+  final _prefillService = SourcePrefillService();
   late SourceTemplate template;
+  final values = <String, TextEditingController>{};
   bool busy = false;
+  bool _useSharedContent = true;
   CreatedIssue? _createdIssue;
   String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    template = sourceTemplates.first;
-    _select(template);
-    _applySharedContent(widget.sharedContent);
+    _select(widget.initialTemplate ?? sourceTemplates.first);
+  }
+
+  void _select(SourceTemplate next) {
+    template = next;
+    for (final controller in values.values) {
+      controller.dispose();
+    }
+    values.clear();
+    for (final field in next.fields) {
+      values[field.id] = TextEditingController(text: field.initialValue);
+    }
+    final sharedContent = widget.sharedContent;
+    if (_useSharedContent && sharedContent != null) {
+      final prefilled = _prefillService.valuesFor(next, sharedContent);
+      for (final entry in prefilled.entries) {
+        values[entry.key]?.text = entry.value;
+      }
+    }
+    _createdIssue = null;
+    _errorMessage = null;
+  }
+
+  Future<void> submit() async {
+    if (!key.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      busy = true;
+      _errorMessage = null;
+    });
+    try {
+      final configuration = await _configurationService.load();
+      final repository = _repositoryFrom(configuration);
+      final map = values.map((key, value) => MapEntry(key, value.text));
+      final issue = await GitHubService(
+        configuration.token,
+        owner: repository.owner,
+        repo: repository.name,
+      ).createIssue(
+        title: '${template.titlePrefix}${title.text.trim()}',
+        body: GitHubService.issueBody(template, map),
+      );
+      if (mounted) {
+        setState(() => _createdIssue = issue);
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Quelle konnte nicht erstellt werden: $error';
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() => busy = false);
+      }
+    }
+  }
+
+  GitHubRepository _repositoryFrom(WikiConfiguration configuration) {
+    if (!configuration.isComplete) {
+      throw const FormatException(
+        'Wiki-Konfiguration ist unvollständig. Einstellungen prüfen.',
+      );
+    }
+    return GitHubRepository.parse(configuration.repositoryUrl);
+  }
+
+  Future<void> _openCreatedIssue() async {
+    final issue = _createdIssue;
+    if (issue == null) {
+      return;
+    }
+    try {
+      await _externalUrlService.open(issue.url);
+    } catch (error) {
+      if (mounted) {
+        setState(
+          () => _errorMessage = 'Issue konnte nicht geöffnet werden: $error',
+        );
+      }
+    }
+  }
+
+  void _startNewSource() {
+    _useSharedContent = false;
+    title.clear();
+    for (final field in template.fields) {
+      values[field.id]!.text = field.initialValue;
+    }
+    setState(() {
+      _createdIssue = null;
+      _errorMessage = null;
+    });
   }
 
   @override
@@ -46,99 +144,6 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
       controller.dispose();
     }
     super.dispose();
-  }
-
-  void _select(SourceTemplate selected) {
-    template = selected;
-    for (final controller in values.values) {
-      controller.dispose();
-    }
-    values
-      ..clear()
-      ..addEntries(
-        selected.fields.map(
-          (field) => MapEntry(field.id, TextEditingController()),
-        ),
-      );
-    _applySharedContent(widget.sharedContent);
-  }
-
-  void _applySharedContent(SharedContent? sharedContent) {
-    if (sharedContent == null) {
-      return;
-    }
-
-    final url = sharedContent.url?.trim();
-    final text = sharedContent.text.trim();
-    if (url != null && url.isNotEmpty) {
-      for (final field in template.fields) {
-        if (field.id.toLowerCase().contains('url')) {
-          values[field.id]?.text = url;
-          break;
-        }
-      }
-    }
-
-    if (text.isNotEmpty) {
-      for (final field in template.fields) {
-        if (field.kind == FieldKind.textarea) {
-          values[field.id]?.text = text;
-          break;
-        }
-      }
-    }
-  }
-
-  Future<void> submit() async {
-    if (!(key.currentState?.validate() ?? false)) {
-      return;
-    }
-    setState(() {
-      busy = true;
-      _createdIssue = null;
-      _errorMessage = null;
-    });
-    try {
-      final issue = await widget.githubService.createSourceIssue(
-        template: template,
-        title: title.text,
-        values: {
-          for (final entry in values.entries) entry.key: entry.value.text,
-        },
-      );
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _createdIssue = issue;
-        busy = false;
-      });
-    } catch (error) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        busy = false;
-        _errorMessage = error.toString();
-      });
-    }
-  }
-
-  Future<void> _openCreatedIssue() async {
-    final issue = _createdIssue;
-    if (issue == null) {
-      return;
-    }
-    await widget.githubService.openIssue(issue.url);
-  }
-
-  void _startNewSource() {
-    setState(() {
-      _createdIssue = null;
-      _errorMessage = null;
-      title.clear();
-      _select(template);
-    });
   }
 
   @override
@@ -168,9 +173,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             if (sharedContent != null) ...[
-              const Text(
-                'Geteilter Inhalt wurde vorausgefüllt und kann bearbeitet werden.',
-              ),
+              const Text('Geteilter Inhalt wurde vorausgefüllt und kann bearbeitet werden.'),
               const SizedBox(height: 12),
             ],
             DropdownButtonFormField<SourceTemplate>(
@@ -308,6 +311,8 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
         decoration: InputDecoration(
           labelText: field.label,
           helperText: field.description,
+          hintText: field.placeholder,
+          alignLabelWithHint: true,
         ),
         validator: (value) => field.required && (value ?? '').trim().isEmpty
             ? 'Pflichtfeld'
