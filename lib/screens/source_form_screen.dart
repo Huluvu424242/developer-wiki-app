@@ -237,6 +237,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
             ...template.fields.map(_field),
             const SizedBox(height: 20),
             FilledButton.icon(
+              key: const Key('source-form-save-button'),
               onPressed: busy ? null : submit,
               icon: const Icon(Icons.cloud_upload),
               label: Text(busy ? 'Wird erstellt …' : 'Quelle speichern'),
