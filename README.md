@@ -117,4 +117,6 @@ Insbesondere müssen relevante Tests sowie `flutter analyze` erfolgreich sein. B
 
 ## Lizenz
 
-MIT © 2026 Thomas Schubert. Siehe [LICENSE](LICENSE).
+MIT © 2026 Thomas Schubert. Siehe [LICENSE](LICENSE). Herkunft und abweichende
+Lizenzen des App-Logos sowie verwendeter Open-Source-Komponenten stehen in
+[ATTRIBUTIONS.md](ATTRIBUTIONS.md).
