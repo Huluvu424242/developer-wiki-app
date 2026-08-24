@@ -1,5 +1,7 @@
 # developer-wiki-app
 
+<img src="assets/branding/developer-wiki-app-logo.png" alt="Logo der Developer-Wiki-App" width="180">
+
 App zum Erfassen von Quellen für das Developer Wiki
 
 Die Flutter-App erfasst strukturierte Quellen mobil und legt sie als GitHub-Issues im konfigurierten persönlichen Developer-Wiki an. Zusätzlich kann sie den zugehörigen Import-Workflow starten und dessen Status anzeigen. Sie besitzt keinen eigenen Server und sendet keine Telemetrie.
@@ -79,6 +81,7 @@ Beim ersten Start das Ziel-Wiki, das Fine-grained PAT und den per `workflow_disp
 Die weiterführende Projektdokumentation liegt unter [`docs/`](docs/README.md):
 
 - [Architektur nach dem C4-Modell](docs/architecture.md)
+- [App-Logo und Launcher-Icons](docs/app-icon.md)
 - [Signierter Android-Release über GitHub Actions](docs/android-release.md)
 
 Änderungen an Features, Bugfixes oder technischer Infrastruktur aktualisieren die betroffenen Dokumentationsartefakte im selben Pull Request. Das [CHANGELOG](CHANGELOG.md) wird nach Keep a Changelog gepflegt.
