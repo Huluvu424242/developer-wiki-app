@@ -1,7 +1,7 @@
 name: developer_wiki_source_capture
 description: Android-App zur strukturierten Erfassung von Quellen-Issues im Developer-Wiki.
 publish_to: none
-version: 0.1.0+1
+version: 0.1.0+2
 environment:
   sdk: '>=3.4.0 <4.0.0'
 dependencies:
