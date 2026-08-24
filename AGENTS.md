@@ -136,7 +136,13 @@ Wenn der Benutzer die Umsetzung einer Story beauftragt, ist grundsätzlich folge
     - Vor der Aufnahme Wartungszustand, Plattformunterstützung, Lizenz und tatsächlichen Bedarf prüfen.
     - Keine Bibliothek für triviale Funktionalität einführen, die mit wenig verständlichem Code ohne zusätzliche Abhängigkeit lösbar ist.
 
-8. Die Umsetzung prüfen.
+8. Lizenzrechtlich relevante, im Produkt verwendete und mit dem Produkt ausgelieferte Bestandteile prüfen und dokumentieren.
+    - Für neue oder geänderte fremde Komponenten und Inhalte prüfen, ob sie lizenzrechtlich relevant sind und mit dem Produkt verwendet sowie ausgeliefert werden. Dazu zählen insbesondere Laufzeitabhängigkeiten, Bibliotheken, Frameworks, Logos, Bilder, Schriften, Audioinhalte und sonstige Assets.
+    - Jeder solche Bestandteil muss zwingend mit Herkunft, Rechteinhaber, Lizenz, betroffenen Dateien bzw. Verwendungszweck und gegebenenfalls einzuhaltenden Bedingungen in `ATTRIBUTIONS.md` eingetragen oder dort aktualisiert werden.
+    - Vor der Aufnahme prüfen, ob die Lizenzbedingungen mit der MIT-Lizenz des Projekts vereinbar sind und der selbst entwickelte Projektcode weiterhin unter MIT veröffentlicht werden kann.
+    - Wenn die MIT-Lizenz wegen der Aufnahme eines Bestandteils geändert oder aufgegeben werden müsste, darf dies nicht stillschweigend erfolgen. Die Auswirkung ist im Pull Request ausdrücklich zu dokumentieren und der menschliche Entwickler muss nach Erstellung des Pull Requests zusätzlich zwingend und unmissverständlich darauf hingewiesen werden.
+
+9. Die Umsetzung prüfen.
     - Akzeptanzkriterien der Story gegen die Implementierung prüfen.
     - `dart format` auf geänderten Dart-Dateien ausführen.
     - `flutter analyze` ausführen und keine neuen Fehler oder Warnungen hinterlassen.
@@ -145,14 +151,14 @@ Wenn der Benutzer die Umsetzung einer Story beauftragt, ist grundsätzlich folge
     - Tests nicht durch beliebige feste Wartezeiten synchronisieren. Wenn möglich auf das Erscheinen oder Verschwinden des erwarteten Zustands bzw. Widgets warten. Feste Zeitwerte nur als begrenzendes Timeout oder als kleine Polling-Schritte verwenden, nicht als eigentliche Erfolgsbedingung des Tests.
     - Die Dokumentationspflichten aus dem Abschnitt `Dokumentationspflege bei Änderungen` prüfen und erfüllen.
 
-9. Einen Pull Request erstellen.
+10. Einen Pull Request erstellen.
     - Der PR verweist auf die Story und hält die Regeln aus `Verknüpfung von Pull Requests mit Stories und Bugs` ein.
     - Der PR beschreibt kurz Umsetzung, wesentliche Architekturentscheidungen und durchgeführte Prüfungen.
     - Abweichungen von Akzeptanzkriterien oder verbleibende Unsicherheiten ausdrücklich nennen.
     - Keine Story als vollständig umgesetzt darstellen, wenn Akzeptanzkriterien noch offen sind.
     - Der PR nennt explizit, welche Dokumentationsartefakte aktualisiert wurden oder warum keine Aktualisierung notwendig war.
 
-10. Dem Benutzer anschließend den Pull Request verlinken.
+11. Dem Benutzer anschließend den Pull Request verlinken.
     - Kurz erläutern, was umgesetzt wurde.
     - Die durchgeführten Prüfungen nennen.
     - Auf offene Punkte oder notwendige lokale Prüfungen hinweisen.
