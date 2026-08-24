@@ -21,6 +21,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 - Quellenformular ergonomischer gestaltet: zusätzlicher Abstand unter dem Speichern-Button, temporärer Validierungshinweis und Löschaktionen für befüllte Eingabefelder.
 - Android-Release-Prozess um produktive `release/<tagname>`-Wartungsbranches für Bugfixes, Security Updates und Lifecycle-Maßnahmen ergänzt.
 - Provisorisches Android-Launcher-Icon durch das offizielle Developer-Wiki-App-Logo mit Adaptive, Round und Themed Icon ersetzt.
+- Herkunft und Lizenzen des App-Logos sowie wesentlicher Open-Source-Komponenten in `ATTRIBUTIONS.md` dokumentiert.
 
 ### Fixed
 
