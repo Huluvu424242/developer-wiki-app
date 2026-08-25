@@ -250,7 +250,7 @@ class MainActivity : FlutterActivity() {
                 "text" to "Das geteilte Bild konnte nicht gelesen werden."
             )
             return try {
-                mapOf("kind" to "image") + copyImageToPrivateCache(uri)
+                copyImageToPrivateCache(uri) + ("kind" to "image")
             } catch (error: Exception) {
                 mapOf(
                     "kind" to "image_error",
