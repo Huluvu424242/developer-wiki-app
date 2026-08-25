@@ -59,6 +59,12 @@ flowchart TB
 - Das Android-Bild-Share-Ziel kopiert eingehende `content://`-URIs unmittelbar
   in diesen privaten Speicher. Danach durchlaufen sie dieselbe Validierung und
   dasselbe Bildquellenformular wie manuell ausgewählte Dateien.
+- Bild-Attachments werden über ein unlabeled Pending-Issue und den offiziellen
+  GitHub-Markdown-Editor hochgeladen. Die App übernimmt aus einem Kommentar des
+  authentifizierten Kontos genau eine stabile `user-attachments`-Referenz und
+  setzt `quelle` erst nach erfolgreicher Finalisierung.
+- Der Pending-Zustand wird verschlüsselt lokal gespeichert, damit der externe
+  Browserwechsel und ein App-Neustart den Ablauf nicht verlieren.
 - Konfigurierbare Werte wie Ziel-Repository und Workflow-Datei werden nicht unnötig im UI-Code fest verdrahtet.
 - Die Architektur bleibt mobile-first, testbar und so einfach wie für den aktuellen Funktionsumfang möglich.
 

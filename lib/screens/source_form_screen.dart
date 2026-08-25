@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../models/created_issue.dart';
 import '../models/image_source_file.dart';
+import '../models/pending_image_upload.dart';
 import '../models/shared_content.dart';
 import '../models/source_template.dart';
 import '../models/wiki_configuration.dart';
@@ -12,6 +13,7 @@ import '../services/configuration_service.dart';
 import '../services/external_url_service.dart';
 import '../services/github_service.dart';
 import '../services/image_input_service.dart';
+import '../services/image_upload_service.dart';
 import '../services/source_prefill_service.dart';
 import 'settings_screen.dart';
 
@@ -21,11 +23,15 @@ class SourceFormScreen extends StatefulWidget {
     this.initialTemplate,
     this.sharedContent,
     this.imageInputGateway,
+    this.imageUploadGateway,
+    this.pendingUpload,
   });
 
   final SourceTemplate? initialTemplate;
   final SharedContent? sharedContent;
   final ImageInputGateway? imageInputGateway;
+  final ImageUploadGateway? imageUploadGateway;
+  final PendingImageUpload? pendingUpload;
 
   @override
   State<SourceFormScreen> createState() => _SourceFormScreenState();
@@ -40,6 +46,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
   final _externalUrlService = ExternalUrlService();
   final _prefillService = SourcePrefillService();
   late final ImageInputGateway _imageInputGateway;
+  late final ImageUploadGateway _imageUploadGateway;
   late SourceTemplate template;
   final values = <String, TextEditingController>{};
   bool busy = false;
@@ -47,7 +54,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
   bool _useSharedContent = true;
   CreatedIssue? _createdIssue;
   ImageSourceFile? _image;
-  bool _imagePrepared = false;
+  PendingImageUpload? _pendingUpload;
   String? _errorMessage;
 
   @override
@@ -55,9 +62,19 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     super.initState();
     _imageInputGateway =
         widget.imageInputGateway ?? PlatformImageInputGateway();
+    _imageUploadGateway =
+        widget.imageUploadGateway ?? GitHubImageUploadService();
     _select(widget.initialTemplate ?? sourceTemplates.first);
+    final pendingUpload = widget.pendingUpload;
     final sharedImage = widget.sharedContent?.image;
-    if (widget.sharedContent?.kind == SharedContentKind.image &&
+    if (pendingUpload != null) {
+      _pendingUpload = pendingUpload;
+      _image = pendingUpload.image;
+      title.text = pendingUpload.title;
+      for (final entry in pendingUpload.values.entries) {
+        values[entry.key]?.text = entry.value;
+      }
+    } else if (widget.sharedContent?.kind == SharedContentKind.image &&
         sharedImage != null) {
       _image = sharedImage;
     }
@@ -87,7 +104,6 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
       }
     }
     _createdIssue = null;
-    _imagePrepared = false;
     _errorMessage = null;
   }
 
@@ -102,27 +118,24 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
       busy = true;
       _errorMessage = null;
     });
-    if (template == imageSourceTemplate) {
-      setState(() {
-        busy = false;
-        _imagePrepared = true;
-      });
-      return;
-    }
     try {
-      final configuration = await _configurationService.load();
-      final repository = _repositoryFrom(configuration);
-      final map = values.map((key, value) => MapEntry(key, value.text));
-      final issue = await GitHubService(
-        configuration.token,
-        owner: repository.owner,
-        repo: repository.name,
-      ).createIssue(
-        title: '${template.titlePrefix}${title.text.trim()}',
-        body: GitHubService.issueBody(template, map),
-      );
-      if (mounted) {
-        setState(() => _createdIssue = issue);
+      if (template == imageSourceTemplate) {
+        await _submitImageSource();
+      } else {
+        final configuration = await _configurationService.load();
+        final repository = _repositoryFrom(configuration);
+        final map = values.map((key, value) => MapEntry(key, value.text));
+        final issue = await GitHubService(
+          configuration.token,
+          owner: repository.owner,
+          repo: repository.name,
+        ).createIssue(
+          title: '${template.titlePrefix}${title.text.trim()}',
+          body: GitHubService.issueBody(template, map),
+        );
+        if (mounted) {
+          setState(() => _createdIssue = issue);
+        }
       }
     } catch (error) {
       if (mounted) {
@@ -134,6 +147,36 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
       if (mounted) {
         setState(() => busy = false);
       }
+    }
+  }
+
+  Future<void> _submitImageSource() async {
+    final pending = _pendingUpload;
+    if (pending == null) {
+      final image = _image!;
+      final map = values.map((key, value) => MapEntry(key, value.text));
+      final started = await _imageUploadGateway.start(
+        title: title.text,
+        values: map,
+        image: image,
+      );
+      if (mounted) {
+        setState(() => _pendingUpload = started);
+      }
+      return;
+    }
+
+    final issue = await _imageUploadGateway.verify(pending);
+    final image = _image;
+    if (image != null) {
+      unawaited(_imageInputGateway.discard(image));
+    }
+    if (mounted) {
+      setState(() {
+        _pendingUpload = null;
+        _image = null;
+        _createdIssue = issue;
+      });
     }
   }
 
@@ -154,7 +197,6 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     setState(() {
       _imageBusy = true;
       _errorMessage = null;
-      _imagePrepared = false;
     });
     try {
       final selected = await _imageInputGateway.pickImage();
@@ -187,7 +229,6 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     }
     setState(() {
       _image = null;
-      _imagePrepared = false;
     });
     try {
       await _imageInputGateway.discard(image);
@@ -238,6 +279,55 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     }
   }
 
+  Future<void> _openPendingUpload() async {
+    final pending = _pendingUpload;
+    if (pending == null) {
+      return;
+    }
+    try {
+      await _imageUploadGateway.open(pending);
+    } catch (error) {
+      if (mounted) {
+        setState(
+          () => _errorMessage =
+              'Pending-Issue konnte nicht geöffnet werden: $error',
+        );
+      }
+    }
+  }
+
+  Future<void> _discardPendingUpload() async {
+    final pending = _pendingUpload;
+    if (pending == null) {
+      return;
+    }
+    setState(() {
+      busy = true;
+      _errorMessage = null;
+    });
+    try {
+      await _imageUploadGateway.discard(pending);
+      await _imageInputGateway.discard(pending.image);
+      if (mounted) {
+        setState(() {
+          _pendingUpload = null;
+          _image = null;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(
+          () => _errorMessage =
+              'Upload konnte nicht verworfen werden: $error',
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => busy = false);
+      }
+    }
+  }
+
   void _startNewSource() {
     _useSharedContent = false;
     title.clear();
@@ -253,7 +343,6 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     }
     setState(() {
       _createdIssue = null;
-      _imagePrepared = false;
       _errorMessage = null;
     });
   }
@@ -261,7 +350,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
   @override
   void dispose() {
     final image = _image;
-    if (image != null) {
+    if (image != null && _pendingUpload == null) {
       unawaited(_imageInputGateway.discard(image));
     }
     title.dispose();
@@ -315,7 +404,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
                     ),
                   )
                   .toList(),
-              onChanged: busy
+              onChanged: busy || _pendingUpload != null
                   ? null
                   : (selected) {
                       if (selected != null) {
@@ -328,13 +417,13 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
               child: Text(template.description),
             ),
             if (_createdIssue != null) _successCard(_createdIssue!),
-            if (_imagePrepared) _preparedImageCard(),
+            if (_pendingUpload != null) _pendingImageCard(_pendingUpload!),
             if (_errorMessage != null) _errorCard(_errorMessage!),
             ValueListenableBuilder<TextEditingValue>(
               valueListenable: title,
               builder: (context, value, _) => TextFormField(
                 controller: title,
-                enabled: !busy,
+                enabled: !busy && _pendingUpload == null,
                 decoration: InputDecoration(
                   labelText: 'Issue-Titel',
                   prefixText: template.titlePrefix,
@@ -355,7 +444,9 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
                 busy
                     ? 'Wird erstellt …'
                     : template == imageSourceTemplate
-                        ? 'Bildquelle vorbereiten'
+                        ? _pendingUpload == null
+                            ? 'Upload auf GitHub starten'
+                            : 'Upload prüfen und Quelle veröffentlichen'
                         : 'Quelle speichern',
               ),
             ),
@@ -378,7 +469,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     }
     return IconButton(
       tooltip: 'Feld leeren',
-      onPressed: busy ? null : controller.clear,
+      onPressed: busy || _pendingUpload != null ? null : controller.clear,
       icon: const Icon(Icons.clear),
     );
   }
@@ -463,7 +554,9 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
                   ),
                 )
                 .toList(),
-            onChanged: busy ? null : (selected) => controller.text = selected ?? '',
+            onChanged: busy || _pendingUpload != null
+                ? null
+                : (selected) => controller.text = selected ?? '',
             validator: (selected) =>
                 field.required && selected == null ? 'Pflichtfeld' : null,
           ),
@@ -476,7 +569,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
         valueListenable: controller,
         builder: (context, value, _) => TextFormField(
           controller: controller,
-          enabled: !busy,
+          enabled: !busy && _pendingUpload == null,
           minLines: field.kind == FieldKind.textarea ? 3 : 1,
           maxLines: field.kind == FieldKind.textarea ? 8 : 1,
           decoration: InputDecoration(
@@ -519,7 +612,9 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
             if (image == null)
               OutlinedButton.icon(
                 key: const Key('image-source-pick-button'),
-                onPressed: _imageBusy || busy ? null : _pickImage,
+                onPressed: _imageBusy || busy || _pendingUpload != null
+                    ? null
+                    : _pickImage,
                 icon: const Icon(Icons.image_outlined),
                 label: Text(
                   _imageBusy ? 'Bild wird übernommen …' : 'Bild auswählen',
@@ -553,13 +648,17 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
                 runSpacing: 8,
                 children: [
                   OutlinedButton.icon(
-                    onPressed: _imageBusy || busy ? null : _pickImage,
+                    onPressed: _imageBusy || busy || _pendingUpload != null
+                        ? null
+                        : _pickImage,
                     icon: const Icon(Icons.swap_horiz),
                     label: const Text('Ersetzen'),
                   ),
                   OutlinedButton.icon(
                     key: const Key('image-source-remove-button'),
-                    onPressed: _imageBusy || busy ? null : _removeImage,
+                    onPressed: _imageBusy || busy || _pendingUpload != null
+                        ? null
+                        : _removeImage,
                     icon: const Icon(Icons.delete_outline),
                     label: const Text('Entfernen'),
                   ),
@@ -592,14 +691,42 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     );
   }
 
-  Widget _preparedImageCard() {
-    return const Card(
-      margin: EdgeInsets.only(bottom: 16),
+  Widget _pendingImageCard(PendingImageUpload upload) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Text(
-          'Die Bild-Quelle ist lokal vorbereitet. Der GitHub-Attachment-Upload '
-          'wird im abschließenden Teil des gestapelten Ablaufs ergänzt.',
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Bild-Upload für Issue #${upload.issueNumber} ausstehend',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Das Bild im geöffneten GitHub-Issue als Kommentar anhängen und '
+              'den Kommentar absenden. Danach hier den Upload prüfen. Erst bei '
+              'Erfolg wird das Label „quelle“ gesetzt.',
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: busy ? null : _openPendingUpload,
+                  icon: const Icon(Icons.open_in_new),
+                  label: const Text('GitHub öffnen'),
+                ),
+                TextButton.icon(
+                  onPressed: busy ? null : _discardPendingUpload,
+                  icon: const Icon(Icons.delete_outline),
+                  label: const Text('Upload verwerfen'),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

@@ -13,6 +13,9 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
   Vorschau sowie Entfernen und Ersetzen des unveränderten Originalbilds.
 - Drittes Android-Share-Ziel für PNG-, GIF- und JPEG-Bilder, das geteilte
   `content://`-Inhalte in denselben privaten Bildquellen-Entwurf übernimmt.
+- Unterbrechbarer GitHub-Attachment-Ablauf für Bild-Quellen: unlabeled
+  Pending-Issue, Upload im GitHub-Markdown-Editor, Prüfung einer stabilen
+  `user-attachments`-URL und erst danach Veröffentlichung mit `quelle`.
 - Verbindliche Projektdokumentation unter `docs/` mit C4-orientierter Architekturübersicht.
 - Dokumentationsregeln für Changelog, README und technische Dokumentation im Implementierungsworkflow.
 - Direkt in den Einstellungen aufrufbare Hilfe zum Erstellen eines Fine-grained GitHub PAT mit den benötigten Least-Privilege-Berechtigungen.

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../models/pending_image_upload.dart';
 import '../models/shared_content.dart';
 import '../models/source_template.dart';
 import '../models/wiki_configuration.dart';
@@ -7,6 +8,7 @@ import '../models/workflow_run.dart';
 import '../services/configuration_service.dart';
 import '../services/external_url_service.dart';
 import '../services/github_service.dart';
+import '../services/image_upload_service.dart';
 import 'recent_sources_screen.dart';
 import 'settings_screen.dart';
 import 'source_form_screen.dart';
@@ -17,11 +19,13 @@ class HomeScreen extends StatefulWidget {
     this.onImportRequested,
     this.sharedContent,
     this.sourceFormBuilder,
+    this.imageUploadGateway,
   });
 
   final VoidCallback? onImportRequested;
   final SharedContent? sharedContent;
   final Widget Function(SourceTemplate, SharedContent?)? sourceFormBuilder;
+  final ImageUploadGateway? imageUploadGateway;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -37,11 +41,45 @@ class _HomeScreenState extends State<HomeScreen> {
   DateTime? _lastDispatchAt;
   WorkflowRun? _workflowRun;
   String? _openedSharedImagePath;
+  late final ImageUploadGateway _imageUploadGateway;
+  PendingImageUpload? _pendingImageUpload;
 
   @override
   void initState() {
     super.initState();
+    _imageUploadGateway =
+        widget.imageUploadGateway ?? GitHubImageUploadService();
+    _loadPendingImageUpload();
     _scheduleSharedImage();
+  }
+
+  Future<void> _loadPendingImageUpload() async {
+    try {
+      final pending = await _imageUploadGateway.loadPending();
+      if (mounted) {
+        setState(() => _pendingImageUpload = pending);
+      }
+    } catch (_) {
+      // Die normale Quellenerfassung bleibt bei defektem Altzustand nutzbar.
+    }
+  }
+
+  Future<void> _openPendingImageUpload() async {
+    final pending = _pendingImageUpload;
+    if (pending == null) {
+      return;
+    }
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SourceFormScreen(
+          initialTemplate: imageSourceTemplate,
+          pendingUpload: pending,
+          imageUploadGateway: _imageUploadGateway,
+        ),
+      ),
+    );
+    await _loadPendingImageUpload();
   }
 
   @override
@@ -254,6 +292,21 @@ class _HomeScreenState extends State<HomeScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          if (_pendingImageUpload != null) ...[
+            Card(
+              child: ListTile(
+                key: const Key('pending-image-upload'),
+                leading: const Icon(Icons.cloud_upload_outlined),
+                title: Text(
+                  'Bild-Upload #${_pendingImageUpload!.issueNumber} fortsetzen',
+                ),
+                subtitle: Text(_pendingImageUpload!.image.name),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: _openPendingImageUpload,
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
           if (widget.sharedContent?.kind == SharedContentKind.imageError) ...[
             Card(
               color: Theme.of(context).colorScheme.errorContainer,
