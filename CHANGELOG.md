@@ -24,6 +24,8 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Changed
 
+- Android-Teilen-Ziele verwenden unterscheidbare App-Logo-Varianten mit
+  Weltkugel-, Text- beziehungsweise Bild-Overlay.
 - README nach der Struktur von Standard Readme neu gegliedert und mit der weiterführenden Dokumentation verknüpft.
 - Quellenformular ergonomischer gestaltet: zusätzlicher Abstand unter dem Speichern-Button, temporärer Validierungshinweis und Löschaktionen für befüllte Eingabefelder.
 - Android-Release-Prozess um produktive `release/<tagname>`-Wartungsbranches für Bugfixes, Security Updates und Lifecycle-Maßnahmen ergänzt.
