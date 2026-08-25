@@ -33,8 +33,8 @@ flowchart TB
 
     subgraph app["Software System: Developer-Wiki-App"]
         ui["Container\nFlutter UI\nScreens, Formulare, Navigation"]
-        services["Container\nAnwendungsservices\nGitHub-, Konfigurations-, Prefill- und URL-Services"]
-        storage["Container\nLokaler geschützter Speicher\nKonfiguration und Fine-grained PAT"]
+        services["Container\nAnwendungsservices\nGitHub-, Konfigurations-, Bild-, Prefill- und URL-Services"]
+        storage["Container\nLokaler Speicher\nGeschützte Konfiguration, PAT und temporäre Bilder"]
     end
 
     github["External Software System\nGitHub REST API\nIssues, Repository-Metadaten, Actions"]
@@ -53,6 +53,9 @@ flowchart TB
 - GitHub-API-Aufrufe werden zentral über Services gekapselt; Screens bauen keine HTTP-Requests selbst zusammen.
 - Das Fine-grained PAT wird lokal über den geschützten Plattform-Speicher abgelegt und nicht geloggt oder im Repository gespeichert.
 - Unterschiedliche Einstiegspunkte, etwa normale Erfassung und Android Share, verwenden denselben fachlichen Erfassungsweg.
+- Bilddateien werden über eine gekapselte Plattformabstraktion ausgewählt,
+  anhand von Dateityp, Größe und Signatur validiert und nur unverändert im
+  privaten temporären App-Speicher gehalten.
 - Konfigurierbare Werte wie Ziel-Repository und Workflow-Datei werden nicht unnötig im UI-Code fest verdrahtet.
 - Die Architektur bleibt mobile-first, testbar und so einfach wie für den aktuellen Funktionsumfang möglich.
 

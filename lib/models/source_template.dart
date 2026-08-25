@@ -1,4 +1,4 @@
-enum FieldKind { input, textarea, dropdown }
+enum FieldKind { input, textarea, dropdown, image }
 
 class SourceField {
   const SourceField(
@@ -28,6 +28,38 @@ class SourceTemplate {
 
 const agentInstruction =
     'Halte dich bei der Bearbeitung an alle für die betroffenen Dateien geltenden Anweisungen aus der AGENTS.md.';
+
+const imageSourceTemplate = SourceTemplate(
+  name: '🖼️ Bild-Quelle',
+  titlePrefix: '[Bild-Quelle]: ',
+  description:
+      'Ein Bild oder einen Screenshot als eigenständige Originalquelle erfassen.',
+  fields: [
+    SourceField(
+      id: 'content',
+      label: 'Inhalt',
+      kind: FieldKind.image,
+      required: true,
+      description: 'PNG, GIF oder JPEG · maximal 10 MiB',
+    ),
+    SourceField(
+      id: 'description',
+      label: 'Beschreibung',
+      kind: FieldKind.textarea,
+    ),
+    SourceField(
+      id: 'agent_notes',
+      label: 'Hinweise an den KI-Agenten',
+      kind: FieldKind.textarea,
+    ),
+    SourceField(
+      id: 'prompt_additions',
+      label: 'Promptergänzungen',
+      kind: FieldKind.textarea,
+      initialValue: agentInstruction,
+    ),
+  ],
+);
 
 const sourceTemplates = <SourceTemplate>[
   SourceTemplate(
@@ -225,4 +257,5 @@ const sourceTemplates = <SourceTemplate>[
             initialValue:
                 'Behandle die beschriebene Person als Privatperson. Recherchiere weder zu ihr noch zu den gemachten Angaben im Internet und rufe keine externen Quellen zur Ergänzung oder Bestätigung ab. Verwende ausschließlich den fachlichen Inhalt dieser privaten Quelle. Falls im Wiki eine öffentliche Quelle zur selben Person existiert, verknüpfe beide Datensätze gegenseitig, halte private und öffentlich belegte Informationen jedoch in getrennten Wiki-Datensätzen und übernimm keine Aussagen zwischen ihnen.'),
       ]),
+  imageSourceTemplate,
 ];

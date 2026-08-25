@@ -1,12 +1,17 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../models/created_issue.dart';
+import '../models/image_source_file.dart';
 import '../models/shared_content.dart';
 import '../models/source_template.dart';
 import '../models/wiki_configuration.dart';
 import '../services/configuration_service.dart';
 import '../services/external_url_service.dart';
 import '../services/github_service.dart';
+import '../services/image_input_service.dart';
 import '../services/source_prefill_service.dart';
 import 'settings_screen.dart';
 
@@ -15,10 +20,12 @@ class SourceFormScreen extends StatefulWidget {
     super.key,
     this.initialTemplate,
     this.sharedContent,
+    this.imageInputGateway,
   });
 
   final SourceTemplate? initialTemplate;
   final SharedContent? sharedContent;
+  final ImageInputGateway? imageInputGateway;
 
   @override
   State<SourceFormScreen> createState() => _SourceFormScreenState();
@@ -32,27 +39,40 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
   final _configurationService = ConfigurationService();
   final _externalUrlService = ExternalUrlService();
   final _prefillService = SourcePrefillService();
+  late final ImageInputGateway _imageInputGateway;
   late SourceTemplate template;
   final values = <String, TextEditingController>{};
   bool busy = false;
+  bool _imageBusy = false;
   bool _useSharedContent = true;
   CreatedIssue? _createdIssue;
+  ImageSourceFile? _image;
+  bool _imagePrepared = false;
   String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
+    _imageInputGateway =
+        widget.imageInputGateway ?? PlatformImageInputGateway();
     _select(widget.initialTemplate ?? sourceTemplates.first);
   }
 
   void _select(SourceTemplate next) {
+    final previousImage = _image;
+    if (previousImage != null) {
+      unawaited(_imageInputGateway.discard(previousImage));
+      _image = null;
+    }
     template = next;
     for (final controller in values.values) {
       controller.dispose();
     }
     values.clear();
     for (final field in next.fields) {
-      values[field.id] = TextEditingController(text: field.initialValue);
+      if (field.kind != FieldKind.image) {
+        values[field.id] = TextEditingController(text: field.initialValue);
+      }
     }
     final sharedContent = widget.sharedContent;
     if (_useSharedContent && sharedContent != null) {
@@ -62,6 +82,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
       }
     }
     _createdIssue = null;
+    _imagePrepared = false;
     _errorMessage = null;
   }
 
@@ -76,6 +97,13 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
       busy = true;
       _errorMessage = null;
     });
+    if (template == imageSourceTemplate) {
+      setState(() {
+        busy = false;
+        _imagePrepared = true;
+      });
+      return;
+    }
     try {
       final configuration = await _configurationService.load();
       final repository = _repositoryFrom(configuration);
@@ -109,8 +137,63 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
       return true;
     }
     return template.fields.any(
-      (field) => field.required && values[field.id]!.text.trim().isEmpty,
+      (field) =>
+          field.required &&
+          (field.kind == FieldKind.image
+              ? _image == null
+              : values[field.id]!.text.trim().isEmpty),
     );
+  }
+
+  Future<void> _pickImage() async {
+    setState(() {
+      _imageBusy = true;
+      _errorMessage = null;
+      _imagePrepared = false;
+    });
+    try {
+      final selected = await _imageInputGateway.pickImage();
+      if (selected == null || !mounted) {
+        return;
+      }
+      final previous = _image;
+      setState(() => _image = selected);
+      if (previous != null) {
+        await _imageInputGateway.discard(previous);
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(
+          () => _errorMessage =
+              'Bild konnte nicht übernommen werden: $error',
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _imageBusy = false);
+      }
+    }
+  }
+
+  Future<void> _removeImage() async {
+    final image = _image;
+    if (image == null) {
+      return;
+    }
+    setState(() {
+      _image = null;
+      _imagePrepared = false;
+    });
+    try {
+      await _imageInputGateway.discard(image);
+    } catch (error) {
+      if (mounted) {
+        setState(
+          () => _errorMessage =
+              'Temporäre Bilddatei konnte nicht entfernt werden: $error',
+        );
+      }
+    }
   }
 
   void _showValidationHint() {
@@ -154,16 +237,28 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     _useSharedContent = false;
     title.clear();
     for (final field in template.fields) {
-      values[field.id]!.text = field.initialValue;
+      if (field.kind != FieldKind.image) {
+        values[field.id]!.text = field.initialValue;
+      }
+    }
+    final image = _image;
+    if (image != null) {
+      unawaited(_imageInputGateway.discard(image));
+      _image = null;
     }
     setState(() {
       _createdIssue = null;
+      _imagePrepared = false;
       _errorMessage = null;
     });
   }
 
   @override
   void dispose() {
+    final image = _image;
+    if (image != null) {
+      unawaited(_imageInputGateway.discard(image));
+    }
     title.dispose();
     for (final controller in values.values) {
       controller.dispose();
@@ -228,6 +323,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
               child: Text(template.description),
             ),
             if (_createdIssue != null) _successCard(_createdIssue!),
+            if (_imagePrepared) _preparedImageCard(),
             if (_errorMessage != null) _errorCard(_errorMessage!),
             ValueListenableBuilder<TextEditingValue>(
               valueListenable: title,
@@ -250,7 +346,13 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
               key: const Key('source-form-save-button'),
               onPressed: busy ? null : submit,
               icon: const Icon(Icons.cloud_upload),
-              label: Text(busy ? 'Wird erstellt …' : 'Quelle speichern'),
+              label: Text(
+                busy
+                    ? 'Wird erstellt …'
+                    : template == imageSourceTemplate
+                        ? 'Bildquelle vorbereiten'
+                        : 'Quelle speichern',
+              ),
             ),
             SizedBox(
               key: const Key('source-form-bottom-clearance'),
@@ -328,6 +430,9 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
   }
 
   Widget _field(SourceField field) {
+    if (field.kind == FieldKind.image) {
+      return _imageField(field);
+    }
     final controller = values[field.id]!;
     if (field.kind == FieldKind.dropdown) {
       return Padding(
@@ -382,6 +487,114 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
           validator: (value) => field.required && (value ?? '').trim().isEmpty
               ? 'Pflichtfeld'
               : null,
+        ),
+      ),
+    );
+  }
+
+  Widget _imageField(SourceField field) {
+    final image = _image;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: FormField<ImageSourceFile>(
+        key: const Key('image-source-field'),
+        initialValue: image,
+        validator: (_) =>
+            field.required && _image == null ? 'Pflichtfeld' : null,
+        builder: (formField) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              field.label,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 4),
+            Text(field.description),
+            const SizedBox(height: 12),
+            if (image == null)
+              OutlinedButton.icon(
+                key: const Key('image-source-pick-button'),
+                onPressed: _imageBusy || busy ? null : _pickImage,
+                icon: const Icon(Icons.image_outlined),
+                label: Text(
+                  _imageBusy ? 'Bild wird übernommen …' : 'Bild auswählen',
+                ),
+              )
+            else ...[
+              Semantics(
+                label: 'Vorschau des ausgewählten Bildes ${image.name}',
+                image: true,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: SizedBox(
+                    key: const Key('image-source-preview'),
+                    width: double.infinity,
+                    height: 220,
+                    child: Image.file(
+                      File(image.path),
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => const Center(
+                        child: Text('Bildvorschau nicht verfügbar'),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text('${image.name} · ${image.formattedSize}'),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: _imageBusy || busy ? null : _pickImage,
+                    icon: const Icon(Icons.swap_horiz),
+                    label: const Text('Ersetzen'),
+                  ),
+                  OutlinedButton.icon(
+                    key: const Key('image-source-remove-button'),
+                    onPressed: _imageBusy || busy ? null : _removeImage,
+                    icon: const Icon(Icons.delete_outline),
+                    label: const Text('Entfernen'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              const Card(
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Text(
+                    'Hinweis: Fotos können Aufnahmeort, Geräteinformationen '
+                    'und weitere sensible Metadaten enthalten. Das Originalbild '
+                    'wird unverändert übernommen.',
+                  ),
+                ),
+              ),
+            ],
+            if (formField.hasError) ...[
+              const SizedBox(height: 8),
+              Text(
+                formField.errorText!,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _preparedImageCard() {
+    return const Card(
+      margin: EdgeInsets.only(bottom: 16),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Text(
+          'Die Bild-Quelle ist lokal vorbereitet. Der GitHub-Attachment-Upload '
+          'wird im abschließenden Teil des gestapelten Ablaufs ergänzt.',
         ),
       ),
     );
