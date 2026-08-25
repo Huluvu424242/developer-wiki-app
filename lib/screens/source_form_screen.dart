@@ -24,6 +24,7 @@ class SourceFormScreen extends StatefulWidget {
     this.sharedContent,
     this.imageInputGateway,
     this.imageUploadGateway,
+    this.imagePreviewBuilder,
     this.pendingUpload,
   });
 
@@ -31,6 +32,7 @@ class SourceFormScreen extends StatefulWidget {
   final SharedContent? sharedContent;
   final ImageInputGateway? imageInputGateway;
   final ImageUploadGateway? imageUploadGateway;
+  final Widget Function(ImageSourceFile image)? imagePreviewBuilder;
   final PendingImageUpload? pendingUpload;
 
   @override
@@ -630,13 +632,14 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
                     key: const Key('image-source-preview'),
                     width: double.infinity,
                     height: 220,
-                    child: Image.file(
-                      File(image.path),
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => const Center(
-                        child: Text('Bildvorschau nicht verfügbar'),
-                      ),
-                    ),
+                    child: widget.imagePreviewBuilder?.call(image) ??
+                        Image.file(
+                          File(image.path),
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => const Center(
+                            child: Text('Bildvorschau nicht verfügbar'),
+                          ),
+                        ),
                   ),
                 ),
               ),

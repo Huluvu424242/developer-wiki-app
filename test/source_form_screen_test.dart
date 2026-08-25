@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:developer_wiki_source_capture/models/image_source_file.dart';
 import 'package:developer_wiki_source_capture/models/created_issue.dart';
 import 'package:developer_wiki_source_capture/models/pending_image_upload.dart';
@@ -10,10 +7,6 @@ import 'package:developer_wiki_source_capture/services/image_input_service.dart'
 import 'package:developer_wiki_source_capture/services/image_upload_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-final _validPngBytes = base64Decode(
-  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
-);
 
 Future<void> pumpUntilFound(
   WidgetTester tester,
@@ -122,13 +115,9 @@ void main() {
   testWidgets('shows, replaces and removes an image source preview', (
     tester,
   ) async {
-    final directory = await Directory.systemTemp.createTemp('image-form-');
-    addTearDown(() => directory.delete(recursive: true));
-    final file = File('${directory.path}/source.png');
-    await file.writeAsBytes(_validPngBytes);
     final gateway = _FakeImageInputGateway(
       ImageSourceFile(
-        path: file.path,
+        path: 'source.png',
         name: 'source.png',
         mimeType: 'image/png',
         sizeBytes: 8,
@@ -140,6 +129,9 @@ void main() {
         home: SourceFormScreen(
           initialTemplate: imageSourceTemplate,
           imageInputGateway: gateway,
+          imagePreviewBuilder: (_) => const ColoredBox(
+            color: Colors.transparent,
+          ),
         ),
       ),
     );
@@ -190,13 +182,9 @@ void main() {
   testWidgets('starts and finalizes the two-step GitHub image upload', (
     tester,
   ) async {
-    final directory = await Directory.systemTemp.createTemp('image-upload-');
-    addTearDown(() => directory.delete(recursive: true));
-    final file = File('${directory.path}/source.png');
-    await file.writeAsBytes(_validPngBytes);
     final inputGateway = _FakeImageInputGateway(
       ImageSourceFile(
-        path: file.path,
+        path: 'source.png',
         name: 'source.png',
         mimeType: 'image/png',
         sizeBytes: 8,
@@ -210,6 +198,9 @@ void main() {
           initialTemplate: imageSourceTemplate,
           imageInputGateway: inputGateway,
           imageUploadGateway: uploadGateway,
+          imagePreviewBuilder: (_) => const ColoredBox(
+            color: Colors.transparent,
+          ),
         ),
       ),
     );
