@@ -56,6 +56,11 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     _imageInputGateway =
         widget.imageInputGateway ?? PlatformImageInputGateway();
     _select(widget.initialTemplate ?? sourceTemplates.first);
+    final sharedImage = widget.sharedContent?.image;
+    if (widget.sharedContent?.kind == SharedContentKind.image &&
+        sharedImage != null) {
+      _image = sharedImage;
+    }
   }
 
   void _select(SourceTemplate next) {

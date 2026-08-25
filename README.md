@@ -44,7 +44,8 @@ Der aktuelle Funktionsumfang umfasst unter anderem:
 - Prüfung der Wiki-Verbindung und des PAT,
 - Start und Statusabfrage des konfigurierten GitHub-Actions-Workflows,
 - geschützte lokale Speicherung der Konfiguration,
-- Android-Share als zusätzlicher Einstieg in die Quellenerfassung.
+- Android-Share mit getrennten Zielen für Links, Text und Bilder als
+  zusätzlicher Einstieg in dieselbe Quellenerfassung.
 
 Die Quellenformulare sind derzeit versioniert in `lib/models/source_template.dart` enthalten. Dadurch bleibt die App offline startbar und externe Template-Änderungen beeinflussen UI und Requests nicht ungeprüft. Eine spätere Version kann Templates lesend aus dem Wiki laden und eine geprüfte lokale Fallback-Version behalten.
 
