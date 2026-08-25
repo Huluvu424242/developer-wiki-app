@@ -33,6 +33,8 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 ### Fixed
 
 - Widget-Test für den Validierungshinweis wartet zustandsbasiert auf die Snackbar statt auf eine feste Verzögerung.
+- Initiale Share-Intent-Inhalte werden innerhalb der vorgesehenen asynchronen
+  Fehlerbehandlung vollständig abgewartet.
 - Widget-Test adressiert den Speichern-Button über einen stabilen Key statt über die konkrete Button-Implementierung.
 - Widget-Test scrollt bis zum lazily aufgebauten Speichern-Button, bevor er ihn antippt.
 - Widget-Test stabilisiert nach dem Scrollen die Sichtbarkeit und das Layout des Speichern-Buttons vor dem Tap.

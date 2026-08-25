@@ -31,7 +31,7 @@ class ShareIntentService {
       final initial = await _channel.invokeMapMethod<String, dynamic>(
         'getInitialShare',
       );
-      return _fromMap(initial);
+      return await _fromMap(initial);
     } on MissingPluginException {
       return null;
     }
