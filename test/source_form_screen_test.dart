@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:developer_wiki_source_capture/models/image_source_file.dart';
@@ -9,6 +10,10 @@ import 'package:developer_wiki_source_capture/services/image_input_service.dart'
 import 'package:developer_wiki_source_capture/services/image_upload_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+final _validPngBytes = base64Decode(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+);
 
 Future<void> pumpUntilFound(
   WidgetTester tester,
@@ -120,9 +125,7 @@ void main() {
     final directory = await Directory.systemTemp.createTemp('image-form-');
     addTearDown(() => directory.delete(recursive: true));
     final file = File('${directory.path}/source.png');
-    await file.writeAsBytes(
-      const [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
-    );
+    await file.writeAsBytes(_validPngBytes);
     final gateway = _FakeImageInputGateway(
       ImageSourceFile(
         path: file.path,
@@ -190,9 +193,7 @@ void main() {
     final directory = await Directory.systemTemp.createTemp('image-upload-');
     addTearDown(() => directory.delete(recursive: true));
     final file = File('${directory.path}/source.png');
-    await file.writeAsBytes(
-      const [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
-    );
+    await file.writeAsBytes(_validPngBytes);
     final inputGateway = _FakeImageInputGateway(
       ImageSourceFile(
         path: file.path,
