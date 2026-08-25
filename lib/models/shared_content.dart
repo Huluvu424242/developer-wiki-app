@@ -1,13 +1,21 @@
-enum SharedContentKind { link, text }
+import 'image_source_file.dart';
+
+enum SharedContentKind { link, text, image, imageError }
 
 class SharedContent {
   const SharedContent({
     required this.kind,
-    required this.text,
+    this.text = '',
+    this.image,
   });
 
   final SharedContentKind kind;
   final String text;
+  final ImageSourceFile? image;
 
-  bool get isEmpty => text.trim().isEmpty;
+  bool get isEmpty => switch (kind) {
+        SharedContentKind.image => image == null,
+        SharedContentKind.imageError => text.trim().isEmpty,
+        SharedContentKind.link || SharedContentKind.text => text.trim().isEmpty,
+      };
 }

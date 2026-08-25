@@ -56,6 +56,9 @@ flowchart TB
 - Bilddateien werden über eine gekapselte Plattformabstraktion ausgewählt,
   anhand von Dateityp, Größe und Signatur validiert und nur unverändert im
   privaten temporären App-Speicher gehalten.
+- Das Android-Bild-Share-Ziel kopiert eingehende `content://`-URIs unmittelbar
+  in diesen privaten Speicher. Danach durchlaufen sie dieselbe Validierung und
+  dasselbe Bildquellenformular wie manuell ausgewählte Dateien.
 - Konfigurierbare Werte wie Ziel-Repository und Workflow-Datei werden nicht unnötig im UI-Code fest verdrahtet.
 - Die Architektur bleibt mobile-first, testbar und so einfach wie für den aktuellen Funktionsumfang möglich.
 

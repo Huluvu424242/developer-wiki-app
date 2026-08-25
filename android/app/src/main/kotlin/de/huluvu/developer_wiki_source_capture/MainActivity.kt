@@ -3,6 +3,7 @@ package de.huluvu.developer_wiki_source_capture
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.provider.OpenableColumns
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -19,7 +20,7 @@ class MainActivity : FlutterActivity() {
     }
 
     private var shareChannel: MethodChannel? = null
-    private var pendingShare: Map<String, String>? = null
+    private var pendingShare: Map<String, Any>? = null
     private var imagePickerResult: MethodChannel.Result? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -238,8 +239,26 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    private fun sharedContentFrom(sourceIntent: Intent?): Map<String, String>? {
-        if (sourceIntent?.action != Intent.ACTION_SEND || sourceIntent.type != "text/plain") {
+    private fun sharedContentFrom(sourceIntent: Intent?): Map<String, Any>? {
+        if (sourceIntent?.action != Intent.ACTION_SEND) {
+            return null
+        }
+        val mimeType = sourceIntent.type?.lowercase()
+        if (mimeType in SUPPORTED_IMAGE_TYPES) {
+            val uri = sharedImageUri(sourceIntent) ?: return mapOf(
+                "kind" to "image_error",
+                "text" to "Das geteilte Bild konnte nicht gelesen werden."
+            )
+            return try {
+                mapOf("kind" to "image") + copyImageToPrivateCache(uri)
+            } catch (error: Exception) {
+                mapOf(
+                    "kind" to "image_error",
+                    "text" to (error.message ?: "Das Bild konnte nicht übernommen werden.")
+                )
+            }
+        }
+        if (mimeType != "text/plain") {
             return null
         }
         val text = sourceIntent.getStringExtra(Intent.EXTRA_TEXT)?.trim().orEmpty()
@@ -250,5 +269,14 @@ class MainActivity : FlutterActivity() {
         val componentName = sourceIntent.component?.className.orEmpty()
         val kind = if (componentName.endsWith("ShareLinkActivity")) "link" else "text"
         return mapOf("kind" to kind, "text" to text)
+    }
+
+    @Suppress("DEPRECATION")
+    private fun sharedImageUri(sourceIntent: Intent): Uri? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            sourceIntent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+        } else {
+            sourceIntent.getParcelableExtra(Intent.EXTRA_STREAM)
+        }
     }
 }

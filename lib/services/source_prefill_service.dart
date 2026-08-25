@@ -8,6 +8,10 @@ class SourcePrefillService {
     SourceTemplate template,
     SharedContent content,
   ) {
+    if (content.kind == SharedContentKind.image ||
+        content.kind == SharedContentKind.imageError) {
+      return const {};
+    }
     final text = content.text.trim();
     if (text.isEmpty) {
       return const {};

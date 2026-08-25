@@ -1,4 +1,5 @@
 import 'package:developer_wiki_source_capture/models/shared_content.dart';
+import 'package:developer_wiki_source_capture/models/image_source_file.dart';
 import 'package:developer_wiki_source_capture/models/source_template.dart';
 import 'package:developer_wiki_source_capture/screens/home_screen.dart';
 import 'package:flutter/material.dart';
@@ -72,5 +73,33 @@ void main() {
       find.text('Geteilter Inhalt wurde vorausgefüllt und kann bearbeitet werden.'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('shared image opens the image source form directly', (
+    tester,
+  ) async {
+    const sharedContent = SharedContent(
+      kind: SharedContentKind.image,
+      image: ImageSourceFile(
+        path: '/private/image.png',
+        name: 'image.png',
+        mimeType: 'image/png',
+        sizeBytes: 8,
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HomeScreen(
+          sharedContent: sharedContent,
+          sourceFormBuilder: (template, content) => Text(
+            '${template.name}:${content?.image?.name}',
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('🖼️ Bild-Quelle:image.png'), findsOneWidget);
   });
 }
