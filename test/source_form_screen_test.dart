@@ -1,9 +1,12 @@
 import 'dart:io';
 
 import 'package:developer_wiki_source_capture/models/image_source_file.dart';
+import 'package:developer_wiki_source_capture/models/created_issue.dart';
+import 'package:developer_wiki_source_capture/models/pending_image_upload.dart';
 import 'package:developer_wiki_source_capture/models/source_template.dart';
 import 'package:developer_wiki_source_capture/screens/source_form_screen.dart';
 import 'package:developer_wiki_source_capture/services/image_input_service.dart';
+import 'package:developer_wiki_source_capture/services/image_upload_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -156,9 +159,68 @@ void main() {
 
     expect(find.text('Bitte markierte Pflichtfelder prüfen.'), findsOneWidget);
     expect(
-      find.textContaining('Die Bild-Quelle ist lokal vorbereitet'),
+      find.textContaining('Bild-Upload für Issue'),
       findsNothing,
     );
+  });
+
+  testWidgets('starts and finalizes the two-step GitHub image upload', (
+    tester,
+  ) async {
+    final directory = await Directory.systemTemp.createTemp('image-upload-');
+    addTearDown(() => directory.delete(recursive: true));
+    final file = File('${directory.path}/source.png');
+    await file.writeAsBytes(
+      const [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
+    );
+    final inputGateway = _FakeImageInputGateway(
+      ImageSourceFile(
+        path: file.path,
+        name: 'source.png',
+        mimeType: 'image/png',
+        sizeBytes: 8,
+      ),
+    );
+    final uploadGateway = _FakeImageUploadGateway();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SourceFormScreen(
+          initialTemplate: imageSourceTemplate,
+          imageInputGateway: inputGateway,
+          imageUploadGateway: uploadGateway,
+        ),
+      ),
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Issue-Titel'),
+      'Architekturdiagramm',
+    );
+    await tester.tap(find.byKey(const Key('image-source-pick-button')));
+    await tester.pumpAndSettle();
+    final saveButton = find.byKey(const Key('source-form-save-button'));
+    await tester.scrollUntilVisible(
+      saveButton,
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+
+    await tester.tap(saveButton);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Bild-Upload für Issue #123'), findsOneWidget);
+    expect(uploadGateway.started, isTrue);
+
+    await tester.scrollUntilVisible(
+      saveButton,
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(saveButton);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Quelle erstellt – Issue #123'), findsOneWidget);
+    expect(uploadGateway.verified, isTrue);
   });
 }
 
@@ -175,4 +237,41 @@ class _FakeImageInputGateway implements ImageInputGateway {
 
   @override
   Future<ImageSourceFile?> pickImage() async => image;
+}
+
+class _FakeImageUploadGateway implements ImageUploadGateway {
+  bool started = false;
+  bool verified = false;
+
+  @override
+  Future<void> discard(PendingImageUpload upload) async {}
+
+  @override
+  Future<PendingImageUpload?> loadPending() async => null;
+
+  @override
+  Future<void> open(PendingImageUpload upload) async {}
+
+  @override
+  Future<PendingImageUpload> start({
+    required String title,
+    required Map<String, String> values,
+    required ImageSourceFile image,
+  }) async {
+    started = true;
+    return PendingImageUpload(
+      issueNumber: 123,
+      issueUrl: 'https://github.com/example/wiki/issues/123',
+      createdAt: DateTime.utc(2026, 8, 25),
+      title: title,
+      values: values,
+      image: image,
+    );
+  }
+
+  @override
+  Future<CreatedIssue> verify(PendingImageUpload upload) async {
+    verified = true;
+    return CreatedIssue(number: upload.issueNumber, url: upload.issueUrl);
+  }
 }

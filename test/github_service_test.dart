@@ -52,6 +52,81 @@ void main() {
     expect(issue.url, 'https://github.com/example/wiki/issues/123');
   });
 
+  test('createIssue can keep an image upload issue unlabeled', () async {
+    late http.Request capturedRequest;
+    final service = GitHubService(
+      'secret',
+      owner: 'example',
+      repo: 'wiki',
+      client: MockClient((request) async {
+        capturedRequest = request;
+        return http.Response(
+          jsonEncode({
+            'number': 124,
+            'html_url': 'https://github.com/example/wiki/issues/124',
+          }),
+          201,
+        );
+      }),
+    );
+
+    await service.createIssue(
+      title: '[Bild-Quelle]: Diagramm',
+      body: 'pending',
+      labels: const [],
+    );
+
+    final payload = jsonDecode(capturedRequest.body) as Map<String, dynamic>;
+    expect(payload['labels'], isEmpty);
+  });
+
+  test('finalizes an attachment through issue APIs', () async {
+    final requests = <http.Request>[];
+    final service = GitHubService(
+      'secret',
+      owner: 'example',
+      repo: 'wiki',
+      client: MockClient((request) async {
+        requests.add(request);
+        if (request.method == 'GET') {
+          return http.Response(
+            jsonEncode([
+              {
+                'body': '![image](https://github.com/user-attachments/assets/'
+                    '123e4567-e89b-12d3-a456-426614174000)',
+                'created_at': '2026-08-25T18:00:00Z',
+                'user': {'login': 'developer'},
+              },
+            ]),
+            200,
+          );
+        }
+        return http.Response('{}', 200);
+      }),
+    );
+
+    final comments = await service.listIssueComments(42);
+    await service.updateIssueBody(42, 'final body');
+    await service.addIssueLabel(42, 'quelle');
+    await service.closeIssue(42);
+
+    expect(comments.single.authorLogin, 'developer');
+    expect(requests.map((request) => request.method), [
+      'GET',
+      'PATCH',
+      'POST',
+      'PATCH',
+    ]);
+    expect(
+      jsonDecode(requests[2].body),
+      {'labels': ['quelle']},
+    );
+    expect(
+      jsonDecode(requests[3].body),
+      {'state': 'closed', 'state_reason': 'not_planned'},
+    );
+  });
+
   test('listRecentSourceIssues loads source issues and excludes pull requests',
       () async {
     late http.Request capturedRequest;
