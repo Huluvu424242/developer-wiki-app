@@ -7,6 +7,8 @@ Diese Dokumentation ergänzt die kompakte Projektübersicht in der Root-`README.
 - [Architektur](architecture.md) – Systemkontext und Container-Sicht nach dem C4-Modell.
 - [App-Logo und Launcher-Icons](app-icon.md) – Masterdatei, Android-Ressourcen und reproduzierbare Ableitung.
 - [Android-Release](android-release.md) – reproduzierbarer, signierter APK-Release über GitHub Actions.
+- [Bild-Quellen und GitHub-Attachments](image-sources.md) – Eingänge,
+  zweistufiger Upload, Wiederaufnahme und Datenschutz.
 - [Menschliche PR-Abnahme](human-review.md) – lokale Prüfung, Rebase-Merge und Vorgehen bei gestapelten Branches.
 
 ## Dokumentationsregeln

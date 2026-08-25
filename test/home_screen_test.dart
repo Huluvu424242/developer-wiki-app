@@ -1,7 +1,10 @@
+import 'package:developer_wiki_source_capture/models/created_issue.dart';
 import 'package:developer_wiki_source_capture/models/shared_content.dart';
 import 'package:developer_wiki_source_capture/models/image_source_file.dart';
+import 'package:developer_wiki_source_capture/models/pending_image_upload.dart';
 import 'package:developer_wiki_source_capture/models/source_template.dart';
 import 'package:developer_wiki_source_capture/screens/home_screen.dart';
+import 'package:developer_wiki_source_capture/services/image_upload_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -102,4 +105,61 @@ void main() {
 
     expect(find.text('🖼️ Bild-Quelle:image.png'), findsOneWidget);
   });
+
+  testWidgets('pending image upload remains visible after restart', (
+    tester,
+  ) async {
+    final gateway = _FakeImageUploadGateway(
+      PendingImageUpload(
+        issueNumber: 42,
+        issueUrl: 'https://github.com/example/wiki/issues/42',
+        createdAt: DateTime.utc(2026, 8, 25),
+        title: 'Diagramm',
+        values: const {},
+        image: const ImageSourceFile(
+          path: '/private/image.png',
+          name: 'image.png',
+          mimeType: 'image/png',
+          sizeBytes: 8,
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(home: HomeScreen(imageUploadGateway: gateway)),
+    );
+    await tester.pump();
+
+    expect(find.byKey(const Key('pending-image-upload')), findsOneWidget);
+    expect(find.text('Bild-Upload #42 fortsetzen'), findsOneWidget);
+  });
+}
+
+class _FakeImageUploadGateway implements ImageUploadGateway {
+  _FakeImageUploadGateway(this.pending);
+
+  final PendingImageUpload? pending;
+
+  @override
+  Future<void> discard(PendingImageUpload upload) async {}
+
+  @override
+  Future<PendingImageUpload?> loadPending() async => pending;
+
+  @override
+  Future<void> open(PendingImageUpload upload) async {}
+
+  @override
+  Future<PendingImageUpload> start({
+    required String title,
+    required Map<String, String> values,
+    required ImageSourceFile image,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<CreatedIssue> verify(PendingImageUpload upload) {
+    throw UnimplementedError();
+  }
 }
