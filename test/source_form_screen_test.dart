@@ -27,6 +27,23 @@ Future<void> pumpUntilFound(
   }
 }
 
+Future<void> pumpUntilNotFound(
+  WidgetTester tester,
+  Finder finder, {
+  Duration timeout = const Duration(seconds: 2),
+  Duration step = const Duration(milliseconds: 20),
+}) async {
+  var elapsed = Duration.zero;
+
+  while (finder.evaluate().isNotEmpty) {
+    if (elapsed >= timeout) {
+      throw TestFailure('Widget ist innerhalb von $timeout nicht verschwunden.');
+    }
+    await tester.pump(step);
+    elapsed += step;
+  }
+}
+
 void main() {
   testWidgets('shows a temporary hint when validation fails', (tester) async {
     await tester.pumpWidget(
@@ -123,16 +140,17 @@ void main() {
     );
 
     await tester.tap(find.byKey(const Key('image-source-pick-button')));
-    await tester.pumpAndSettle();
+    final preview = find.byKey(const Key('image-source-preview'));
+    await pumpUntilFound(tester, preview);
 
-    expect(find.byKey(const Key('image-source-preview')), findsOneWidget);
+    expect(preview, findsOneWidget);
     expect(find.textContaining('source.png'), findsOneWidget);
     expect(find.text('Ersetzen'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('image-source-remove-button')));
-    await tester.pumpAndSettle();
+    await pumpUntilNotFound(tester, preview);
 
-    expect(find.byKey(const Key('image-source-preview')), findsNothing);
+    expect(preview, findsNothing);
     expect(gateway.discarded, hasLength(1));
   });
 
@@ -197,7 +215,10 @@ void main() {
       'Architekturdiagramm',
     );
     await tester.tap(find.byKey(const Key('image-source-pick-button')));
-    await tester.pumpAndSettle();
+    await pumpUntilFound(
+      tester,
+      find.byKey(const Key('image-source-preview')),
+    );
     final saveButton = find.byKey(const Key('source-form-save-button'));
     await tester.scrollUntilVisible(
       saveButton,
@@ -206,9 +227,10 @@ void main() {
     );
 
     await tester.tap(saveButton);
-    await tester.pumpAndSettle();
+    final pendingUpload = find.textContaining('Bild-Upload für Issue #123');
+    await pumpUntilFound(tester, pendingUpload);
 
-    expect(find.textContaining('Bild-Upload für Issue #123'), findsOneWidget);
+    expect(pendingUpload, findsOneWidget);
     expect(uploadGateway.started, isTrue);
 
     await tester.scrollUntilVisible(
@@ -217,9 +239,10 @@ void main() {
       scrollable: find.byType(Scrollable).first,
     );
     await tester.tap(saveButton);
-    await tester.pumpAndSettle();
+    final createdIssue = find.textContaining('Quelle erstellt – Issue #123');
+    await pumpUntilFound(tester, createdIssue);
 
-    expect(find.textContaining('Quelle erstellt – Issue #123'), findsOneWidget);
+    expect(createdIssue, findsOneWidget);
     expect(uploadGateway.verified, isTrue);
   });
 }
