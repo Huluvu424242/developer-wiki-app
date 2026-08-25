@@ -7,6 +7,8 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.1.0+3] - 2026-08-25
+
 ### Added
 
 - Grundlage für Bild-Quellen mit eigenem Quellentyp, validierter Bildauswahl,
@@ -54,4 +56,5 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 - Pflichtfelder werden beim Speichern unabhängig von ihrer aktuellen Sichtbarkeit im scrollbaren Quellenformular geprüft.
 - Snackbar-Widget-Test prüft nur den globalen Validierungshinweis und setzt keine gleichzeitig sichtbaren Inline-Feldfehler voraus.
 
-[Unreleased]: https://github.com/Huluvu424242/developer-wiki-app/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/Huluvu424242/developer-wiki-app/compare/v0.1.0+3...HEAD
+[0.1.0+3]: https://github.com/Huluvu424242/developer-wiki-app/compare/v0.1.0+2...v0.1.0+3
