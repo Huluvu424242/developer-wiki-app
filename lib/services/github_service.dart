@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../models/created_issue.dart';
+import '../models/github_issue_comment.dart';
 import '../models/source_issue_summary.dart';
 import '../models/source_template.dart';
 import '../models/workflow_run.dart';
@@ -29,6 +30,7 @@ class GitHubService {
   Future<CreatedIssue> createIssue({
     required String title,
     required String body,
+    List<String> labels = const ['quelle'],
   }) async {
     final response = await _client.post(
       Uri.parse('https://api.github.com/repos/$owner/$repo/issues'),
@@ -36,7 +38,7 @@ class GitHubService {
       body: jsonEncode({
         'title': title,
         'body': body,
-        'labels': ['quelle'],
+        'labels': labels,
       }),
     );
     if (response.statusCode != 201) {
@@ -47,6 +49,74 @@ class GitHubService {
       number: data['number'] as int,
       url: data['html_url'] as String,
     );
+  }
+
+  Future<List<GitHubIssueComment>> listIssueComments(int issueNumber) async {
+    final response = await _client.get(
+      Uri.parse(
+        'https://api.github.com/repos/$owner/$repo/issues/'
+        '$issueNumber/comments',
+      ),
+      headers: _headers,
+    );
+    if (response.statusCode != 200) {
+      throw Exception(_message(response));
+    }
+    final data = jsonDecode(response.body) as List<dynamic>;
+    return data
+        .cast<Map<String, dynamic>>()
+        .map(
+          (comment) => GitHubIssueComment(
+            body: comment['body']?.toString() ?? '',
+            createdAt: DateTime.parse(comment['created_at'] as String).toUtc(),
+            authorLogin:
+                (comment['user'] as Map<String, dynamic>?)?['login']
+                        ?.toString() ??
+                    '',
+          ),
+        )
+        .toList(growable: false);
+  }
+
+  Future<void> updateIssueBody(int issueNumber, String body) async {
+    await _patchIssue(issueNumber, {'body': body});
+  }
+
+  Future<void> addIssueLabel(int issueNumber, String label) async {
+    final response = await _client.post(
+      Uri.parse(
+        'https://api.github.com/repos/$owner/$repo/issues/'
+        '$issueNumber/labels',
+      ),
+      headers: {..._headers, 'Content-Type': 'application/json'},
+      body: jsonEncode({'labels': [label]}),
+    );
+    if (response.statusCode != 200) {
+      throw Exception(_message(response));
+    }
+  }
+
+  Future<void> closeIssue(int issueNumber) async {
+    await _patchIssue(
+      issueNumber,
+      {'state': 'closed', 'state_reason': 'not_planned'},
+    );
+  }
+
+  Future<void> _patchIssue(
+    int issueNumber,
+    Map<String, Object> payload,
+  ) async {
+    final response = await _client.patch(
+      Uri.parse(
+        'https://api.github.com/repos/$owner/$repo/issues/$issueNumber',
+      ),
+      headers: {..._headers, 'Content-Type': 'application/json'},
+      body: jsonEncode(payload),
+    );
+    if (response.statusCode != 200) {
+      throw Exception(_message(response));
+    }
   }
 
   Future<List<SourceIssueSummary>> listRecentSourceIssues({

@@ -77,6 +77,12 @@ flutter run
 
 Beim ersten Start das Ziel-Wiki, das Fine-grained PAT und den per `workflow_dispatch` startbaren Import-Workflow konfigurieren. Anschließend können Quellen erfasst und als Issues im Wiki gespeichert werden.
 
+Für Bild-Quellen erstellt die App zunächst ein noch nicht importierbares
+Pending-Issue und öffnet dessen GitHub-Kommentarbereich. Dort das Bild auswählen,
+den Kommentar absenden und anschließend in der App den Upload prüfen. Der genaue
+Ablauf und die technische Begründung stehen in der
+[Bildquellen-Dokumentation](docs/image-sources.md).
+
 ## Dokumentation
 
 Die weiterführende Projektdokumentation liegt unter [`docs/`](docs/README.md):
@@ -84,6 +90,7 @@ Die weiterführende Projektdokumentation liegt unter [`docs/`](docs/README.md):
 - [Architektur nach dem C4-Modell](docs/architecture.md)
 - [App-Logo und Launcher-Icons](docs/app-icon.md)
 - [Signierter Android-Release über GitHub Actions](docs/android-release.md)
+- [Bild-Quellen und GitHub-Attachments](docs/image-sources.md)
 
 Änderungen an Features, Bugfixes oder technischer Infrastruktur aktualisieren die betroffenen Dokumentationsartefakte im selben Pull Request. Das [CHANGELOG](CHANGELOG.md) wird nach Keep a Changelog gepflegt.
 
