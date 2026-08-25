@@ -33,7 +33,7 @@ android {
         applicationId = "de.huluvu.developer_wiki_source_capture"
         minSdk = 23
         targetSdk = 35
-        versionCode = 1
+        versionCode = 3
         versionName = "0.1.0"
     }
 
