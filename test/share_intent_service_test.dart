@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:developer_wiki_source_capture/models/image_source_file.dart';
 import 'package:developer_wiki_source_capture/models/shared_content.dart';
+import 'package:developer_wiki_source_capture/services/image_validation_service.dart';
 import 'package:developer_wiki_source_capture/services/share_intent_service.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -55,4 +57,29 @@ void main() {
     expect(content?.kind, SharedContentKind.imageError);
     expect(content?.text, 'Datei zu groß');
   });
+
+  test('handles an asynchronous missing plugin error while mapping', () async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (_) async => {
+              'kind': 'image',
+              'path': '/private/shared.png',
+              'name': 'shared.png',
+              'mimeType': 'image/png',
+              'sizeBytes': 8,
+            });
+
+    final content = await ShareIntentService(
+      channel: channel,
+      validationService: _MissingPluginImageValidationService(),
+    ).initialize((_) {});
+
+    expect(content, isNull);
+  });
+}
+
+class _MissingPluginImageValidationService extends ImageValidationService {
+  @override
+  Future<ImageSourceFile> validate(ImageSourceFile image) async {
+    throw MissingPluginException();
+  }
 }
