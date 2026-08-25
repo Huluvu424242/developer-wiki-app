@@ -227,11 +227,17 @@ void main() {
     await tester.ensureVisible(saveButton);
     await tester.pump();
     await tester.tap(saveButton);
+    await tester.pump();
+    expect(uploadGateway.started, isTrue);
+
     final pendingUpload = find.textContaining('Bild-Upload für Issue #123');
-    await pumpUntilFound(tester, pendingUpload);
+    await tester.scrollUntilVisible(
+      pendingUpload,
+      -300,
+      scrollable: find.byType(Scrollable).first,
+    );
 
     expect(pendingUpload, findsOneWidget);
-    expect(uploadGateway.started, isTrue);
 
     await tester.scrollUntilVisible(
       saveButton,
@@ -241,11 +247,17 @@ void main() {
     await tester.ensureVisible(saveButton);
     await tester.pump();
     await tester.tap(saveButton);
+    await tester.pump();
+    expect(uploadGateway.verified, isTrue);
+
     final createdIssue = find.textContaining('Quelle erstellt – Issue #123');
-    await pumpUntilFound(tester, createdIssue);
+    await tester.scrollUntilVisible(
+      createdIssue,
+      -300,
+      scrollable: find.byType(Scrollable).first,
+    );
 
     expect(createdIssue, findsOneWidget);
-    expect(uploadGateway.verified, isTrue);
   });
 }
 

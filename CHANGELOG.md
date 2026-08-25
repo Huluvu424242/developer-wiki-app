@@ -32,6 +32,8 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Fixed
 
+- Der zweistufige Upload-Widget-Test scrollt zu lazy aufgebauten Pending- und
+  Erfolgskarten, bevor er deren Darstellung prüft.
 - Bildquellen-Widget-Tests machen gescrollte Aktionsbuttons vor dem Tap
   vollständig sichtbar und pumpen anschließend das aktualisierte Layout.
 - Bildquellen-Widget-Tests verwenden eine injizierte synchrone Vorschau und
