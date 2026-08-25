@@ -16,10 +16,12 @@ class HomeScreen extends StatefulWidget {
     super.key,
     this.onImportRequested,
     this.sharedContent,
+    this.sourceFormBuilder,
   });
 
   final VoidCallback? onImportRequested;
   final SharedContent? sharedContent;
+  final Widget Function(SourceTemplate, SharedContent?)? sourceFormBuilder;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -34,15 +36,48 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _importFailed = false;
   DateTime? _lastDispatchAt;
   WorkflowRun? _workflowRun;
+  String? _openedSharedImagePath;
+
+  @override
+  void initState() {
+    super.initState();
+    _scheduleSharedImage();
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.sharedContent != widget.sharedContent) {
+      _scheduleSharedImage();
+    }
+  }
+
+  void _scheduleSharedImage() {
+    final content = widget.sharedContent;
+    final path = content?.image?.path;
+    if (content?.kind != SharedContentKind.image ||
+        path == null ||
+        path == _openedSharedImagePath) {
+      return;
+    }
+    _openedSharedImagePath = path;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _openSource(imageSourceTemplate);
+      }
+    });
+  }
 
   void _openSource(SourceTemplate template) {
+    final customBuilder = widget.sourceFormBuilder;
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => SourceFormScreen(
-          initialTemplate: template,
-          sharedContent: widget.sharedContent,
-        ),
+        builder: (_) => customBuilder?.call(template, widget.sharedContent) ??
+            SourceFormScreen(
+              initialTemplate: template,
+              sharedContent: widget.sharedContent,
+            ),
       ),
     );
   }
@@ -219,6 +254,19 @@ class _HomeScreenState extends State<HomeScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          if (widget.sharedContent?.kind == SharedContentKind.imageError) ...[
+            Card(
+              color: Theme.of(context).colorScheme.errorContainer,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  'Geteiltes Bild konnte nicht übernommen werden: '
+                  '${widget.sharedContent!.text}',
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
           Text(
             isShared ? 'Geteilten Inhalt erfassen' : 'Neue Quelle erfassen',
             style: Theme.of(context).textTheme.titleLarge,
