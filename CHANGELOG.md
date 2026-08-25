@@ -32,6 +32,9 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Fixed
 
+- Bildquellen-Widget-Tests warten zustandsbasiert auf Vorschau-, Pending- und
+  Erfolgszustände, statt bei einem animierten Textcursor mit `pumpAndSettle`
+  bis zum Timeout zu laufen.
 - Widget-Test für den Validierungshinweis wartet zustandsbasiert auf die Snackbar statt auf eine feste Verzögerung.
 - Widget-Test adressiert den Speichern-Button über einen stabilen Key statt über die konkrete Button-Implementierung.
 - Widget-Test scrollt bis zum lazily aufgebauten Speichern-Button, bevor er ihn antippt.
