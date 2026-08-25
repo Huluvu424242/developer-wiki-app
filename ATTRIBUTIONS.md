@@ -14,6 +14,8 @@ steht unter der in der Root-Datei [`LICENSE`](LICENSE) genannten MIT-Lizenz.
   `android/app/src/main/res/mipmap-*`
 - das daraus abgeleitete monochrome Android-Icon
   `android/app/src/main/res/drawable/ic_launcher_monochrome.xml`
+- die daraus abgeleiteten Android-Icons der Teilen-Ziele
+  `android/app/src/main/res/drawable/ic_share_*.xml`
 
 **Entstehung:** Gestaltung, Auswahl und Veröffentlichung durch
 [Huluvu424242](https://github.com/Huluvu424242) unter Verwendung der
