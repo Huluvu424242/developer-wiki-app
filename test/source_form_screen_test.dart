@@ -37,7 +37,9 @@ Future<void> pumpUntilNotFound(
 
   while (finder.evaluate().isNotEmpty) {
     if (elapsed >= timeout) {
-      throw TestFailure('Widget ist innerhalb von $timeout nicht verschwunden.');
+      throw TestFailure(
+        'Widget ist innerhalb von $timeout nicht verschwunden.',
+      );
     }
     await tester.pump(step);
     elapsed += step;
