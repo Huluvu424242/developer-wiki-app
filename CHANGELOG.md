@@ -32,6 +32,8 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Fixed
 
+- Bildquellen-Widget-Tests verwenden vollständig decodierbare PNG-Testdaten,
+  damit der Bild-Codec unter Windows nicht an einer abgeschnittenen Datei hängt.
 - Bildquellen-Widget-Tests warten zustandsbasiert auf Vorschau-, Pending- und
   Erfolgszustände, statt bei einem animierten Textcursor mit `pumpAndSettle`
   bis zum Timeout zu laufen.
