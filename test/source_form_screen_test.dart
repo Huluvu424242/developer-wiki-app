@@ -144,7 +144,10 @@ void main() {
     expect(find.textContaining('source.png'), findsOneWidget);
     expect(find.text('Ersetzen'), findsOneWidget);
 
-    await tester.tap(find.byKey(const Key('image-source-remove-button')));
+    final removeButton = find.byKey(const Key('image-source-remove-button'));
+    await tester.ensureVisible(removeButton);
+    await tester.pump();
+    await tester.tap(removeButton);
     await pumpUntilNotFound(tester, preview);
 
     expect(preview, findsNothing);
@@ -169,6 +172,8 @@ void main() {
       300,
       scrollable: find.byType(Scrollable).first,
     );
+    await tester.ensureVisible(saveButton);
+    await tester.pump();
     await tester.tap(saveButton);
     await tester.pump();
 
@@ -219,7 +224,8 @@ void main() {
       300,
       scrollable: find.byType(Scrollable).first,
     );
-
+    await tester.ensureVisible(saveButton);
+    await tester.pump();
     await tester.tap(saveButton);
     final pendingUpload = find.textContaining('Bild-Upload für Issue #123');
     await pumpUntilFound(tester, pendingUpload);
@@ -232,6 +238,8 @@ void main() {
       300,
       scrollable: find.byType(Scrollable).first,
     );
+    await tester.ensureVisible(saveButton);
+    await tester.pump();
     await tester.tap(saveButton);
     final createdIssue = find.textContaining('Quelle erstellt – Issue #123');
     await pumpUntilFound(tester, createdIssue);
