@@ -101,7 +101,7 @@ class _BoundedTextFormFieldState extends State<BoundedTextFormField> {
         context, {
         required currentLength,
         required isFocused,
-        required maxLength,
+        maxLength,
       }) {
         final remaining = (maxLength ?? widget.maxLength) - currentLength;
         if (remaining > 10) {
