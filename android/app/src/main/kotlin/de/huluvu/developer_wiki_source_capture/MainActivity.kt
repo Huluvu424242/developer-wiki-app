@@ -26,6 +26,7 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         configureExternalUrlChannel(flutterEngine)
+        configureAppInfoChannel(flutterEngine)
         configureShareChannel(flutterEngine)
         configureImageChannel(flutterEngine)
     }
@@ -63,6 +64,36 @@ class MainActivity : FlutterActivity() {
             pendingShare = sharedContent
         } else {
             channel.invokeMethod("shared", sharedContent)
+        }
+    }
+
+    private fun configureAppInfoChannel(flutterEngine: FlutterEngine) {
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            "developer_wiki/app_info"
+        ).setMethodCallHandler { call, result ->
+            if (call.method != "getAppInfo") {
+                result.notImplemented()
+                return@setMethodCallHandler
+            }
+            try {
+                @Suppress("DEPRECATION")
+                val packageInfo = packageManager.getPackageInfo(packageName, 0)
+                val buildNumber = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    packageInfo.longVersionCode.toString()
+                } else {
+                    @Suppress("DEPRECATION")
+                    packageInfo.versionCode.toString()
+                }
+                result.success(
+                    mapOf(
+                        "version" to packageInfo.versionName.orEmpty(),
+                        "buildNumber" to buildNumber
+                    )
+                )
+            } catch (error: Exception) {
+                result.error("app_info_failed", error.message, null)
+            }
         }
     }
 
