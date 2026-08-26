@@ -32,11 +32,23 @@ void main() {
 
     expect(find.text('Releaseversion 1.2.3+45'), findsOneWidget);
     expect(find.text('Barrierefreiheitserklärung'), findsOneWidget);
+    expect(
+      tester.widget<BugReportButton>(
+        find.byType(BugReportButton),
+      ).contextName,
+      'Über-Dialog',
+    );
 
     await tester.tap(find.text('Barrierefreiheitserklärung'));
     await tester.pumpAndSettle();
     expect(find.text('Bekannte Barrieren'), findsOneWidget);
     expect(find.text('Bug melden'), findsWidgets);
+    expect(
+      tester
+          .widgetList<BugReportButton>(find.byType(BugReportButton))
+          .map((button) => button.contextName),
+      contains('Barrierefreiheitserklärung'),
+    );
   });
 
   testWidgets('bug report requires type and opens prefilled app issue', (
