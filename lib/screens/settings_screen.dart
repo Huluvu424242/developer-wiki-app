@@ -5,7 +5,7 @@ import '../services/configuration_service.dart';
 import '../services/github_service.dart';
 import '../widgets/app_support.dart';
 import '../widgets/bounded_text_form_field.dart';
-import '../widgets/error_summary.dart';
+import '../widgets/error_summary.dart' as validation;
 import '../widgets/pat_help_button.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -200,6 +200,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     )) {
       return;
     }
+    if (!mounted) {
+      return;
+    }
     if (!_connectionVerified) {
       _setStatus(
         'Bitte die Verbindung vor dem Speichern erfolgreich testen.',
@@ -288,11 +291,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           controller: _scrollController,
           padding: const EdgeInsets.all(16),
           children: [
-            ErrorSummary(
+            validation.ErrorSummary(
               focusNode: _summaryFocus,
               errors: _validationErrors
                   .map(
-                    (error) => ValidationErrorItem(
+                    (error) => validation.ValidationErrorItem(
                       label: error,
                       onActivate: () => _focusError(error),
                     ),
