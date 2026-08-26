@@ -74,12 +74,24 @@ void main() {
     expect(errorSummary, findsOneWidget);
     expect(find.text('Issue-Titel: Pflichtfeld'), findsOneWidget);
 
-    await tester.tap(find.text('Issue-Titel: Pflichtfeld'));
-    await tester.pump();
-    expect(
-      FocusManager.instance.primaryFocus?.debugLabel,
-      'Issue-Titel',
+    final titleErrorLink = find.ancestor(
+      of: find.text('Issue-Titel: Pflichtfeld'),
+      matching: find.byType(TextButton),
     );
+    await tester.ensureVisible(titleErrorLink);
+    await tester.pumpAndSettle();
+    final tappableTitleErrorLink = titleErrorLink.hitTestable();
+    expect(tappableTitleErrorLink, findsOneWidget);
+    await tester.tap(tappableTitleErrorLink);
+    await tester.pump();
+
+    final titleEditable = tester.widget<EditableText>(
+      find.descendant(
+        of: find.widgetWithText(TextFormField, 'Issue-Titel'),
+        matching: find.byType(EditableText),
+      ),
+    );
+    expect(titleEditable.focusNode.hasFocus, isTrue);
   });
 
   testWidgets('clears a default value with one tap', (tester) async {
