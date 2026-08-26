@@ -223,14 +223,17 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
 
   void _focusValidationError(String error) {
     final label = error.split(':').first;
-    final node = label == 'Issue-Titel'
-        ? _titleFocus
-        : _fieldFocus.entries
-            .where((entry) =>
-                template.fields.any((field) =>
-                    field.id == entry.key && field.label == label))
-            .map((entry) => entry.value)
-            .firstOrNull;
+    FocusNode? node;
+    if (label == 'Issue-Titel') {
+      node = _titleFocus;
+    } else {
+      for (final field in template.fields) {
+        if (field.label == label) {
+          node = _fieldFocus[field.id];
+          break;
+        }
+      }
+    }
     if (node == null) {
       return;
     }
@@ -779,6 +782,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
             ],
           ],
         ),
+        ),
       ),
     );
   }
@@ -819,7 +823,6 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
               ],
             ),
           ],
-        ),
         ),
       ),
     );
