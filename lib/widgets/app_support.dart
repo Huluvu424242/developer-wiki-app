@@ -4,7 +4,7 @@ import '../models/app_info.dart';
 import '../services/app_info_service.dart';
 import '../services/external_url_service.dart';
 import 'bounded_text_form_field.dart';
-import 'error_summary.dart';
+import 'error_summary.dart' as validation;
 
 const _appRepository = 'Huluvu424242/developer-wiki-app';
 
@@ -269,12 +269,12 @@ class _BugReportDialogState extends State<_BugReportDialog> {
   bool _busy = false;
   String? _errorMessage;
 
-  List<ValidationErrorItem> get _errors {
+  List<validation.ValidationErrorItem> get _errors {
     if (!_showErrors || _type != null) {
       return const [];
     }
     return [
-      ValidationErrorItem(
+      validation.ValidationErrorItem(
         label: 'Fehlerart: Bitte auswählen',
         onActivate: () => _focus(_typeFocus),
       ),
@@ -374,7 +374,7 @@ class _BugReportDialogState extends State<_BugReportDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ErrorSummary(errors: _errors, focusNode: _summaryFocus),
+                validation.ErrorSummary(errors: _errors, focusNode: _summaryFocus),
                 Text('Kontext: ${widget.contextName}'),
                 Text('Releaseversion: ${widget.appInfo.displayVersion}'),
                 const SizedBox(height: 16),
