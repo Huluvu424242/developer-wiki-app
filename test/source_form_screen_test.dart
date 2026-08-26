@@ -5,6 +5,7 @@ import 'package:developer_wiki_source_capture/models/source_template.dart';
 import 'package:developer_wiki_source_capture/screens/source_form_screen.dart';
 import 'package:developer_wiki_source_capture/services/image_input_service.dart';
 import 'package:developer_wiki_source_capture/services/image_upload_service.dart';
+import 'package:developer_wiki_source_capture/widgets/app_support.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -45,6 +46,32 @@ Future<void> pumpUntilNotFound(
 }
 
 void main() {
+  testWidgets('bug report context identifies the selected source dialog', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: SourceFormScreen(initialTemplate: imageSourceTemplate),
+      ),
+    );
+
+    expect(
+      tester.widget<AppSupportMenu>(find.byType(AppSupportMenu)).contextName,
+      'Quellendialog – 🖼️ Bild-Quelle',
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SourceFormScreen(initialTemplate: sourceTemplates[3]),
+      ),
+    );
+
+    expect(
+      tester.widget<AppSupportMenu>(find.byType(AppSupportMenu)).contextName,
+      'Quellendialog – 🔒 Privatperson fürs Wiki',
+    );
+  });
+
   testWidgets('shows a temporary hint when validation fails', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
