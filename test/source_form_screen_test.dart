@@ -66,6 +66,18 @@ void main() {
     await pumpUntilFound(tester, validationHint);
 
     expect(validationHint, findsOneWidget);
+    expect(
+      find.byKey(const Key('validation-error-summary')),
+      findsOneWidget,
+    );
+    expect(find.text('Issue-Titel: Pflichtfeld'), findsOneWidget);
+
+    await tester.tap(find.text('Issue-Titel: Pflichtfeld'));
+    await tester.pump();
+    final titleField = tester.widget<TextFormField>(
+      find.widgetWithText(TextFormField, 'Issue-Titel'),
+    );
+    expect(titleField.focusNode?.hasFocus, isTrue);
   });
 
   testWidgets('clears a default value with one tap', (tester) async {
