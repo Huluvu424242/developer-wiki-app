@@ -16,6 +16,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Changed
 
+- Das importierbare Branch-Ruleset schützt neben `master` jetzt auch alle Branches unter `release/**`.
 - Einstellungen verwenden jetzt feldnahe Validierung, temporäre Hinweise und reservierten Platz unter den Aktionsschaltflächen.
 
 ## [0.1.0+3] - 2026-08-25
