@@ -5,6 +5,7 @@ import '../models/wiki_configuration.dart';
 import '../services/configuration_service.dart';
 import '../services/external_url_service.dart';
 import '../services/github_service.dart';
+import '../widgets/app_support.dart';
 import 'source_form_screen.dart';
 
 class RecentSourcesScreen extends StatefulWidget {
@@ -94,6 +95,7 @@ class _RecentSourcesScreenState extends State<RecentSourcesScreen> {
             onPressed: _busy ? null : _load,
             icon: const Icon(Icons.refresh),
           ),
+          const AppSupportMenu(contextName: 'Letzte Quellen'),
         ],
       ),
       body: _body(),
