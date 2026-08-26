@@ -93,6 +93,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<bool> _showValidationErrors(List<String> errors) async {
+    _formKey.currentState?.validate();
     if (errors.isEmpty) {
       setState(() => _validationErrors = const []);
       return false;
