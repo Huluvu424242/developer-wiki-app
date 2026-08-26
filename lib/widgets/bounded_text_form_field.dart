@@ -62,7 +62,8 @@ class _BoundedTextFormFieldState extends State<BoundedTextFormField> {
     if (atLimit && !_limitAnnounced) {
       _limitAnnounced = true;
       SystemSound.play(SystemSoundType.alert);
-      SemanticsService.announce(
+      SemanticsService.sendAnnouncement(
+        View.of(context),
         'Kein Zeichen mehr möglich',
         Directionality.of(context),
       );
