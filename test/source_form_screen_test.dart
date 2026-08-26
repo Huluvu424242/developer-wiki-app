@@ -74,10 +74,10 @@ void main() {
 
     await tester.tap(find.text('Issue-Titel: Pflichtfeld'));
     await tester.pump();
-    final titleField = tester.widget<TextFormField>(
-      find.widgetWithText(TextFormField, 'Issue-Titel'),
+    expect(
+      FocusManager.instance.primaryFocus?.debugLabel,
+      'Issue-Titel',
     );
-    expect(titleField.focusNode?.hasFocus, isTrue);
   });
 
   testWidgets('clears a default value with one tap', (tester) async {
