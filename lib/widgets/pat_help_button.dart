@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'app_support.dart';
+
 class PatHelpButton extends StatelessWidget {
   const PatHelpButton({super.key});
 
@@ -86,6 +88,7 @@ class _PatHelpDialog extends StatelessWidget {
         ),
       ),
       actions: [
+        const BugReportButton(contextName: 'PAT-Hilfedialog'),
         TextButton(
           onPressed: Navigator.of(context).pop,
           child: const Text('Schließen'),
