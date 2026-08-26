@@ -59,17 +59,19 @@ void main() {
       scrollable: find.byType(Scrollable).first,
     );
     await tester.ensureVisible(saveButton);
-    await tester.pump();
-    await tester.tap(saveButton);
+    await tester.pumpAndSettle();
+    final tappableSaveButton = saveButton.hitTestable();
+    expect(tappableSaveButton, findsOneWidget);
+    await tester.tap(tappableSaveButton);
+
+    final errorSummary = find.byKey(
+      const Key('validation-error-summary'),
+    );
+    await pumpUntilFound(tester, errorSummary);
 
     final validationHint = find.text('Bitte markierte Pflichtfelder prüfen.');
-    await pumpUntilFound(tester, validationHint);
-
     expect(validationHint, findsOneWidget);
-    expect(
-      find.byKey(const Key('validation-error-summary')),
-      findsOneWidget,
-    );
+    expect(errorSummary, findsOneWidget);
     expect(find.text('Issue-Titel: Pflichtfeld'), findsOneWidget);
 
     await tester.tap(find.text('Issue-Titel: Pflichtfeld'));
