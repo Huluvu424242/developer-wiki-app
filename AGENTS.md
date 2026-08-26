@@ -44,7 +44,16 @@ Wenn der Benutzer einen Fehler meldet und um Behebung bittet, ist grundsätzlich
 
 Wenn der Benutzer neue Funktionen, fachliche Anforderungen oder größere Erweiterungen planen und als Stories erfassen möchte, ist grundsätzlich folgender Ablauf einzuhalten:
 
-Auch Aufgaben „auf Zuruf“, bei denen der Benutzer unmittelbar um eine Änderung oder Realisierung bittet, müssen vor der Umsetzung als Story erfasst werden. Dies gilt unabhängig von Umfang oder betroffener Datei auch für kleine funktionale Änderungen, UX- oder Barrierefreiheitsvorgaben, Konfigurationsanpassungen und Änderungen an den Arbeitsregeln. Ein ausdrücklicher Wunsch nach direkter Umsetzung hebt die Story-Pflicht nicht auf. Für solche Aufträge gilt verbindlich: zuerst Repository und Kontext analysieren, dann eine Story mit dem Label `story` und prüfbaren Akzeptanzkriterien erstellen, anschließend auf einem eigenen Branch realisieren und einen Pull Request mit einem passenden Closing-Keyword für die Story erstellen. Gemeldete Defekte folgen weiterhin dem gesonderten Ablauf aus `Fehlerbehebung` und werden als Bug-Issue erfasst.
+Auch Aufgaben „auf Zuruf“, bei denen der Benutzer unmittelbar um eine Änderung oder Realisierung bittet, müssen grundsätzlich vor der Umsetzung als Story erfasst werden. Dies gilt unabhängig von Umfang oder betroffener Datei auch für kleine funktionale Änderungen, UX- oder Barrierefreiheitsvorgaben, Konfigurationsanpassungen und Änderungen an den Arbeitsregeln. Für solche Aufträge gilt grundsätzlich: zuerst Repository und Kontext analysieren, dann eine Story mit dem Label `story` und prüfbaren Akzeptanzkriterien erstellen, anschließend auf einem eigenen Branch realisieren und einen Pull Request mit einem passenden Closing-Keyword für die Story erstellen.
+
+Von dieser Story-Pflicht darf ausschließlich nach folgendem Entscheidungsdialog abgewichen werden:
+- Vor Beginn der Umsetzung muss der KI-Assistent dem Benutzer wörtlich die Rückfrage `Soll ich zunächst eine Story erstellen?` stellen und die Antwort abwarten.
+- Antwortet der Benutzer mit `Ja`, wird zwingend zuerst die Story erstellt und erst anschließend nach dem Story-Workflow umgesetzt.
+- Antwortet der Benutzer mit `Nein`, darf die konkret angefragte Änderung ohne vorherige Story direkt auf einem eigenen Branch umgesetzt und als Pull Request bereitgestellt werden.
+- Ist die Antwort nicht eindeutig, darf die Story-Pflicht nicht als aufgehoben betrachtet werden; der KI-Assistent muss nachfragen oder zunächst eine Story erstellen.
+- Die Ausnahme gilt nur für den konkret erfragten Auftrag und begründet keine dauerhafte Aufhebung der Story-Pflicht für spätere Aufgaben.
+
+Gemeldete Defekte folgen weiterhin dem gesonderten Ablauf aus `Fehlerbehebung` und werden als Bug-Issue erfasst.
 
 1. Das Repository und den fachlichen Kontext zunächst analysieren.
     - Für GitHub-Zugriffe ausschließlich den verbundenen GitHub-Connector verwenden.
