@@ -61,21 +61,21 @@ class _WikiSourceAppState extends State<WikiSourceApp> {
         future: _configuration,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            return const Scaffold(
+            return Scaffold(
               appBar: AppBar(
-                title: Text('Developer Wiki'),
-                actions: [
+                title: const Text('Developer Wiki'),
+                actions: const [
                   AppSupportMenu(contextName: 'App wird geladen'),
                 ],
               ),
-              body: Center(child: CircularProgressIndicator()),
+              body: const Center(child: CircularProgressIndicator()),
             );
           }
           if (snapshot.hasError) {
             return Scaffold(
-              appBar: const AppBar(
-                title: Text('Developer Wiki'),
-                actions: [
+              appBar: AppBar(
+                title: const Text('Developer Wiki'),
+                actions: const [
                   AppSupportMenu(contextName: 'Startfehler'),
                 ],
               ),
