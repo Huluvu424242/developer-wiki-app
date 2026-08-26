@@ -248,6 +248,51 @@ Rebase darf verwendet werden, um einen Story-, Bugfix- oder sonstigen Arbeitsbra
     - Force Pushes auf `master` bleiben durch das Ruleset verboten.
     - History-Rewriting ist nur auf dem zugehörigen Arbeitsbranch und nur nach den oben genannten Regeln zulässig.
 
+## UX- und Barrierefreiheitsregeln
+
+Für alle Screens, Seiten, Formulare und Dialoge der App gelten folgende Regeln verbindlich:
+
+1. Validierungsfehler werden sowohl am betroffenen Eingabefeld als auch in einem Fehlersammler angezeigt.
+    - Der Fehlersammler erscheint immer am Anfang des Inhalts und damit oberhalb aller Eingabefelder.
+    - Jeder Eintrag im Fehlersammler benennt den Fehler verständlich und ist als Link bzw. fokussierbare Aktion zum zugehörigen invaliden Eingabefeld ausgeführt.
+    - Beim Aktivieren eines Eintrags wird das zugehörige Feld sichtbar gemacht und der Eingabefokus dorthin gesetzt.
+    - Die Anzeige im Fehlersammler ersetzt niemals die einzelne Fehleranzeige unmittelbar am invaliden Eingabefeld.
+
+2. Der primäre Aktionsbereich befindet sich am unteren Ende der Seite oder des Dialogs, jedoch nicht unmittelbar am unteren Bildschirmrand.
+    - Unterhalb der Aktionsschaltflächen bleibt ausreichend Platz für temporäre Meldungen, Systemeinblendungen und Bedienhilfen.
+    - Aktionsschaltflächen dürfen durch Snackbars, Toasts, Tooltips, Bildschirmränder, Gestennavigation oder die Bildschirmtastatur nicht verdeckt werden.
+
+3. Werden durch eine ausgelöste Aktion, beispielsweise Speichern, Validierungsfehler sichtbar, erfolgen immer beide Rückmeldungen:
+    - Es wird eine kurze temporäre Hinweismeldung angezeigt, dass Eingaben korrigiert werden müssen.
+    - Gleichzeitig wird zum Fehlersammler am Anfang des Inhalts gesprungen und der Fokus barrierefrei auf den Fehlersammler gesetzt.
+    - Die Hinweismeldung und der Fokuswechsel müssen für assistive Technologien wahrnehmbar sein.
+
+4. Jede App besitzt eine Barrierefreiheitserklärung.
+    - Die Erklärung ist innerhalb der App dauerhaft erreichbar.
+    - Sie beschreibt mindestens den aktuellen Stand der Barrierefreiheit, bekannte Barrieren und einen barrierefrei nutzbaren Kontakt- oder Meldeweg.
+
+5. Jede App besitzt einen Menüpunkt `Über`.
+    - Über diesen Menüpunkt können Nutzer jederzeit die installierte Releaseversion der App ermitteln.
+    - Der About-Dialog zeigt zwingend die Releaseversion an.
+    - Der About-Dialog enthält zusätzlich eine eindeutig beschriftete Schaltfläche, über die die Barrierefreiheitserklärung geöffnet werden kann.
+
+6. Auf jeder Seite und in jedem Dialog ist eine barrierefrei erreichbare Möglichkeit zum Melden eines Fehlers vorhanden.
+    - Der Meldeweg erstellt auf der Projektseite der App ein GitHub-Issue mit dem Label `bug`.
+    - Im Bugreport werden der aktuell genutzte Screen bzw. Dialog und die installierte Releaseversion als Kontext automatisch vorbelegt.
+    - Der Bugreport enthält ein Pflichtfeld `Fehlerart` als zunächst nicht vorbelegte Auswahlliste; ein Platzhalter darf nicht als gültige Auswahl gelten.
+    - Die Auswahlliste enthält zwingend `Barrierefreiheitsfehler` und `Sonstiges`; app-spezifische weitere Fehlerarten sind zulässig.
+    - Zusätzlich wird ein Freitextfeld mit einer maximalen Länge von 2000 Zeichen angeboten.
+    - Bezeichnungen, Hilfetexte, Pflichtfeldstatus, Validierungsfehler und Bedienelemente des Meldewegs müssen für Screenreader semantisch eindeutig sein.
+    - Vor dem Öffnen oder Übermitteln dürfen keine Zugangsdaten, Tokens oder sonstigen Secrets in den Bugreport übernommen werden.
+
+7. Jedes Eingabefeld besitzt eine fachlich festgelegte maximale Zeichenlänge und einen Zeichenzähler.
+    - Der Zeichenzähler wird sichtbar, sobald nur noch zehn Zeichen bis zur Längenbegrenzung verbleiben, und bleibt bis zum Erreichen der Grenze sichtbar.
+    - Screenreader geben den verbleibenden Umfang in der Form `noch x Zeichen` aus.
+    - Nach Eingabe des letzten zulässigen Zeichens ertönt ein akustisches Signal und assistive Technologien geben den Hinweis `Kein Zeichen mehr möglich` aus.
+    - Das akustische Signal darf nicht die einzige Rückmeldung sein; der sichtbare Zeichenzähler und die semantische Textausgabe bleiben erforderlich.
+    - Zusätzliche Eingaben über die Grenze hinaus werden verhindert, ohne bereits eingegebenen Text zu verlieren.
+    - Die Rückmeldung beim Erreichen der Grenze darf pro Grenzerreichung nicht bei jedem weiteren Eingabeversuch ununterbrochen wiederholt werden.
+
 ## Architekturleitplanken
 
 Für die Weiterentwicklung der App gelten zusätzlich folgende Leitplanken:
