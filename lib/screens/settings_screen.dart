@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/wiki_configuration.dart';
 import '../services/configuration_service.dart';
 import '../services/github_service.dart';
+import '../widgets/app_support.dart';
 import '../widgets/pat_help_button.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -185,6 +186,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: Text(
           widget.isSetup ? 'Developer Wiki – Einrichtung' : 'Einstellungen',
         ),
+        actions: [
+          AppSupportMenu(
+            contextName: widget.isSetup ? 'Ersteinrichtung' : 'Einstellungen',
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
