@@ -9,6 +9,7 @@ import '../services/configuration_service.dart';
 import '../services/external_url_service.dart';
 import '../services/github_service.dart';
 import '../services/image_upload_service.dart';
+import '../widgets/app_support.dart';
 import 'recent_sources_screen.dart';
 import 'settings_screen.dart';
 import 'source_form_screen.dart';
@@ -143,6 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'Der Import-Workflow des verbundenen Wikis wird jetzt gestartet.',
         ),
         actions: [
+          const BugReportButton(contextName: 'Quellenimport-Dialog'),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
             child: const Text('Abbrechen'),
@@ -287,6 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: _openSettings,
             icon: const Icon(Icons.settings),
           ),
+          const AppSupportMenu(contextName: 'Startseite'),
         ],
       ),
       body: ListView(
