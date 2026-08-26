@@ -44,6 +44,8 @@ Wenn der Benutzer einen Fehler meldet und um Behebung bittet, ist grundsätzlich
 
 Wenn der Benutzer neue Funktionen, fachliche Anforderungen oder größere Erweiterungen planen und als Stories erfassen möchte, ist grundsätzlich folgender Ablauf einzuhalten:
 
+Auch Aufgaben „auf Zuruf“, bei denen der Benutzer unmittelbar um eine Änderung oder Realisierung bittet, müssen vor der Umsetzung als Story erfasst werden. Dies gilt unabhängig von Umfang oder betroffener Datei auch für kleine funktionale Änderungen, UX- oder Barrierefreiheitsvorgaben, Konfigurationsanpassungen und Änderungen an den Arbeitsregeln. Ein ausdrücklicher Wunsch nach direkter Umsetzung hebt die Story-Pflicht nicht auf. Für solche Aufträge gilt verbindlich: zuerst Repository und Kontext analysieren, dann eine Story mit dem Label `story` und prüfbaren Akzeptanzkriterien erstellen, anschließend auf einem eigenen Branch realisieren und einen Pull Request mit einem passenden Closing-Keyword für die Story erstellen. Gemeldete Defekte folgen weiterhin dem gesonderten Ablauf aus `Fehlerbehebung` und werden als Bug-Issue erfasst.
+
 1. Das Repository und den fachlichen Kontext zunächst analysieren.
     - Für GitHub-Zugriffe ausschließlich den verbundenen GitHub-Connector verwenden.
     - Bestehende Architektur, Dokumentation, Issues, Pull Requests, Labels und Milestones prüfen, soweit sie für die Planung relevant sind.
