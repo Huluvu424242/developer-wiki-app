@@ -7,6 +7,17 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Added
+
+- Appweites Menü mit About-Dialog, installierter Release- und Buildnummer sowie offline verfügbarer Barrierefreiheitserklärung.
+- Sicherer, kontextbezogener Bugreport für alle Screens und App-Dialoge, der ohne Wiki-PAT ein vorbereitetes Issue mit dem Label `bug` im Browser öffnet.
+- Fehlersammler mit Feldnavigation und Fokussteuerung für Quellenformular, Einstellungen und Bugreport.
+- Fachliche Maximallängen und barrierefreie Restzeichenzähler für alle Texteingaben mit kombinierter sichtbarer, semantischer und akustischer Grenzrückmeldung.
+
+### Changed
+
+- Einstellungen verwenden jetzt feldnahe Validierung, temporäre Hinweise und reservierten Platz unter den Aktionsschaltflächen.
+
 ## [0.1.0+3] - 2026-08-25
 
 ### Added
