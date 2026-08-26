@@ -329,6 +329,7 @@ class _BugReportDialogState extends State<_BugReportDialog> {
       'github.com',
       '/$_appRepository/issues/new',
       {
+        'template': 'app_bug_report.md',
         'labels': 'bug',
         'title': title,
         'body': body,
