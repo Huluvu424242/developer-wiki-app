@@ -17,7 +17,7 @@ import '../services/image_upload_service.dart';
 import '../services/source_prefill_service.dart';
 import '../widgets/app_support.dart';
 import '../widgets/bounded_text_form_field.dart';
-import '../widgets/error_summary.dart';
+import '../widgets/error_summary.dart' as validation;
 import 'settings_screen.dart';
 
 class SourceFormScreen extends StatefulWidget {
@@ -463,11 +463,11 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
           controller: _scrollController,
           padding: const EdgeInsets.all(16),
           children: [
-            ErrorSummary(
+            validation.ErrorSummary(
               focusNode: _summaryFocus,
               errors: _validationErrors
                   .map(
-                    (error) => ValidationErrorItem(
+                    (error) => validation.ValidationErrorItem(
                       label: error,
                       onActivate: () => _focusValidationError(error),
                     ),
