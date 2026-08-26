@@ -71,7 +71,12 @@ void main() {
     await tester.pump();
     expect(find.byKey(const Key('validation-error-summary')), findsOneWidget);
 
-    await tester.tap(find.text('Bitte auswählen').last);
+    final typeDropdown = find.byType(DropdownButtonFormField<String>);
+    await tester.ensureVisible(typeDropdown);
+    await tester.pumpAndSettle();
+    final tappableTypeDropdown = typeDropdown.hitTestable();
+    expect(tappableTypeDropdown, findsOneWidget);
+    await tester.tap(tappableTypeDropdown);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Barrierefreiheitsfehler').last);
     await tester.enterText(
