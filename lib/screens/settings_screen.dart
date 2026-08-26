@@ -129,6 +129,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String? _required(String? value) =>
       (value ?? '').trim().isEmpty ? 'Pflichtfeld' : null;
 
+  String? _repositoryValidator(String? value) {
+    final requiredError = _required(value);
+    if (requiredError != null) {
+      return requiredError;
+    }
+    try {
+      GitHubRepository.parse(value!);
+      return null;
+    } on FormatException catch (error) {
+      return error.message.toString();
+    }
+  }
+
   Future<void> _testConnection() async {
     if (await _showValidationErrors(_collectErrors(includeWorkflow: false))) {
       return;
@@ -278,7 +291,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               enabled: !_busy,
               keyboardType: TextInputType.url,
               textInputAction: TextInputAction.next,
-              validator: _required,
+              validator: _repositoryValidator,
               decoration: const InputDecoration(
                 labelText: 'GitHub Wiki',
                 helperText: 'Repository-URL oder owner/repo',
