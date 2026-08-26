@@ -9,9 +9,14 @@ class SourceField {
       this.placeholder = '',
       this.required = false,
       this.options = const [],
-      this.initialValue = ''});
+      this.initialValue = '',
+      this.maxLength});
   final String id, label, description, placeholder, initialValue;
   final FieldKind kind;
+  final int? maxLength;
+
+  int get effectiveMaxLength =>
+      maxLength ?? (kind == FieldKind.input ? 500 : 4000);
   final bool required;
   final List<String> options;
 }
