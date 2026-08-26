@@ -48,6 +48,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Fixed
 
+- Bugreports unterscheiden den aktuell gewählten Quellendialog sowie Über-Dialog und Barrierefreiheitserklärung eindeutig im vorbelegten Kontext.
 - Der zweistufige Upload-Widget-Test scrollt zu lazy aufgebauten Pending- und
   Erfolgskarten, bevor er deren Darstellung prüft.
 - Bildquellen-Widget-Tests machen gescrollte Aktionsbuttons vor dem Tap
