@@ -17,6 +17,7 @@ import '../services/image_upload_service.dart';
 import '../services/source_prefill_service.dart';
 import '../widgets/app_support.dart';
 import '../widgets/bounded_text_form_field.dart';
+import '../widgets/error_summary.dart';
 import 'settings_screen.dart';
 
 class SourceFormScreen extends StatefulWidget {
@@ -45,6 +46,10 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
   static const _bottomClearance = 64.0;
 
   final key = GlobalKey<FormState>();
+  final _scrollController = ScrollController();
+  final _summaryFocus = FocusNode(debugLabel: 'Quellenformular-Fehlersammler');
+  final _titleFocus = FocusNode(debugLabel: 'Issue-Titel');
+  final _fieldFocus = <String, FocusNode>{};
   final title = TextEditingController();
   final _configurationService = ConfigurationService();
   final _externalUrlService = ExternalUrlService();
@@ -60,6 +65,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
   ImageSourceFile? _image;
   PendingImageUpload? _pendingUpload;
   String? _errorMessage;
+  List<String> _validationErrors = const [];
 
   @override
   void initState() {
@@ -95,7 +101,13 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
       controller.dispose();
     }
     values.clear();
+    for (final focusNode in _fieldFocus.values) {
+      focusNode.dispose();
+    }
+    _fieldFocus.clear();
     for (final field in next.fields) {
+      _fieldFocus[field.id] = FocusNode(debugLabel: field.label);
+
       if (field.kind != FieldKind.image) {
         values[field.id] = TextEditingController(text: field.initialValue);
       }
@@ -109,12 +121,20 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     }
     _createdIssue = null;
     _errorMessage = null;
+    _validationErrors = const [];
   }
 
   Future<void> submit() async {
     final formIsValid = key.currentState?.validate() ?? false;
     if (!formIsValid || _hasMissingRequiredValues()) {
+      setState(() => _validationErrors = _collectValidationErrors());
       _showValidationHint();
+      await _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+      );
+      _summaryFocus.requestFocus();
       return;
     }
 
@@ -181,6 +201,43 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
         _image = null;
         _createdIssue = issue;
       });
+    }
+  }
+
+  List<String> _collectValidationErrors() {
+    final errors = <String>[];
+    if (title.text.trim().isEmpty) {
+      errors.add('Issue-Titel: Pflichtfeld');
+    }
+    for (final field in template.fields) {
+      final missing = field.required &&
+          (field.kind == FieldKind.image
+              ? _image == null
+              : values[field.id]!.text.trim().isEmpty);
+      if (missing) {
+        errors.add('${field.label}: Pflichtfeld');
+      }
+    }
+    return errors;
+  }
+
+  void _focusValidationError(String error) {
+    final label = error.split(':').first;
+    final node = label == 'Issue-Titel'
+        ? _titleFocus
+        : _fieldFocus.entries
+            .where((entry) =>
+                template.fields.any((field) =>
+                    field.id == entry.key && field.label == label))
+            .map((entry) => entry.value)
+            .firstOrNull;
+    if (node == null) {
+      return;
+    }
+    node.requestFocus();
+    final focusContext = node.context;
+    if (focusContext != null) {
+      Scrollable.ensureVisible(focusContext);
     }
   }
 
@@ -357,6 +414,12 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     if (image != null && _pendingUpload == null) {
       unawaited(_imageInputGateway.discard(image));
     }
+    _scrollController.dispose();
+    _summaryFocus.dispose();
+    _titleFocus.dispose();
+    for (final focusNode in _fieldFocus.values) {
+      focusNode.dispose();
+    }
     title.dispose();
     for (final controller in values.values) {
       controller.dispose();
@@ -394,8 +457,20 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
       body: Form(
         key: key,
         child: ListView(
+          controller: _scrollController,
           padding: const EdgeInsets.all(16),
           children: [
+            ErrorSummary(
+              focusNode: _summaryFocus,
+              errors: _validationErrors
+                  .map(
+                    (error) => ValidationErrorItem(
+                      label: error,
+                      onActivate: () => _focusValidationError(error),
+                    ),
+                  )
+                  .toList(growable: false),
+            ),
             if (sharedContent != null) ...[
               const Text(
                 'Geteilter Inhalt wurde vorausgefüllt und kann bearbeitet werden.',
@@ -430,8 +505,10 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
             if (_errorMessage != null) _errorCard(_errorMessage!),
             ValueListenableBuilder<TextEditingValue>(
               valueListenable: title,
-              builder: (context, value, _) => TextFormField(
+              builder: (context, value, _) => BoundedTextFormField(
                 controller: title,
+                focusNode: _titleFocus,
+                maxLength: 256,
                 enabled: !busy && _pendingUpload == null,
                 decoration: InputDecoration(
                   labelText: 'Issue-Titel',
@@ -545,6 +622,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
         child: ValueListenableBuilder<TextEditingValue>(
           valueListenable: controller,
           builder: (context, value, _) => DropdownButtonFormField<String>(
+            focusNode: _fieldFocus[field.id],
             key: ValueKey('${field.id}:${value.text}'),
             initialValue: value.text.isEmpty ? null : value.text,
             decoration: InputDecoration(
@@ -576,8 +654,10 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
       padding: const EdgeInsets.only(bottom: 12),
       child: ValueListenableBuilder<TextEditingValue>(
         valueListenable: controller,
-        builder: (context, value, _) => TextFormField(
+        builder: (context, value, _) => BoundedTextFormField(
           controller: controller,
+          focusNode: _fieldFocus[field.id],
+          maxLength: field.effectiveMaxLength,
           enabled: !busy && _pendingUpload == null,
           minLines: field.kind == FieldKind.textarea ? 3 : 1,
           maxLines: field.kind == FieldKind.textarea ? 8 : 1,
@@ -603,7 +683,9 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     final image = _image;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: FormField<ImageSourceFile>(
+      child: Focus(
+        focusNode: _fieldFocus[field.id],
+        child: FormField<ImageSourceFile>(
         key: const Key('image-source-field'),
         initialValue: image,
         validator: (_) =>
@@ -737,6 +819,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
               ],
             ),
           ],
+        ),
         ),
       ),
     );
