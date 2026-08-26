@@ -259,6 +259,69 @@ Rebase darf verwendet werden, um einen Story-, Bugfix- oder sonstigen Arbeitsbra
     - Force Pushes auf `master` bleiben durch das Ruleset verboten.
     - History-Rewriting ist nur auf dem zugehörigen Arbeitsbranch und nur nach den oben genannten Regeln zulässig.
 
+## Sicherheitsvorgaben
+
+Diese Sicherheitsvorgaben gelten verbindlich für App-Code, Entwicklung, Tests, Dokumentation, GitHub Actions, Releases und unterstützende Automationen.
+
+1. PATs sind strikt an Repository und Zweck gebunden.
+    - Für einen PAT-basierten Zugriff auf das App-Repository `Huluvu424242/developer-wiki-app` darf ausschließlich ein eigens für dieses Repository und den konkreten Zugriffszweck bereitgestelltes PAT verwendet werden.
+    - PATs eines persönlichen Developer-Wikis oder anderer Repositories dürfen niemals für Zugriffe auf das App-Repository verwendet werden.
+    - Ein für das App-Repository bereitgestelltes PAT darf umgekehrt nicht für andere Repositories, Dienste, Umgebungen oder Aufgaben wiederverwendet werden.
+    - Für unterschiedliche Repositories, Umgebungen und Zwecke sind getrennte Zugangsdaten zu verwenden.
+    - Das in der App konfigurierte Wiki-PAT darf insbesondere nicht für Bugreports oder andere Zugriffe auf das App-Repository zweckentfremdet werden.
+
+2. GitHub-Connectoren und GitHub Apps sind von PATs zu unterscheiden.
+    - Ein verbundener GitHub-Connector oder eine GitHub App authentifiziert sich über eigene Installationsberechtigungen und gilt nicht als wiederverwendetes PAT.
+    - Auch Connector- und App-Berechtigungen müssen nach dem Least-Privilege-Prinzip auf die tatsächlich benötigten Repositories und Operationen begrenzt sein.
+    - Das Vorhandensein eines Connectors rechtfertigt weder das Auslesen noch das Kopieren oder Ersetzen von PATs.
+
+3. Secrets dürfen niemals hardcodiert oder eingecheckt werden.
+    - PATs, Passwörter, private Schlüssel, Keystore-Passwörter, Signierschlüssel, Webhook-Secrets und andere Zugangsdaten dürfen weder direkt noch codiert, verschleiert oder in Base64 im Repository abgelegt werden.
+    - Das Verbot gilt insbesondere für Quellcode, Konfigurationsdateien, Umgebungsdateien, Beispiele, Tests, Fixtures, Snapshots, Dokumentation, Issues, Pull Requests, Review-Kommentare, Commit-Nachrichten, URLs, Screenshots, Logs, Fehlermeldungen, Telemetrie und Build-Artefakte.
+    - Platzhalter in Beispielen und Tests müssen eindeutig ungültig sein und dürfen keinem echten Secret entsprechen.
+    - Dateien wie `.env`, Keystores, Schlüsseldateien und lokal erzeugte Secret-Exporte müssen durch geeignete Ignore-Regeln und Prozesse vor versehentlichem Einchecken geschützt werden.
+
+4. Secrets werden ausschließlich über geeignete sichere Speicher bereitgestellt.
+    - Zulässig sind zweckgebundene Secret Stores, GitHub Actions Secrets, nur zur Laufzeit gesetzte Umgebungsvariablen und der geschützte Plattform-Speicher der App.
+    - Secrets dürfen nicht über normale App-Konfigurationen, ungeschützte lokale Dateien, Kommandozeilenargumente mit sichtbarer Prozessliste oder öffentlich einsehbare CI-Variablen transportiert werden.
+    - Anwendungen und Automationen dürfen Secrets nur so lange im Speicher halten, wie dies für den konkreten Vorgang erforderlich ist.
+
+5. Für alle Zugangsdaten gilt Least Privilege.
+    - Repository-Zugriff, Berechtigungen und Gültigkeitsdauer sind auf das technisch notwendige Minimum zu begrenzen.
+    - Fine-grained PATs sind gegenüber breit berechtigten Tokens zu bevorzugen.
+    - Schreibrechte dürfen nur vergeben werden, wenn reine Leserechte nicht ausreichen.
+    - Nicht mehr benötigte Zugangsdaten und Berechtigungen sind zeitnah zu widerrufen.
+    - Zugangsdaten für Entwicklung, Tests, CI und Produktion dürfen nicht miteinander geteilt werden.
+
+6. Secrets dürfen nicht umgewidmet, extrahiert oder weitergegeben werden.
+    - Zugangsdaten aus Nutzereingaben, Dateien, Logs, verbundenen Diensten oder fremden Kontexten dürfen nicht für einen anderen als den ausdrücklich vorgesehenen Zweck verwendet werden.
+    - Secrets dürfen nicht an andere Repositories, Hosts oder Drittdienste übertragen werden.
+    - Ein Secret darf nur an den ausdrücklich vorgesehenen Zielhost und ausschließlich über eine verschlüsselte Verbindung übertragen werden.
+    - Externe Eingaben, Ziel-URLs und Antworten sind vor der Nutzung zu validieren; Weiterleitungen auf unerwartete Hosts dürfen keine Zugangsdaten erhalten.
+
+7. Logs und Fehlermeldungen müssen frei von Secrets bleiben.
+    - Authorization-Header, Tokens, Cookies, signierte URLs, sensible Query-Parameter und andere Zugangsdaten dürfen nicht protokolliert oder ungefiltert in Fehlermeldungen übernommen werden.
+    - Potenziell sensible Werte sind vor Logging, Anzeige, Serialisierung und Fehlerweitergabe zuverlässig zu entfernen oder zu redigieren.
+    - Debug-Ausgaben mit Zugangsdaten sind auch vorübergehend und lokal nicht zulässig, wenn sie in persistente Logs, Screenshots oder gemeinsam genutzte Ausgaben gelangen können.
+
+8. Tests und Beispiele verwenden keine produktiven Zugangsdaten.
+    - Tests verwenden ausschließlich Fakes, Mocks oder eindeutig ungültige Testwerte.
+    - Tests dürfen nicht von einem realen PAT, einem privaten Schlüssel oder einem produktiven Repository-Zugriff abhängen.
+    - Testausgaben, Snapshots und Fehlerfälle müssen darauf geprüft werden, dass keine Secrets oder sicherheitsrelevanten Nutzerdaten enthalten sind.
+
+9. CI, Abhängigkeiten und Sicherheitsprüfungen werden restriktiv behandelt.
+    - GitHub-Actions-Workflows erhalten explizite und minimale `permissions`.
+    - Secrets werden nur den Schritten bereitgestellt, die sie tatsächlich benötigen, und nicht an nicht vertrauenswürdigen Code oder unkontrollierte Fork-Kontexte weitergegeben.
+    - Sicherheitsprüfungen, Zertifikatsprüfungen, Secret Scanning, Signaturprüfungen oder Schutzmechanismen dürfen nicht ohne dokumentierte fachliche Begründung deaktiviert oder umgangen werden.
+    - Neue Abhängigkeiten und externe Actions sind vor der Aufnahme auf Herkunft, Wartungszustand, benötigte Berechtigungen und bekannte Sicherheitsrisiken zu prüfen.
+
+10. Vermutete oder bestätigte Offenlegungen werden als Sicherheitsvorfall behandelt.
+    - Ein möglicherweise offengelegtes Secret darf nicht weiterverwendet werden und ist unverzüglich zu widerrufen oder zu rotieren.
+    - Das Secret ist aus allen erreichbaren Speicherorten, Artefakten und Ausgaben zu entfernen; eine Löschung nur aus dem letzten Commit gilt nicht als ausreichende Bereinigung.
+    - Betroffene Berechtigungen, Zugriffe und Logs sind auf Missbrauch zu prüfen.
+    - Ursache, Auswirkung und notwendige Schutzmaßnahmen sind nachvollziehbar zu dokumentieren, ohne das Secret erneut offenzulegen.
+    - Bei Unsicherheit ist das Secret als kompromittiert zu behandeln.
+
 ## UX- und Barrierefreiheitsregeln
 
 Für alle Screens, Seiten, Formulare und Dialoge der App gelten folgende Regeln verbindlich:
