@@ -32,6 +32,8 @@ Zusätzliche Account Permissions sind für den aktuellen Funktionsumfang nicht e
 
 Release-Keystores und daraus erzeugte Base64-Dateien dürfen ebenfalls nicht ins Repository eingecheckt werden.
 
+Der App-Bugreport öffnet ausschließlich eine vorbereitete GitHub-Seite im Browser. Das für das persönliche Wiki gespeicherte PAT wird dabei weder gelesen noch für Zugriffe auf das App-Repository verwendet.
+
 ## Hintergrund
 
 Die App ist ein Client des persönlichen Developer-Wikis. Sie übernimmt die mobile Erfassung und GitHub-Interaktion; Importlogik, Archivierung und Wissensaufbereitung verbleiben im Wiki-Repository.
@@ -45,7 +47,11 @@ Der aktuelle Funktionsumfang umfasst unter anderem:
 - Start und Statusabfrage des konfigurierten GitHub-Actions-Workflows,
 - geschützte lokale Speicherung der Konfiguration,
 - Android-Share mit getrennten Zielen für Links, Text und Bilder als
-  zusätzlicher Einstieg in dieselbe Quellenerfassung.
+  zusätzlicher Einstieg in dieselbe Quellenerfassung,
+- appweites Menü mit About, installierter Releaseversion, offline verfügbarer
+  Barrierefreiheitserklärung und kontextbezogenem Bugreport,
+- feldnahe Validierungsfehler mit zusätzlichem Fehlersammler sowie
+  barrierefreie Restzeichenzähler an allen Texteingaben.
 
 Die Quellenformulare sind derzeit versioniert in `lib/models/source_template.dart` enthalten. Dadurch bleibt die App offline startbar und externe Template-Änderungen beeinflussen UI und Requests nicht ungeprüft. Eine spätere Version kann Templates lesend aus dem Wiki laden und eine geprüfte lokale Fallback-Version behalten.
 
@@ -88,6 +94,7 @@ Ablauf und die technische Begründung stehen in der
 Die weiterführende Projektdokumentation liegt unter [`docs/`](docs/README.md):
 
 - [Architektur nach dem C4-Modell](docs/architecture.md)
+- [Barrierefreiheit und UX](docs/accessibility.md)
 - [App-Logo und Launcher-Icons](docs/app-icon.md)
 - [Signierter Android-Release über GitHub Actions](docs/android-release.md)
 - [Bild-Quellen und GitHub-Attachments](docs/image-sources.md)
