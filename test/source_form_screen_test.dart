@@ -51,7 +51,10 @@ void main() {
   ) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: SourceFormScreen(initialTemplate: imageSourceTemplate),
+        home: SourceFormScreen(
+          key: ValueKey('image-source-dialog'),
+          initialTemplate: imageSourceTemplate,
+        ),
       ),
     );
 
@@ -62,7 +65,10 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        home: SourceFormScreen(initialTemplate: sourceTemplates[3]),
+        home: SourceFormScreen(
+          key: const ValueKey('private-person-dialog'),
+          initialTemplate: sourceTemplates[3],
+        ),
       ),
     );
 
