@@ -6,6 +6,7 @@ import 'screens/home_screen.dart';
 import 'screens/settings_screen.dart';
 import 'services/configuration_service.dart';
 import 'services/share_intent_service.dart';
+import 'widgets/app_support.dart';
 
 void main() => runApp(const WikiSourceApp());
 
@@ -61,11 +62,23 @@ class _WikiSourceAppState extends State<WikiSourceApp> {
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return const Scaffold(
+              appBar: AppBar(
+                title: Text('Developer Wiki'),
+                actions: [
+                  AppSupportMenu(contextName: 'App wird geladen'),
+                ],
+              ),
               body: Center(child: CircularProgressIndicator()),
             );
           }
           if (snapshot.hasError) {
             return Scaffold(
+              appBar: const AppBar(
+                title: Text('Developer Wiki'),
+                actions: [
+                  AppSupportMenu(contextName: 'Startfehler'),
+                ],
+              ),
               body: Center(
                 child: Padding(
                   padding: const EdgeInsets.all(24),
