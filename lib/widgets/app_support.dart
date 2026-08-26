@@ -123,7 +123,7 @@ Future<void> showAppAbout(
       ),
       actions: [
         BugReportButton(
-          contextName: 'About-Dialog',
+          contextName: 'Über-Dialog',
           appInfoGateway: gateway,
           externalUrlService: externalUrlService,
         ),
