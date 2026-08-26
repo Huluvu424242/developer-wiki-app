@@ -41,6 +41,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _connectionVerified = false;
   String? _status;
   bool _statusIsError = false;
+  bool _validateWorkflow = false;
   List<String> _validationErrors = const [];
 
   @override
@@ -92,7 +93,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return errors;
   }
 
-  Future<bool> _showValidationErrors(List<String> errors) async {
+  Future<bool> _showValidationErrors(
+    List<String> errors, {
+    required bool includeWorkflow,
+  }) async {
+    setState(() => _validateWorkflow = includeWorkflow);
     _formKey.currentState?.validate();
     if (errors.isEmpty) {
       setState(() => _validationErrors = const []);
@@ -130,6 +135,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String? _required(String? value) =>
       (value ?? '').trim().isEmpty ? 'Pflichtfeld' : null;
 
+  String? _workflowValidator(String? value) =>
+      _validateWorkflow ? _required(value) : null;
+
   String? _repositoryValidator(String? value) {
     final requiredError = _required(value);
     if (requiredError != null) {
@@ -144,7 +152,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _testConnection() async {
-    if (await _showValidationErrors(_collectErrors(includeWorkflow: false))) {
+    if (await _showValidationErrors(
+      _collectErrors(includeWorkflow: false),
+      includeWorkflow: false,
+    )) {
       return;
     }
     final repository = GitHubRepository.parse(_repositoryController.text);
@@ -183,7 +194,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _save() async {
-    if (await _showValidationErrors(_collectErrors(includeWorkflow: true))) {
+    if (await _showValidationErrors(
+      _collectErrors(includeWorkflow: true),
+      includeWorkflow: true,
+    )) {
       return;
     }
     if (!_connectionVerified) {
@@ -335,7 +349,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               focusNode: _workflowFocus,
               maxLength: 255,
               enabled: !_busy,
-              validator: _required,
+              validator: _workflowValidator,
               decoration: const InputDecoration(
                 labelText: 'Import-Workflow',
                 helperText:
