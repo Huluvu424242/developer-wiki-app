@@ -451,9 +451,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
             icon: const Icon(Icons.settings),
           ),
           AppSupportMenu(
-            contextName: sharedContent == null
-                ? 'Quellenformular'
-                : 'Geteilten Inhalt erfassen',
+            contextName: 'Quellendialog – ${template.name}',
           ),
         ],
       ),
