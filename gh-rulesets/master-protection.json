@@ -1,11 +1,12 @@
 {
-  "name": "Protect master",
+  "name": "Protect master and release branches",
   "target": "branch",
   "enforcement": "active",
   "conditions": {
     "ref_name": {
       "include": [
-        "refs/heads/master"
+        "refs/heads/master",
+        "refs/heads/release/**"
       ],
       "exclude": []
     }
