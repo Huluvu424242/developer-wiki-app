@@ -15,6 +15,8 @@ import '../services/github_service.dart';
 import '../services/image_input_service.dart';
 import '../services/image_upload_service.dart';
 import '../services/source_prefill_service.dart';
+import '../widgets/app_support.dart';
+import '../widgets/bounded_text_form_field.dart';
 import 'settings_screen.dart';
 
 class SourceFormScreen extends StatefulWidget {
@@ -381,6 +383,11 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
               MaterialPageRoute(builder: (_) => const SettingsScreen()),
             ),
             icon: const Icon(Icons.settings),
+          ),
+          AppSupportMenu(
+            contextName: sharedContent == null
+                ? 'Quellenformular'
+                : 'Geteilten Inhalt erfassen',
           ),
         ],
       ),
