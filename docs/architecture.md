@@ -33,7 +33,7 @@ flowchart TB
 
     subgraph app["Software System: Developer-Wiki-App"]
         ui["Container\nFlutter UI\nScreens, Formulare, Navigation"]
-        services["Container\nAnwendungsservices\nGitHub-, Konfigurations-, Bild-, Prefill- und URL-Services"]
+        services["Container\nAnwendungsservices\nGitHub-, Konfigurations-, Bild-, Prefill-, App-Info- und URL-Services"]
         storage["Container\nLokaler Speicher\nGeschützte Konfiguration, PAT und temporäre Bilder"]
     end
 
@@ -66,6 +66,9 @@ flowchart TB
 - Der Pending-Zustand wird verschlüsselt lokal gespeichert, damit der externe
   Browserwechsel und ein App-Neustart den Ablauf nicht verlieren.
 - Konfigurierbare Werte wie Ziel-Repository und Workflow-Datei werden nicht unnötig im UI-Code fest verdrahtet.
+- Gemeinsame UI-Komponenten kapseln App-Menü, About, Barrierefreiheitserklärung, Fehlersammler und begrenzte Textfelder.
+- App-Bugreports werden ohne Wiki-PAT als vorbereitete URL im externen Browser geöffnet; Kontext und installierte Releaseversion werden lokal ergänzt.
+- Die installierte Releaseversion wird über eine testbare App-Info-Abstraktion aus den Android-Paketinformationen gelesen.
 - Die Architektur bleibt mobile-first, testbar und so einfach wie für den aktuellen Funktionsumfang möglich.
 
 ## Pflege
