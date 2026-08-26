@@ -380,6 +380,7 @@ class _BugReportDialogState extends State<_BugReportDialog> {
                 DropdownButtonFormField<String>(
                   focusNode: _typeFocus,
                   initialValue: _type,
+                  hint: const Text('Bitte auswählen'),
                   decoration: const InputDecoration(
                     labelText: 'Fehlerart *',
                     helperText: 'Bitte eine Fehlerart auswählen.',
