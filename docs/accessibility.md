@@ -29,10 +29,12 @@ GitHub-Bugreport im Browser:
 
 `https://github.com/Huluvu424242/developer-wiki-app/issues/new`
 
-Der Nutzer kann die Meldung auf GitHub prüfen und endgültig absenden. Das in
-der App gespeicherte PAT des persönlichen Developer-Wikis wird dafür weder
-gelesen noch übertragen. Der Browserablauf setzt das Label `bug` über die
-vorbereitete GitHub-URL.
+Bereits im Bugreport-Dialog wird darauf hingewiesen, dass zum endgültigen
+Absenden eine Anmeldung bei GitHub erforderlich ist. Der Nutzer kann die
+vorbereitete Meldung auf GitHub zunächst prüfen und erst dort endgültig
+absenden oder den Vorgang abbrechen. Das in der App gespeicherte PAT des
+persönlichen Developer-Wikis wird dafür weder gelesen noch übertragen. Der
+Browserablauf setzt das Label `bug` über die vorbereitete GitHub-URL.
 
 Keine Logs, Tokens oder anderen Diagnosedaten werden automatisch beigefügt.
 
