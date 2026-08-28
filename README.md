@@ -32,7 +32,7 @@ Zusätzliche Account Permissions sind für den aktuellen Funktionsumfang nicht e
 
 Release-Keystores und daraus erzeugte Base64-Dateien dürfen ebenfalls nicht ins Repository eingecheckt werden.
 
-Der App-Bugreport öffnet ausschließlich eine vorbereitete GitHub-Seite im Browser. Das für das persönliche Wiki gespeicherte PAT wird dabei weder gelesen noch für Zugriffe auf das App-Repository verwendet.
+Der App-Bugreport öffnet ausschließlich eine vorbereitete GitHub-Seite im Browser. Zum endgültigen Absenden ist dort eine Anmeldung bei GitHub erforderlich; der vorbereitete Bericht kann vor dem Absenden geprüft oder verworfen werden. Das für das persönliche Wiki gespeicherte PAT wird dabei weder gelesen noch für Zugriffe auf das App-Repository verwendet.
 
 ## Hintergrund
 
