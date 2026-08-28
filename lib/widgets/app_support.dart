@@ -425,6 +425,15 @@ class _BugReportDialogState extends State<_BugReportDialog> {
                     alignLabelWithHint: true,
                   ),
                 ),
+                const SizedBox(height: 12),
+                const Semantics(
+                  container: true,
+                  child: Text(
+                    'Zum Absenden ist eine Anmeldung bei GitHub erforderlich. '
+                    'Der vorbereitete Bericht kann auf GitHub geprüft und erst '
+                    'dort endgültig abgesendet werden.',
+                  ),
+                ),
                 if (_errorMessage != null) ...[
                   const SizedBox(height: 12),
                   Semantics(
