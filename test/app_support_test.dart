@@ -78,6 +78,14 @@ void main() {
 
     expect(find.text('Kontext: Quellenformular'), findsOneWidget);
     expect(find.text('Releaseversion: 1.2.3+45'), findsOneWidget);
+    expect(
+      find.text(
+        'Zum Absenden ist eine Anmeldung bei GitHub erforderlich. '
+        'Der vorbereitete Bericht kann auf GitHub geprüft und erst dort '
+        'endgültig abgesendet werden.',
+      ),
+      findsOneWidget,
+    );
 
     await tester.tap(find.text('Auf GitHub prüfen'));
     await tester.pump();
