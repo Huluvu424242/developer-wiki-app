@@ -11,6 +11,17 @@ Jegliche Kommunikation zwischen KI-Agenten und menschlichen Entwicklern erfolgt 
 - Neu erstellte oder für den aktuellen Arbeitsstand relevante GitHub-Artefakte werden als direkt aufrufbare Links angeboten. Dies gilt insbesondere für Stories, Fehlerreports bzw. Bug-Issues und Pull Requests.
 - Gehören mehrere GitHub-Artefakte zur konkreten Arbeit, werden alle relevanten Links gemeinsam genannt.
 
+### Sprache von Bezeichnern im Projekt
+
+Für Bezeichner in Quellcode, Dateinamen, Modellen, Services und anderen technischen Artefakten gilt fachliche Präzision vor sprachlicher Vereinheitlichung.
+
+- Technische Begriffe dürfen und sollen in ihrer etablierten englischen Fachsprache verwendet werden, wenn dies der üblichen Bedeutung in Flutter, Dart, APIs, Protokollen, Architektur oder Softwareentwicklung entspricht.
+- Fachliche Begriffe werden bevorzugt in der Sprache der jeweiligen Fachdomäne benannt. Begriffe einer deutschsprachigen Fachdomäne sollen daher deutsch formuliert werden, wenn sich ihre fachliche Bedeutung dadurch präziser und ohne Informationsverlust ausdrücken lässt.
+- Begriffe dürfen nicht mechanisch übersetzt oder eingedeutscht werden. Eine technische `Editor`-Komponente bleibt beispielsweise `Editor`, solange tatsächlich ein Editor gemeint ist; `Redakteur` beziehungsweise eine daraus gebildete Komponente ist nur passend, wenn die Fachdomäne tatsächlich einen Redakteur beschreibt.
+- Bei Mischbegriffen hat die fachlich korrekte Bedeutung Vorrang vor einer rein deutschen oder rein englischen Benennung.
+- Technische, sprach- oder frameworktypische Präfixe und Konventionen wie `get...`, `set...` und `is...` bleiben erhalten. Sie dürfen nicht aus Gründen sprachlicher Vereinheitlichung umbenannt werden, wenn sie Teil etablierter Sprachsemantik, Tooling-, Framework-, Serialisierungs-, Reflection- oder API-Konventionen sind.
+- Die bestehenden Dart-/Flutter-Namenskonventionen wie `UpperCamelCase`, `lowerCamelCase` und `snake_case.dart` bleiben unabhängig von der Sprache eines fachlichen Begriffs verbindlich.
+
 ## Fehlerbehebung
 
 Wenn der Benutzer einen Fehler meldet und um Behebung bittet, ist grundsätzlich folgender Ablauf einzuhalten:
@@ -145,6 +156,7 @@ Wenn der Benutzer die Umsetzung einer Story beauftragt, ist grundsätzlich folge
     - Keine unnötig langen oder komprimierten Codezeilen erzeugen.
     - Kommentare sollen vor allem das Warum erklären und nicht offensichtlichen Code wiederholen.
     - Strukturierte Daten bevorzugt über klar benannte Modelle statt über lose Maps durch mehrere Schichten reichen.
+    - Für die Sprache fachlicher und technischer Bezeichner gilt zusätzlich der Abschnitt `Sprache von Bezeichnern im Projekt`.
 
 6. Fehler- und Zustandsbehandlung robust umsetzen.
     - Lade-, Erfolgs-, Leer- und Fehlerzustände sichtbar und verständlich behandeln, sofern sie für die Story relevant sind.
@@ -381,6 +393,30 @@ Für alle Screens, Seiten, Formulare und Dialoge der App gelten folgende Regeln 
 ## Architekturleitplanken
 
 Für die Weiterentwicklung der App gelten zusätzlich folgende Leitplanken:
+
+### Fachlich geschnittene Projektstruktur
+
+Die Struktur der eigentlichen Anwendung richtet sich grundsätzlich zuerst nach fachlichen Features beziehungsweise Komponenten und erst innerhalb dieser fachlichen Einheiten nach technischen Rollen. Ziel ist hohe fachliche Kohäsion: Zusammengehörige Funktionalität soll gemeinsam auffindbar und möglichst als fachliche Einheit verschiebbar, kopierbar oder herauslösbar sein.
+
+Beispiel für eine fachlich eigenständige Fehlerberichtsfunktion:
+
+```text
+lib/
+  bugreport/
+    screens/
+    services/
+    models/
+    widgets/
+```
+
+- Globale technische Ordner wie `screens/`, `services/` oder `models/` sollen nicht der primäre Schnitt für fachlich eigenständige Features sein. Technische Unterordner sind innerhalb eines fachlichen Ordners zulässig und sinnvoll, wenn Umfang und Übersichtlichkeit dies rechtfertigen.
+- Kleine fachliche Features dürfen flach bleiben. Technische Unterordner werden nicht vorsorglich angelegt und dürfen keine künstliche Verschachtelung erzeugen.
+- Wird ein fachliches Feature zu groß, ist zuerst fachlich weiter zu schneiden: Ein Teilfeature kann als fachlich benannter Unterordner innerhalb des bisherigen Features ausgegliedert oder als eigenständiges fachliches Feature auf dieselbe Ebene gehoben werden.
+- Ein fachlicher Ordner darf deshalb sowohl technisch benannte Unterordner wie `screens/`, `services/`, `models/` oder `widgets/` als auch weitere fachlich benannte Unterordner enthalten.
+- Flutter-/Dart-Konventionen und technisch vorgegebene Projektbereiche wie `lib/`, `test/`, `android/`, `ios/`, `assets/` und vergleichbare Plattform-, Build- und Tooling-Strukturen bleiben erhalten. Die fachliche Strukturierung findet innerhalb der dafür geeigneten Anwendungsbereiche statt und ersetzt keine Flutter-Konvention.
+- Projektweit tatsächlich gemeinsame technische Infrastruktur darf zentral organisiert werden, wenn sie keiner einzelnen fachlichen Komponente sinnvoll gehört. Eine solche zentrale Ablage darf nicht als Begründung dienen, feature-lokale Fachlogik wieder nach technischen Schichten über das gesamte Projekt zu verteilen.
+- Tests sollen die fachliche Struktur der Anwendung soweit sinnvoll spiegeln, damit Implementierung und zugehörige Tests gemeinsam auffindbar bleiben.
+- Bestehender Code muss nicht in einer Big-Bang-Migration umgebaut werden. Bei neuen Features und gezielten Refactorings soll die Struktur schrittweise in diese Richtung entwickelt werden, sofern dies den vereinbarten Story- oder Bugfix-Umfang nicht unangemessen vergrößert.
 
 - Die App ist ein Client des persönlichen Developer-Wikis, nicht das Wiki selbst. Quellen erfassen, GitHub-Issues erzeugen und Wiki-Workflows auslösen gehören in die App; Importlogik, Archivierung und Wissensaufbereitung bleiben im Wiki-Repository.
 - Eine fachliche Funktion soll einen zentralen Implementierungsweg besitzen. Unterschiedliche Einstiegspunkte wie normale Erfassung und Android-Share sollen dieselbe Fachlogik wiederverwenden.
