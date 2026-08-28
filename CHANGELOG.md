@@ -34,25 +34,42 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
   `user-attachments`-URL und erst danach Veröffentlichung mit `quelle`.
 - Verbindliche Projektdokumentation unter `docs/` mit C4-orientierter Architekturübersicht.
 - Dokumentationsregeln für Changelog, README und technische Dokumentation im Implementierungsworkflow.
+- Direkt in den Einstellungen aufrufbare Hilfe zum Erstellen eines Fine-grained GitHub PAT mit den benötigten Least-Privilege-Berechtigungen.
+- Dokumentierter Prozess für die menschliche PR-Abnahme und das schrittweise Prüfen und Rebasen gestapelter Branches.
+- Verbindliche PR-Regel zur Verknüpfung vollständig erledigter Stories und Bugs mit GitHub-Closing-Keywords.
 
 ### Changed
 
-- Android-Share-Ziele verwenden eigenständige Launcher-Icons mit unterscheidbaren Overlays für Link, Text und Bild.
+- Android-Teilen-Ziele verwenden unterscheidbare App-Logo-Varianten mit
+  Weltkugel-, Text- beziehungsweise Bild-Overlay.
+- README nach der Struktur von Standard Readme neu gegliedert und mit der weiterführenden Dokumentation verknüpft.
+- Quellenformular ergonomischer gestaltet: zusätzlicher Abstand unter dem Speichern-Button, temporärer Validierungshinweis und Löschaktionen für befüllte Eingabefelder.
+- Android-Release-Prozess um produktive `release/<tagname>`-Wartungsbranches für Bugfixes, Security Updates und Lifecycle-Maßnahmen ergänzt.
+- Provisorisches Android-Launcher-Icon durch das offizielle Developer-Wiki-App-Logo mit Adaptive, Round und Themed Icon ersetzt.
+- Herkunft und Lizenzen des App-Logos sowie wesentlicher Open-Source-Komponenten in `ATTRIBUTIONS.md` dokumentiert.
 
 ### Fixed
 
-- Dialoge zur Fehlererfassung übermitteln jetzt eindeutig unterscheidbare Kontexte für Link-, Text-, Bild- und Personenquellen sowie für Über-Dialog und Barrierefreiheitserklärung.
+- Bugreports unterscheiden den aktuell gewählten Quellendialog sowie Über-Dialog und Barrierefreiheitserklärung eindeutig im vorbelegten Kontext.
+- Der zweistufige Upload-Widget-Test scrollt zu lazy aufgebauten Pending- und
+  Erfolgskarten, bevor er deren Darstellung prüft.
+- Bildquellen-Widget-Tests machen gescrollte Aktionsbuttons vor dem Tap
+  vollständig sichtbar und pumpen anschließend das aktualisierte Layout.
+- Bildquellen-Widget-Tests verwenden eine injizierte synchrone Vorschau und
+  hängen damit weder vom nativen Bild-Codec noch vom Windows-Dateisystem ab.
+- Bildquellen-Widget-Tests verwenden vollständig decodierbare PNG-Testdaten,
+  damit der Bild-Codec unter Windows nicht an einer abgeschnittenen Datei hängt.
+- Bildquellen-Widget-Tests warten zustandsbasiert auf Vorschau-, Pending- und
+  Erfolgszustände, statt bei einem animierten Textcursor mit `pumpAndSettle`
+  bis zum Timeout zu laufen.
+- Widget-Test für den Validierungshinweis wartet zustandsbasiert auf die Snackbar statt auf eine feste Verzögerung.
+- Initiale Share-Intent-Inhalte werden innerhalb der vorgesehenen asynchronen
+  Fehlerbehandlung vollständig abgewartet.
+- Widget-Test adressiert den Speichern-Button über einen stabilen Key statt über die konkrete Button-Implementierung.
+- Widget-Test scrollt bis zum lazily aufgebauten Speichern-Button, bevor er ihn antippt.
+- Widget-Test stabilisiert nach dem Scrollen die Sichtbarkeit und das Layout des Speichern-Buttons vor dem Tap.
+- Pflichtfelder werden beim Speichern unabhängig von ihrer aktuellen Sichtbarkeit im scrollbaren Quellenformular geprüft.
+- Snackbar-Widget-Test prüft nur den globalen Validierungshinweis und setzt keine gleichzeitig sichtbaren Inline-Feldfehler voraus.
 
-## [0.1.0+2] - 2026-08-24
-
-### Added
-
-- Bild-Quelle als eigener Quellentyp mit Bildauswahl und GitHub-Attachment-Ablauf.
-- App-Logo und Share-Ziel-Varianten für Link-, Text- und Bildquellen.
-- `ATTRIBUTIONS.md` für lizenzrechtlich relevante ausgelieferte Bestandteile.
-
-## [0.1.0+1] - 2026-08-22
-
-### Added
-
-- Erste veröffentlichte Android-Version der Developer-Wiki-App.
+[Unreleased]: https://github.com/Huluvu424242/developer-wiki-app/compare/v0.1.0+3...HEAD
+[0.1.0+3]: https://github.com/Huluvu424242/developer-wiki-app/compare/v0.1.0+2...v0.1.0+3
