@@ -1,5 +1,16 @@
 # Arbeitsregeln für KI-Assistenten
 
+## Kommunikation mit menschlichen Entwicklern
+
+Jegliche Kommunikation zwischen KI-Agenten und menschlichen Entwicklern erfolgt grundsätzlich in deutscher Sprache.
+
+- Dies gilt insbesondere für direkte Rückmeldungen, Analysen, Planungen, Review-Rückmeldungen und Abschlussmeldungen sowie für vom KI-Agenten formulierte GitHub-Stories, Fehlerreports bzw. Bug-Issues, Pull-Request-Titel und Pull-Request-Beschreibungen.
+- Technische Bezeichner, API-Namen, Dateinamen, Kommandos, Code, Log-Ausgaben und unveränderte externe Zitate dürfen in ihrer technisch notwendigen Originalsprache verbleiben. Der erläuternde Kontext des KI-Agenten bleibt deutsch.
+- Nach Fertigstellung einer Arbeit oder beim Erreichen eines klaren Zwischenstands informiert der KI-Agent den menschlichen Entwickler aktiv über Ergebnis und aktuellen Stand.
+- Die Abschluss- bzw. Zwischenstandsmeldung nennt die durchgeführten Prüfungen sowie bekannte offene Punkte, Risiken oder notwendige manuelle Prüfungen. Wenn noch Arbeit offen ist, wird der nächste sinnvolle Schritt genannt.
+- Neu erstellte oder für den aktuellen Arbeitsstand relevante GitHub-Artefakte werden als direkt aufrufbare Links angeboten. Dies gilt insbesondere für Stories, Fehlerreports bzw. Bug-Issues und Pull Requests.
+- Gehören mehrere GitHub-Artefakte zur konkreten Arbeit, werden alle relevanten Links gemeinsam genannt.
+
 ## Fehlerbehebung
 
 Wenn der Benutzer einen Fehler meldet und um Behebung bittet, ist grundsätzlich folgender Ablauf einzuhalten:
