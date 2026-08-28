@@ -22,6 +22,10 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 - Das importierbare Branch-Ruleset schützt neben `master` jetzt auch alle Branches unter `release/**`.
 - Einstellungen verwenden jetzt feldnahe Validierung, temporäre Hinweise und reservierten Platz unter den Aktionsschaltflächen.
 
+### Fixed
+
+- Der GitHub-Anmeldehinweis im Bugreport verwendet kein unzulässiges `const` mehr am `Semantics`-Widget, sodass `flutter analyze` nicht mehr mit `const_with_non_const` abbricht.
+
 ## [0.1.0+3] - 2026-08-25
 
 ### Added
