@@ -2,6 +2,8 @@
 
 <img src="assets/branding/developer-wiki-app-logo.png" alt="Logo der Developer-Wiki-App" width="180">
 
+(Die App funktioniert soweit wie gewünscht und damit pausiert die Entwicklung bis Feature Requests eintreffen)
+
 App zum Erfassen von Quellen für das Developer Wiki
 
 Die Flutter-App erfasst strukturierte Quellen mobil und legt sie als GitHub-Issues im konfigurierten persönlichen Developer-Wiki an. Zusätzlich kann sie den zugehörigen Import-Workflow starten und dessen Status anzeigen. Sie besitzt keinen eigenen Server und sendet keine Telemetrie.
