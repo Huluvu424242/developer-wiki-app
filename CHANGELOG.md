@@ -16,6 +16,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Changed
 
+- Die Architekturleitplanken strukturieren Anwendungscode künftig zuerst nach fachlichen Features und erst innerhalb dieser Features nach technischen Rollen; Bezeichner unterscheiden bewusst zwischen technischer englischer Terminologie und der Sprache der Fachdomäne.
 - KI-Agenten kommunizieren mit menschlichen Entwicklern verbindlich auf Deutsch, formulieren insbesondere Stories, Bug-Issues und Pull Requests auf Deutsch und melden nach Arbeiten Ergebnis, Stand und relevante GitHub-Links zurück.
 - Der Bugreport weist vor dem Wechsel zu GitHub darauf hin, dass zum endgültigen Absenden eine GitHub-Anmeldung erforderlich ist und der vorbereitete Bericht dort zunächst geprüft werden kann.
 - Das importierbare Branch-Ruleset schützt neben `master` jetzt auch alle Branches unter `release/**`.
