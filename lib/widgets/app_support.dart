@@ -426,9 +426,9 @@ class _BugReportDialogState extends State<_BugReportDialog> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Semantics(
+                Semantics(
                   container: true,
-                  child: Text(
+                  child: const Text(
                     'Zum Absenden ist eine Anmeldung bei GitHub erforderlich. '
                     'Der vorbereitete Bericht kann auf GitHub geprüft und erst '
                     'dort endgültig abgesendet werden.',
