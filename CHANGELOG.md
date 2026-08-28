@@ -16,6 +16,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Changed
 
+- Der Bugreport weist vor dem Wechsel zu GitHub darauf hin, dass zum endgültigen Absenden eine GitHub-Anmeldung erforderlich ist und der vorbereitete Bericht dort zunächst geprüft werden kann.
 - Das importierbare Branch-Ruleset schützt neben `master` jetzt auch alle Branches unter `release/**`.
 - Einstellungen verwenden jetzt feldnahe Validierung, temporäre Hinweise und reservierten Platz unter den Aktionsschaltflächen.
 
