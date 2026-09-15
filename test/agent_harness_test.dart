@@ -15,6 +15,7 @@ void main() {
     'agent-rules/05-security-ci.md',
     'agent-rules/06-quality.md',
     'agent-rules/06-documentation.md',
+    'agent-rules/07-release.md',
     'agent-rules/08-wiki-integration.md',
   ];
 
