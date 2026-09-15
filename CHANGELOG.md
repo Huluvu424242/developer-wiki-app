@@ -17,6 +17,10 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 - Flutter-, Architektur-, UX-, Barrierefreiheits- und Qualitätsregeln mit den passenden Erkenntnissen aus dem Taugt’s-Harness harmonisiert; insbesondere Lebenszyklusprüfungen nach `await`, sichere `const`-Widgetbäume, Lazy-Formularvalidierung, Scroll-Widgettests, robuste Fehlersammler-Navigation und einheitliche Abschlussstatus präzisiert.
 - Einen verbindlichen Releasevorbereitungs-Vertrag ergänzt: `pubspec.yaml` ist technische Versionsquelle, `CHANGELOG.md` fachlicher Master; Versions-, Dokumentations-, Lizenz- und Konsistenzprüfungen sowie die Trennung zwischen Repository-Vorbereitung und produktiver Veröffentlichung sind festgelegt.
 
+### Security
+
+- Externe Actions des produktiven Android-Release-Workflows auf überprüfte unveränderliche Commit-SHAs gepinnt und Herkunft, Wartungszustand, Lizenz sowie bewusst verbleibende bewegliche Buildbestandteile dokumentiert.
+
 ## [0.1.0+4] - 2026-08-28
 
 ### Added
