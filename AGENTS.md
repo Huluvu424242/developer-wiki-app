@@ -13,7 +13,7 @@ Für GitHub-Zugriffe und -Änderungen ist ausschließlich der verbundene GitHub-
 Die Module sind in dieser Reihenfolge zu lesen:
 
 1. [Workflow und Zusammenarbeit](agent-rules/01-workflow-collaboration.md)
-2. [Projektgrundgerüst](agent-rules/02.md)
+2. [Projektaufsetzung und Grundgerüst](agent-rules/02-project-bootstrap.md)
 3. [Architektur – fachliche Struktur](agent-rules/03-structure.md)
 4. [Architektur – Implementierung](agent-rules/03-implementation.md)
 5. [UX und Barrierefreiheit](agent-rules/04-ux-accessibility.md)
