@@ -6,7 +6,7 @@ Die Root-`AGENTS.md` ist der verbindliche Einstiegspunkt für KI-Arbeiten am Rep
 
 Story #141 modularisiert den bisherigen monolithischen Harness, ohne seine fachlichen Anforderungen abzuschwächen. Regeln aus `taugts` und `Developer-Wiki` dienten als Strukturvorbild, wurden aber nicht mechanisch übernommen.
 
-| Bisheriger Bereich in `AGENTS.md` | Normative Heimat nach #141 |
+| Bisheriger Bereich in `AGENTS.md` | Normative Heimat nach #141/#143 |
 | --- | --- |
 | Kommunikation, Story-/Bug-Workflow, PR-Verknüpfung, Rebase | `agent-rules/01-workflow-collaboration.md` |
 | Grundgerüst-Grenzen | `agent-rules/02-project-bootstrap.md` |
@@ -15,6 +15,7 @@ Story #141 modularisiert den bisherigen monolithischen Harness, ohne seine fachl
 | UX und Barrierefreiheit | `agent-rules/04-ux-accessibility.md` |
 | Repository-/Zweckbindung von Zugängen | `agent-rules/05-security-access.md` |
 | sichere Datenbehandlung | `agent-rules/05-security-data.md` |
+| Actions-/Tooling-Governance, Triggerprüfung und Freigabeverzeichnis | `agent-rules/05-security-tooling.md` |
 | Tests, CI und Sicherheitsvorfälle | `agent-rules/05-security-ci.md` |
 | Codestyle, Tests, Abhängigkeiten und Lizenzen | `agent-rules/06-quality.md` |
 | Changelog, README und `docs/` | `agent-rules/06-documentation.md` |
@@ -38,12 +39,30 @@ Story #142 gleicht die bestehenden App-Regeln mit dem aktuellen Taugt’s-Harnes
 | Qualitätsstatus | Prüfungen vorhanden | einheitliche Abschlussstatus | `Implementiert, technische Prüfung ausstehend` und `Geprüft und mergebereit` verbindlich verwenden |
 | Standardprüfungen | Format, Analyze und Tests bereits gefordert | einheitliche Befehlsfolge | `dart format --set-exit-if-changed lib test`, `flutter analyze`, `flutter test` als Standard für geänderten Dart-/Flutter-Code |
 
+## Werkzeugketten-Governance nach Story #143
+
+Story #143 übernimmt die passenden Governance-Prinzipien aus `taugts` und `Developer-Wiki`, ohne Freigaben anderer Repositories zu kopieren. Normativ ist ausschließlich `agent-rules/05-security-tooling.md`.
+
+Kernpunkte:
+
+- nicht freigegebene GitHub Actions und externe Werkzeugketten unterliegen Default-Deny;
+- vor schreibenden GitHub-Operationen werden mögliche automatische Trigger geprüft;
+- neue oder geänderte Werkzeugketten benötigen grundsätzlich eine eigene Story und einen separaten Pull Request;
+- Review/Merge und produktive Erstverwendung sind getrennte Entscheidungen;
+- ein Freigabeverzeichnis beschreibt nur tatsächlich erteilte Freigaben und kann keine Freigabe selbst erzeugen;
+- Secret-Namen dürfen für die technische Inventarisierung dokumentiert werden, Secret-Werte nicht;
+- externe Actions sollen bei neuen oder geänderten Workflows soweit praktikabel auf unveränderliche Commit-SHAs gepinnt werden.
+
+Der vorhandene Workflow `Android Release APK` ist vollständig inventarisiert, besitzt aber keine nachweisbare Freigabe zur selbständigen Agentenausführung. Er bleibt deshalb im Freigabeverzeichnis ausdrücklich als **vorhanden, aber nicht zur selbständigen Agentenausführung freigegeben** gekennzeichnet. Sein aktueller `workflow_dispatch`-Trigger bedeutet zugleich, dass normale Branch- und Pull-Request-Schreiboperationen ihn nicht automatisch starten.
+
+Das tatsächliche SHA-Pinning von `actions/checkout@v6`, `actions/setup-java@v5` und `subosito/flutter-action@v2` ist bewusst nicht Teil von #143, weil dies eine Änderung der produktiven Werkzeugkette wäre.
+
 ## Bewusste Abweichungen von der vorgeschlagenen Zielstruktur
 
-- Die umfangreichen Sicherheitsregeln sind in die drei Module Zugriff, Datenbehandlung sowie Tests/CI/Vorfälle geteilt. Dadurch bleibt jede Regel fachlich eindeutig zugeordnet und besser reviewbar.
+- Die Sicherheitsregeln sind in Zugriff, Datenbehandlung, Werkzeugketten sowie Tests/CI/Vorfälle geteilt. Dadurch bleibt jede Regel fachlich eindeutig zugeordnet und besser reviewbar.
 - Architektur ist in fachliche Struktur und Implementierung aufgeteilt, weil diese beiden Regelgruppen unabhängig voneinander umfangreich sind.
 - Qualität und Dokumentation besitzen getrennte normative Module, damit Prüf-/Lizenzregeln nicht mit Dokumentationsregeln vermischt werden.
-- Ein eigenes Release-Regelmodul ist bewusst noch nicht Bestandteil von #141 oder #142. Story #144 führt diesen fachlich separat ein. Bis dahin gelten die allgemeinen Workflow-, Sicherheits-, Qualitäts- und Dokumentationsregeln auch für Releasearbeiten.
+- Ein eigenes Release-Regelmodul ist bewusst noch nicht Bestandteil von #141 bis #143. Story #144 führt diesen fachlich separat ein. Bis dahin gelten die allgemeinen Workflow-, Sicherheits-, Werkzeugketten-, Qualitäts- und Dokumentationsregeln auch für Releasearbeiten.
 
 ## Bewusste Abgrenzungen
 
@@ -55,7 +74,7 @@ Nicht übernommen wurden insbesondere:
 - Taugt’s-spezifische MkDocs-, GitHub-Pages- und Workflowvorgaben;
 - die Bootstrap-Pflicht „Name und Logo vor Implementierungsbeginn“, weil die bestehende Developer-Wiki-App diese Identität bereits besitzt;
 - Wiki-interne OKF-, Quellenarchiv-, Wissenssynthese-, Retrieval- und `wiki-data`-Regeln aus `Developer-Wiki`;
-- konkrete Freigaben, Workflow-Dateien, Repositorypfade oder Datenmodelle anderer Projekte.
+- konkrete Freigaben anderer Repositories.
 
 ## Normative Quelle
 
