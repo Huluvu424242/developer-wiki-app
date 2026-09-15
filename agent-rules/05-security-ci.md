@@ -8,6 +8,7 @@
 - Vertrauliche Laufzeitwerte werden nur den Schritten bereitgestellt, die sie tatsächlich benötigen, und nicht an nicht vertrauenswürdigen Code oder unkontrollierte Fork-Kontexte weitergegeben.
 - Sicherheitsprüfungen, Zertifikatsprüfungen, Secret Scanning, Signaturprüfungen und vergleichbare Schutzmechanismen werden nicht ohne dokumentierte fachliche Begründung deaktiviert oder umgangen.
 - Neue Abhängigkeiten und externe Actions werden vor Aufnahme auf Herkunft, Wartungszustand, benötigte Berechtigungen und bekannte Sicherheitsrisiken geprüft.
+- Für Erstellung, Änderung und Ausführung von GitHub Actions sowie anderen ausführbaren Werkzeugketten gelten zusätzlich die verbindlichen Regeln aus [Sicherheit und Werkzeugketten](05-security-tooling.md).
 
 ## Sicherheitsvorfall
 
@@ -16,5 +17,3 @@
 - Betroffene Berechtigungen, Zugriffe und Logs werden auf Missbrauch geprüft.
 - Ursache, Auswirkung und notwendige Schutzmaßnahmen werden nachvollziehbar dokumentiert, ohne das Secret erneut offenzulegen.
 - Bei Unsicherheit ist das Secret als kompromittiert zu behandeln.
-
-Eine weitergehende Governance für ausführbare Werkzeugketten wird in Story #143 behandelt und in Story #141 nicht vorweggenommen.
