@@ -48,6 +48,9 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Resolve Flutter dependencies
+        run: flutter pub get
+
       - name: Install pinned Python formatter
         run: python3 -m pip install --disable-pip-version-check "black==25.1.0"
 
