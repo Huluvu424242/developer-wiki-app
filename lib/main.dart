@@ -75,9 +75,7 @@ class _WikiSourceAppState extends State<WikiSourceApp> {
             return Scaffold(
               appBar: AppBar(
                 title: const Text('Developer Wiki'),
-                actions: const [
-                  AppSupportMenu(contextName: 'Startfehler'),
-                ],
+                actions: const [AppSupportMenu(contextName: 'Startfehler')],
               ),
               body: Center(
                 child: Padding(

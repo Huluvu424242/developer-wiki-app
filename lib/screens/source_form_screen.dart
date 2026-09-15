@@ -149,14 +149,15 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
         final configuration = await _configurationService.load();
         final repository = _repositoryFrom(configuration);
         final map = values.map((key, value) => MapEntry(key, value.text));
-        final issue = await GitHubService(
-          configuration.token,
-          owner: repository.owner,
-          repo: repository.name,
-        ).createIssue(
-          title: '${template.titlePrefix}${title.text.trim()}',
-          body: GitHubService.issueBody(template, map),
-        );
+        final issue =
+            await GitHubService(
+              configuration.token,
+              owner: repository.owner,
+              repo: repository.name,
+            ).createIssue(
+              title: '${template.titlePrefix}${title.text.trim()}',
+              body: GitHubService.issueBody(template, map),
+            );
         if (mounted) {
           setState(() => _createdIssue = issue);
         }
@@ -210,7 +211,8 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
       errors.add('Issue-Titel: Pflichtfeld');
     }
     for (final field in template.fields) {
-      final missing = field.required &&
+      final missing =
+          field.required &&
           (field.kind == FieldKind.image
               ? _image == null
               : values[field.id]!.text.trim().isEmpty);
@@ -275,8 +277,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     } catch (error) {
       if (mounted) {
         setState(
-          () => _errorMessage =
-              'Bild konnte nicht übernommen werden: $error',
+          () => _errorMessage = 'Bild konnte nicht übernommen werden: $error',
         );
       }
     } finally {
@@ -381,8 +382,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
     } catch (error) {
       if (mounted) {
         setState(
-          () => _errorMessage =
-              'Upload konnte nicht verworfen werden: $error',
+          () => _errorMessage = 'Upload konnte nicht verworfen werden: $error',
         );
       }
     } finally {
@@ -450,9 +450,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
             ),
             icon: const Icon(Icons.settings),
           ),
-          AppSupportMenu(
-            contextName: 'Quellendialog – ${template.name}',
-          ),
+          AppSupportMenu(contextName: 'Quellendialog – ${template.name}'),
         ],
       ),
       body: Form(
@@ -483,10 +481,8 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
               decoration: const InputDecoration(labelText: 'Quellentyp'),
               items: sourceTemplates
                   .map(
-                    (item) => DropdownMenuItem(
-                      value: item,
-                      child: Text(item.name),
-                    ),
+                    (item) =>
+                        DropdownMenuItem(value: item, child: Text(item.name)),
                   )
                   .toList(),
               onChanged: busy || _pendingUpload != null
@@ -514,7 +510,10 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
                 decoration: InputDecoration(
                   labelText: 'Issue-Titel',
                   prefixText: template.titlePrefix,
-                  suffixIcon: _clearButton(title, hasValue: value.text.isNotEmpty),
+                  suffixIcon: _clearButton(
+                    title,
+                    hasValue: value.text.isNotEmpty,
+                  ),
                 ),
                 validator: (value) =>
                     (value ?? '').trim().isEmpty ? 'Pflichtfeld' : null,
@@ -531,10 +530,10 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
                 busy
                     ? 'Wird erstellt …'
                     : template == imageSourceTemplate
-                        ? _pendingUpload == null
-                            ? 'Upload auf GitHub starten'
-                            : 'Upload prüfen und Quelle veröffentlichen'
-                        : 'Quelle speichern',
+                    ? _pendingUpload == null
+                          ? 'Upload auf GitHub starten'
+                          : 'Upload prüfen und Quelle veröffentlichen'
+                    : 'Quelle speichern',
               ),
             ),
             SizedBox(
@@ -636,10 +635,8 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
             ),
             items: field.options
                 .map(
-                  (option) => DropdownMenuItem(
-                    value: option,
-                    child: Text(option),
-                  ),
+                  (option) =>
+                      DropdownMenuItem(value: option, child: Text(option)),
                 )
                 .toList(),
             onChanged: busy || _pendingUpload != null
@@ -687,99 +684,95 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
       child: Focus(
         focusNode: _fieldFocus[field.id],
         child: FormField<ImageSourceFile>(
-        key: const Key('image-source-field'),
-        initialValue: image,
-        validator: (_) =>
-            field.required && _image == null ? 'Pflichtfeld' : null,
-        builder: (formField) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              field.label,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 4),
-            Text(field.description),
-            const SizedBox(height: 12),
-            if (image == null)
-              OutlinedButton.icon(
-                key: const Key('image-source-pick-button'),
-                onPressed: _imageBusy || busy || _pendingUpload != null
-                    ? null
-                    : _pickImage,
-                icon: const Icon(Icons.image_outlined),
-                label: Text(
-                  _imageBusy ? 'Bild wird übernommen …' : 'Bild auswählen',
-                ),
-              )
-            else ...[
-              Semantics(
-                label: 'Vorschau des ausgewählten Bildes ${image.name}',
-                image: true,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: SizedBox(
-                    key: const Key('image-source-preview'),
-                    width: double.infinity,
-                    height: 220,
-                    child: widget.imagePreviewBuilder?.call(image) ??
-                        Image.file(
-                          File(image.path),
-                          fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) => const Center(
-                            child: Text('Bildvorschau nicht verfügbar'),
-                          ),
-                        ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text('${image.name} · ${image.formattedSize}'),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  OutlinedButton.icon(
-                    onPressed: _imageBusy || busy || _pendingUpload != null
-                        ? null
-                        : _pickImage,
-                    icon: const Icon(Icons.swap_horiz),
-                    label: const Text('Ersetzen'),
-                  ),
-                  OutlinedButton.icon(
-                    key: const Key('image-source-remove-button'),
-                    onPressed: _imageBusy || busy || _pendingUpload != null
-                        ? null
-                        : _removeImage,
-                    icon: const Icon(Icons.delete_outline),
-                    label: const Text('Entfernen'),
-                  ),
-                ],
-              ),
+          key: const Key('image-source-field'),
+          initialValue: image,
+          validator: (_) =>
+              field.required && _image == null ? 'Pflichtfeld' : null,
+          builder: (formField) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(field.label, style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 4),
+              Text(field.description),
               const SizedBox(height: 12),
-              const Card(
-                child: Padding(
-                  padding: EdgeInsets.all(12),
-                  child: Text(
-                    'Hinweis: Fotos können Aufnahmeort, Geräteinformationen '
-                    'und weitere sensible Metadaten enthalten. Das Originalbild '
-                    'wird unverändert übernommen.',
+              if (image == null)
+                OutlinedButton.icon(
+                  key: const Key('image-source-pick-button'),
+                  onPressed: _imageBusy || busy || _pendingUpload != null
+                      ? null
+                      : _pickImage,
+                  icon: const Icon(Icons.image_outlined),
+                  label: Text(
+                    _imageBusy ? 'Bild wird übernommen …' : 'Bild auswählen',
+                  ),
+                )
+              else ...[
+                Semantics(
+                  label: 'Vorschau des ausgewählten Bildes ${image.name}',
+                  image: true,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: SizedBox(
+                      key: const Key('image-source-preview'),
+                      width: double.infinity,
+                      height: 220,
+                      child:
+                          widget.imagePreviewBuilder?.call(image) ??
+                          Image.file(
+                            File(image.path),
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) => const Center(
+                              child: Text('Bildvorschau nicht verfügbar'),
+                            ),
+                          ),
+                    ),
                   ),
                 ),
-              ),
-            ],
-            if (formField.hasError) ...[
-              const SizedBox(height: 8),
-              Text(
-                formField.errorText!,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.error,
+                const SizedBox(height: 8),
+                Text('${image.name} · ${image.formattedSize}'),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: _imageBusy || busy || _pendingUpload != null
+                          ? null
+                          : _pickImage,
+                      icon: const Icon(Icons.swap_horiz),
+                      label: const Text('Ersetzen'),
+                    ),
+                    OutlinedButton.icon(
+                      key: const Key('image-source-remove-button'),
+                      onPressed: _imageBusy || busy || _pendingUpload != null
+                          ? null
+                          : _removeImage,
+                      icon: const Icon(Icons.delete_outline),
+                      label: const Text('Entfernen'),
+                    ),
+                  ],
                 ),
-              ),
+                const SizedBox(height: 12),
+                const Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Text(
+                      'Hinweis: Fotos können Aufnahmeort, Geräteinformationen '
+                      'und weitere sensible Metadaten enthalten. Das Originalbild '
+                      'wird unverändert übernommen.',
+                    ),
+                  ),
+                ),
+              ],
+              if (formField.hasError) ...[
+                const SizedBox(height: 8),
+                Text(
+                  formField.errorText!,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ],
             ],
-          ],
-        ),
+          ),
         ),
       ),
     );

@@ -5,13 +5,11 @@ void main() {
   final parser = GitHubAttachmentParser();
 
   test('extracts and deduplicates stable GitHub attachment URLs', () {
-    const url = 'https://github.com/user-attachments/assets/'
+    const url =
+        'https://github.com/user-attachments/assets/'
         '123e4567-e89b-12d3-a456-426614174000';
 
-    expect(
-      parser.stableUrls(['![image]($url)', '<img src="$url">']),
-      [url],
-    );
+    expect(parser.stableUrls(['![image]($url)', '<img src="$url">']), [url]);
   });
 
   test('ignores temporary and unrelated URLs', () {

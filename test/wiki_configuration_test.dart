@@ -10,10 +10,7 @@ void main() {
 
       expect(repository.owner, 'Huluvu424242');
       expect(repository.name, 'Developer-Wiki');
-      expect(
-        repository.url,
-        'https://github.com/Huluvu424242/Developer-Wiki',
-      );
+      expect(repository.url, 'https://github.com/Huluvu424242/Developer-Wiki');
     });
 
     test('accepts owner/repo shorthand', () {

@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
 
 class ValidationErrorItem {
-  const ValidationErrorItem({
-    required this.label,
-    required this.onActivate,
-  });
+  const ValidationErrorItem({required this.label, required this.onActivate});
 
   final String label;
   final VoidCallback onActivate;
 }
 
 class ErrorSummary extends StatelessWidget {
-  const ErrorSummary({
-    super.key,
-    required this.errors,
-    this.focusNode,
-  });
+  const ErrorSummary({super.key, required this.errors, this.focusNode});
 
   final List<ValidationErrorItem> errors;
   final FocusNode? focusNode;

@@ -9,10 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('home screen offers sources, import and settings', (tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(home: HomeScreen()),
-    );
+  testWidgets('home screen offers sources, import and settings', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
 
     expect(find.text('Neue Quelle erfassen'), findsOneWidget);
     expect(find.byIcon(Icons.settings), findsOneWidget);
@@ -39,9 +39,7 @@ void main() {
   });
 
   testWidgets('selected source opens matching form', (tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(home: HomeScreen()),
-    );
+    await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
 
     final template = sourceTemplates.first;
     await tester.tap(find.text(template.name));
@@ -51,17 +49,16 @@ void main() {
     expect(find.text(template.description), findsOneWidget);
   });
 
-  testWidgets('shared content is forwarded to the selected source form',
-      (tester) async {
+  testWidgets('shared content is forwarded to the selected source form', (
+    tester,
+  ) async {
     const sharedContent = SharedContent(
       kind: SharedContentKind.link,
       text: 'https://example.org/source',
     );
 
     await tester.pumpWidget(
-      const MaterialApp(
-        home: HomeScreen(sharedContent: sharedContent),
-      ),
+      const MaterialApp(home: HomeScreen(sharedContent: sharedContent)),
     );
 
     expect(find.text('Geteilten Inhalt erfassen'), findsOneWidget);
@@ -73,7 +70,9 @@ void main() {
 
     expect(find.text('Geteilten Inhalt erfassen'), findsOneWidget);
     expect(
-      find.text('Geteilter Inhalt wurde vorausgefüllt und kann bearbeitet werden.'),
+      find.text(
+        'Geteilter Inhalt wurde vorausgefüllt und kann bearbeitet werden.',
+      ),
       findsOneWidget,
     );
   });
@@ -95,9 +94,8 @@ void main() {
       MaterialApp(
         home: HomeScreen(
           sharedContent: sharedContent,
-          sourceFormBuilder: (template, content) => Text(
-            '${template.name}:${content?.image?.name}',
-          ),
+          sourceFormBuilder: (template, content) =>
+              Text('${template.name}:${content?.image?.name}'),
         ),
       ),
     );

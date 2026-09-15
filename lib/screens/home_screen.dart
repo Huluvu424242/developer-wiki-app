@@ -112,7 +112,8 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => customBuilder?.call(template, widget.sharedContent) ??
+        builder: (_) =>
+            customBuilder?.call(template, widget.sharedContent) ??
             SourceFormScreen(
               initialTemplate: template,
               sharedContent: widget.sharedContent,
@@ -185,7 +186,9 @@ class _HomeScreenState extends State<HomeScreen> {
       ).dispatchWorkflow(workflow: configuration.workflowFile);
       if (mounted) {
         setState(() {
-          _lastDispatchAt = dispatchStartedAt.subtract(const Duration(seconds: 5));
+          _lastDispatchAt = dispatchStartedAt.subtract(
+            const Duration(seconds: 5),
+          );
           _importMessage = 'Import gestartet. Status kann aktualisiert werden.';
           _importFailed = false;
         });
@@ -217,14 +220,15 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final configuration = await _configurationService.load();
       final repository = _repositoryFrom(configuration);
-      final run = await GitHubService(
-        configuration.token,
-        owner: repository.owner,
-        repo: repository.name,
-      ).latestWorkflowRun(
-        workflow: configuration.workflowFile,
-        notBefore: notBefore,
-      );
+      final run =
+          await GitHubService(
+            configuration.token,
+            owner: repository.owner,
+            repo: repository.name,
+          ).latestWorkflowRun(
+            workflow: configuration.workflowFile,
+            notBefore: notBefore,
+          );
       if (!mounted) {
         return;
       }
@@ -411,7 +415,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: _statusBusy ? null : _refreshImportStatus,
                   icon: const Icon(Icons.refresh),
                   label: Text(
-                    _statusBusy ? 'Wird aktualisiert …' : 'Status aktualisieren',
+                    _statusBusy
+                        ? 'Wird aktualisiert …'
+                        : 'Status aktualisieren',
                   ),
                 ),
                 if (run != null)

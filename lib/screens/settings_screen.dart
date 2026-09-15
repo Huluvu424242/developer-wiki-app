@@ -9,11 +9,7 @@ import '../widgets/error_summary.dart' as validation;
 import '../widgets/pat_help_button.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({
-    super.key,
-    this.isSetup = false,
-    this.onConfigured,
-  });
+  const SettingsScreen({super.key, this.isSetup = false, this.onConfigured});
 
   final bool isSetup;
   final VoidCallback? onConfigured;
@@ -327,8 +323,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               validator: _required,
               decoration: InputDecoration(
                 labelText: 'Fine-grained PAT',
-                helperText:
-                    'Das Token wird nur im geschützten lokalen Speicher abgelegt.',
+                helperText: 'Das Token wird nur im geschützten lokalen Speicher abgelegt.',
                 suffixIcon: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

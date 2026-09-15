@@ -33,9 +33,7 @@ void main() {
     expect(find.text('Releaseversion 1.2.3+45'), findsOneWidget);
     expect(find.text('Barrierefreiheitserklärung'), findsOneWidget);
     expect(
-      tester.widget<BugReportButton>(
-        find.byType(BugReportButton),
-      ).contextName,
+      tester.widget<BugReportButton>(find.byType(BugReportButton)).contextName,
       'Über-Dialog',
     );
 

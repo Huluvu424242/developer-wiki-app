@@ -40,28 +40,37 @@ void main() {
     expect(listed.toSet().length, listed.length);
   });
 
-  test('local markdown links inside the harness resolve without entry cycles', () {
-    final harnessFiles = <String>['AGENTS.md', ...modules];
-    final linkPattern = RegExp(r'\[[^\]]+\]\(([^)]+)\)');
+  test(
+    'local markdown links inside the harness resolve without entry cycles',
+    () {
+      final harnessFiles = <String>['AGENTS.md', ...modules];
+      final linkPattern = RegExp(r'\[[^\]]+\]\(([^)]+)\)');
 
-    for (final path in harnessFiles) {
-      final file = File(path);
-      final parent = file.parent;
-      final text = file.readAsStringSync();
-      for (final match in linkPattern.allMatches(text)) {
-        final target = match.group(1)!;
-        if (target.startsWith('http') || target.startsWith('#')) {
-          continue;
-        }
-        final cleanTarget = target.split('#').first;
-        final resolved = File('${parent.path}/$cleanTarget');
-        expect(resolved.existsSync(), isTrue,
-            reason: '$path -> $cleanTarget');
-        if (path != 'AGENTS.md') {
-          expect(cleanTarget, isNot('../AGENTS.md'),
-              reason: '$path must not require AGENTS.md recursively');
+      for (final path in harnessFiles) {
+        final file = File(path);
+        final parent = file.parent;
+        final text = file.readAsStringSync();
+        for (final match in linkPattern.allMatches(text)) {
+          final target = match.group(1)!;
+          if (target.startsWith('http') || target.startsWith('#')) {
+            continue;
+          }
+          final cleanTarget = target.split('#').first;
+          final resolved = File('${parent.path}/$cleanTarget');
+          expect(
+            resolved.existsSync(),
+            isTrue,
+            reason: '$path -> $cleanTarget',
+          );
+          if (path != 'AGENTS.md') {
+            expect(
+              cleanTarget,
+              isNot('../AGENTS.md'),
+              reason: '$path must not require AGENTS.md recursively',
+            );
+          }
         }
       }
-    }
-  });
+    },
+  );
 }

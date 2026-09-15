@@ -75,10 +75,7 @@ class _PatHelpDialog extends StatelessWidget {
             ),
             Text('6. Token erzeugen und einmalig in diese App kopieren.'),
             SizedBox(height: 16),
-            Text(
-              'Sicherheit',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            Text('Sicherheit', style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
             Text(
               'Das Token nur in den App-Einstellungen speichern. Nicht in '

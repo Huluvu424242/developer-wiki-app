@@ -29,8 +29,8 @@ class GitHubRepository {
       throw const FormatException('Repository-Angabe fehlt.');
     }
 
-    final normalized = trimmed.startsWith('http://') ||
-            trimmed.startsWith('https://')
+    final normalized =
+        trimmed.startsWith('http://') || trimmed.startsWith('https://')
         ? trimmed
         : 'https://github.com/$trimmed';
     final uri = Uri.tryParse(normalized);
@@ -38,8 +38,9 @@ class GitHubRepository {
       throw const FormatException('Bitte ein GitHub-Repository angeben.');
     }
 
-    final segments =
-        uri.pathSegments.where((segment) => segment.isNotEmpty).toList();
+    final segments = uri.pathSegments
+        .where((segment) => segment.isNotEmpty)
+        .toList();
     if (segments.length != 2) {
       throw const FormatException(
         'Repository als https://github.com/owner/repo oder owner/repo angeben.',
