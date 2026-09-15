@@ -40,3 +40,9 @@ Stories beschreiben Ziel, Nutzen, fachliche Anforderungen, Akzeptanzkriterien, A
 - Nach Rebase relevante Prüfungen wiederholen.
 - Veröffentlichte Arbeitsbranches nur entsprechend `git push --force-with-lease` aktualisieren; ungesichertes `--force` ist verboten.
 - Der geschützte `master` wird ausschließlich über Pull Requests verändert.
+
+## Abschlussstatus
+
+- `Implementiert, technische Prüfung ausstehend`: Mindestens eine erforderliche automatisierte Prüfung konnte nicht erfolgreich ausgeführt werden. Grund, Auswirkung und Restrisiko werden genannt.
+- `Geprüft und mergebereit`: Alle erforderlichen und verfügbaren automatisierten Prüfungen waren erfolgreich, die Dokumentation ist aktuell und es ist kein bekannter technischer Blocker offen. Noch offene manuelle Prüfungen werden transparent benannt.
+- Nicht ausführbare Prüfungen werden niemals als erfolgreich dargestellt.
