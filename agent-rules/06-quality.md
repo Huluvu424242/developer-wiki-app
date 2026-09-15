@@ -15,6 +15,10 @@
 ## Prüfung
 
 - Akzeptanzkriterien gegen die Umsetzung prüfen.
+- Sobald Dart-/Flutter-Dateien geändert wurden und ein Flutter-/Dart-SDK verfügbar ist, wird die Formatierung **vor dem ersten Validierungs-Push beziehungsweise vor Bereitstellung des PRs aktiv angewendet**, bevorzugt mit `dart format lib test`. Die dadurch entstehenden reinen Formatierungsänderungen werden zusammen mit der fachlichen Änderung in den Arbeitsbranch übernommen.
+- Der Formatcheck in CI ist kein Ersatz für diese Vorabformatierung. Ziel ist, bekannte oder durch die eigene Änderung verursachte Formatierungsfehler bereits vor dem ersten CI-Lauf zu beseitigen, statt einen vermeidbaren roten Erstlauf zu erzeugen.
+- Meldet eine freigegebene Validation dennoch Formatierungsfehler, behebt der KI-Agent diese im laufenden Implementierungsauftrag selbständig und lässt die relevanten Prüfungen erneut laufen; dafür wird keine Rückfrage an den Menschen benötigt.
+- Wird erstmals eine repositoryweite Formatprüfung eingeführt und deckt sie bereits vorhandene Formatierungsabweichungen auf, werden diese im einführenden Werkzeugketten-PR als rein mechanische Formatierungsbereinigung mit behoben, sofern dabei keine fachlichen Änderungen erforderlich sind. Fachlich unklare Abweichungen werden nicht geraten.
 - Für geänderten Dart-/Flutter-Code sind vor Abschluss `dart format --set-exit-if-changed lib test`, `flutter analyze` und `flutter test` die Standardprüfungen, soweit das Flutter-SDK verfügbar ist.
 - Ein Pull Request mit geändertem Dart- oder Flutter-Code wird nur dann als `Geprüft und mergebereit` gemeldet, wenn die erforderlichen und verfügbaren automatisierten Prüfungen erfolgreich waren.
 - Kann mindestens eine erforderliche automatisierte Prüfung nicht erfolgreich ausgeführt werden, lautet der Status `Implementiert, technische Prüfung ausstehend`.
