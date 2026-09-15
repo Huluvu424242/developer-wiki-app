@@ -85,7 +85,7 @@ Für `kiagent-*`-Workflows gilt:
 
 ### Pauschalfreigabe für KI-Agenten-Workflows: `kiagent-*`
 
-- **Namenskonvention:** Workflow-Datei unter `.github/workflows/` beginnt mit `kiagent-`; der YAML-Anzeigename `name:` beginnt ebenfalls mit `kiagent-`.
+- **Namenskonvention:** Workflow-Datei unter `.github/workflows/` beginnt mit `kiagent-`; der YAML-Anzeigename `name:` beginnt ebenfalls exakt mit `kiagent-`.
 - **Freigabestatus:** bestimmungsgemäße Ausführung durch den KI-Agenten erlaubt.
 - **Umfang:** automatische Trigger sowie vorhandene manuelle Start-/Wiederholungsmöglichkeiten innerhalb der jeweiligen Workflow-Konfiguration; dies umfasst auch technische Validierungsläufe auf dem zugehörigen Werkzeugketten-PR-Branch.
 - **Voraussetzung für neue oder geänderte Workflows:** eigene Story, separater Werkzeugketten-PR und zwingende menschliche Prüfung vor Merge.
