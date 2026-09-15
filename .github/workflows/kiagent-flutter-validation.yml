@@ -30,7 +30,18 @@ jobs:
         run: flutter pub get
 
       - name: Check formatting
-        run: dart format --set-exit-if-changed lib test
+        shell: bash
+        run: |
+          set +e
+          dart format --set-exit-if-changed lib test
+          format_exit=$?
+          set -e
+          if [ "$format_exit" -ne 0 ]; then
+            echo "::group::Required formatting changes"
+            git diff -- lib test
+            echo "::endgroup::"
+            exit "$format_exit"
+          fi
 
       - name: Analyze
         run: flutter analyze
