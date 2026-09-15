@@ -1,4 +1,4 @@
-name: kiagent-Flutter Validation
+name: kiagent-flutter-validation
 
 on:
   push:
