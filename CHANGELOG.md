@@ -7,6 +7,10 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Added
+
+- Eine schlanke `kiagent-flutter-validation`-GitHub-Action prüft bei jedem Push Formatierung, statische Analyse und Tests mit minimalen Leserechten und ohne Secrets oder Repository-Schreibwirkungen.
+
 ### Changed
 
 - Den Agenten-Harness von einer monolithischen `AGENTS.md` auf einen verbindlichen Einstiegspunkt mit thematischen Regelmodulen unter `agent-rules/` umgestellt; Regelpriorität, Wiki-/App-Verantwortungsgrenze und deterministische Harness-Strukturprüfung ergänzt.
