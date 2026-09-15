@@ -9,8 +9,8 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Added
 
-- Eine schlanke `kiagent-flutter-validation`-GitHub-Action prüft bei jedem Push Formatierung, statische Analyse und Tests mit minimalen Leserechten und ohne Secrets oder Repository-Schreibwirkungen.
-- Eine manuell gestartete `kiagent-format-and-commit`-GitHub-Action formatiert ausschließlich getrackte Python- und Dart-Dateien auf dem ausgewählten Branch und committet notwendige reine Formatierungsänderungen auf denselben Branch.
+- Eine schlanke `kiagent-flutter-validation`-GitHub-Action prüft bei jeder Pull-Request-Erstellung Formatierung, statische Analyse und Tests mit minimalen Leserechten und ohne Secrets oder Repository-Schreibwirkungen.
+- Eine bei Push sowie manuell startbare `kiagent-format-and-commit`-GitHub-Action formatiert ausschließlich getrackte Python- und Dart-Dateien auf dem aktuellen Branch und committet notwendige reine Formatierungsänderungen auf denselben Branch.
 
 ### Changed
 
