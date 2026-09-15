@@ -97,6 +97,7 @@ Für `kiagent-*`-Workflows gilt:
 
 - **Namenskonvention:** Workflow-Datei unter `.github/workflows/` beginnt mit `kiagent-`; der YAML-Anzeigename `name:` beginnt ebenfalls exakt mit `kiagent-`.
 - **Freigabestatus:** bestimmungsgemäße Ausführung durch den KI-Agenten erlaubt.
+- **Standidentität:** Für die pauschale `kiagent-*`-Freigabe werden keine festen Blob-SHAs einzelner Workflow-Dateien als Freigabeschlüssel gepflegt. Maßgeblich ist der jeweils versionierte Workflowstand im Repository beziehungsweise auf dem zugehörigen Werkzeugketten-PR-Branch innerhalb der nachfolgend definierten Gültigkeitsgrenzen.
 - **Umfang:** automatische Trigger sowie vorhandene manuelle Start-/Wiederholungsmöglichkeiten innerhalb der jeweiligen Workflow-Konfiguration; dies umfasst auch technische Validierungsläufe auf dem zugehörigen Werkzeugketten-PR-Branch.
 - **Voraussetzung für neue oder geänderte Workflows:** eigene Story, separater Werkzeugketten-PR und zwingende menschliche Review-Möglichkeit vor Merge.
 - **Mehrfachauftrag:** Sind mehrere Workflow-Stories ausdrücklich in einem Auftrag beauftragt, werden zunächst alle zugehörigen PRs erstellt; die menschliche Review-Lücke beginnt erst danach.
@@ -110,7 +111,7 @@ Für `kiagent-*`-Workflows gilt:
 - **Repository:** `Huluvu424242/developer-wiki-app`
 - **Workflow-Datei:** `.github/workflows/android-release.yml`
 - **Anzeigename:** `Android Release APK`
-- **Dokumentierter Stand:** Git-Blob-SHA `7fbc905b85ebd17aad70e6ac7e850b357d7ca91c`, inventarisiert auf `master`-Commit `a11f8630e27e9a222e80757b8684675ba8319e76`
+- **Dokumentierter Stand:** Git-Blob-SHA `f366928f3498812e02bdae98bf923f289f0079fb`, inventarisiert auf `master`-Commit `732b4444478f5d8e47a6b8829fa37d0c351529f1`
 - **Freigabestatus:** vorhanden, aber nicht zur selbständigen Agentenausführung freigegeben; weder manuelle Ausführung noch Wiederholung fehlgeschlagener Läufe ist durch dieses Verzeichnis erlaubt
 - **Trigger:** ausschließlich `workflow_dispatch`; keine automatische Ausführung durch Push, Pull Request, Label, Issue, Tag oder Release
 - **Inputs:** Pflichtfeld `release_version`; optionales Markdown-Feld `release_notes`
@@ -119,12 +120,12 @@ Für `kiagent-*`-Workflows gilt:
 - **Concurrency:** Gruppe `android-release-${{ inputs.release_version }}`; `cancel-in-progress: false`
 - **Repository-/Datenzugriffe:** vollständiger Checkout mit `fetch-depth: 0`; Projektabhängigkeiten über `flutter pub get`; Zugriff auf Buildausgaben sowie GitHub-Tag-/Releasebereich
 - **Secret-Namen:** `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`; zusätzlich wird für die Release-Veröffentlichung das eingebaute `github.token` als `GH_TOKEN` verwendet
-- **Externe Actions:** `actions/checkout@v6`, `actions/setup-java@v5`, `subosito/flutter-action@v2`
+- **Externe Actions:** `actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803` (`v6.1.0`), `actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961` (`v5`, geprüfter Major-Tag-Stand vom 15.09.2026), `subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2` (`v2.23.0`)
 - **Build-/Prüfschritte:** Version aus `pubspec.yaml` gegen `release_version` prüfen, vorhandenen Tag ausschließen, Java 21/Temurin und Flutter stable einrichten, `flutter pub get`, `flutter analyze`, `flutter test`, Keystore decodieren, signierte APK bauen, Release-Dateien vorbereiten und SHA-256-Prüfsumme erzeugen
 - **Outputs:** `developer-wiki-app-<release_version>.apk`, zugehörige `.sha256`-Datei und Release Notes; diese werden als Bestandteile des GitHub Release veröffentlicht, nicht als GitHub-Actions-Artefakt mit eigener Retention
 - **Schreibwirkungen:** `gh release create` erstellt den Tag `v<release_version>`, veröffentlicht das GitHub Release mit APK und Prüfsumme und markiert es mit `--latest`
 - **Gültigkeitsgrenze:** Inventar und Sicherheitsbewertung des aktuellen Workflows; keine Agentenfreigabe, keine Settings-/Secret-Änderung und keine Freigabe für geänderte Workflowstände
-- **Supply-Chain-Hinweis:** Die externen Actions werden aktuell über bewegliche Major-Tags referenziert. Eine Härtung auf unveränderliche Commit-SHAs ist sinnvoll, aber nicht Bestandteil dieser Story und benötigt eine eigene Werkzeugketten-Story und einen separaten PR.
+- **Supply-Chain-Hinweis:** Die externen GitHub Actions sind gemäß Story #147 auf überprüfte unveränderliche Commit-SHAs gepinnt. Beweglich bleiben bewusst unter anderem `ubuntu-latest`, Flutter `stable` und Java 21 innerhalb der dokumentierten Grenzen; Details stehen in `docs/android-release.md`.
 
 ## Änderungen am Freigabeverzeichnis
 
