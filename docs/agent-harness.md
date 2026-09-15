@@ -6,7 +6,7 @@ Die Root-`AGENTS.md` ist der verbindliche Einstiegspunkt für KI-Arbeiten am Rep
 
 Story #141 modularisiert den bisherigen monolithischen Harness, ohne seine fachlichen Anforderungen abzuschwächen. Regeln aus `taugts` und `Developer-Wiki` dienten als Strukturvorbild, wurden aber nicht mechanisch übernommen.
 
-| Bisheriger Bereich in `AGENTS.md` | Normative Heimat nach #141/#143 |
+| Bisheriger Bereich in `AGENTS.md` | Normative Heimat nach #141–#144 |
 | --- | --- |
 | Kommunikation, Story-/Bug-Workflow, PR-Verknüpfung, Rebase | `agent-rules/01-workflow-collaboration.md` |
 | Grundgerüst-Grenzen | `agent-rules/02-project-bootstrap.md` |
@@ -19,6 +19,7 @@ Story #141 modularisiert den bisherigen monolithischen Harness, ohne seine fachl
 | Tests, CI und Sicherheitsvorfälle | `agent-rules/05-security-ci.md` |
 | Codestyle, Tests, Abhängigkeiten und Lizenzen | `agent-rules/06-quality.md` |
 | Changelog, README und `docs/` | `agent-rules/06-documentation.md` |
+| Releasevorbereitung und Versionskonsistenz | `agent-rules/07-release.md` |
 | Verantwortungsgrenze App ↔ Developer-Wiki | `agent-rules/08-wiki-integration.md` |
 
 ## Harmonisierung nach Story #142
@@ -53,16 +54,31 @@ Kernpunkte:
 - Secret-Namen dürfen für die technische Inventarisierung dokumentiert werden, Secret-Werte nicht;
 - externe Actions sollen bei neuen oder geänderten Workflows soweit praktikabel auf unveränderliche Commit-SHAs gepinnt werden.
 
-Der vorhandene Workflow `Android Release APK` ist vollständig inventarisiert, besitzt aber keine nachweisbare Freigabe zur selbständigen Agentenausführung. Er bleibt deshalb im Freigabeverzeichnis ausdrücklich als **vorhanden, aber nicht zur selbständigen Agentenausführung freigegeben** gekennzeichnet. Sein aktueller `workflow_dispatch`-Trigger bedeutet zugleich, dass normale Branch- und Pull-Request-Schreiboperationen ihn nicht automatisch starten.
+Der vorhandene Workflow `Android Release APK` ist vollständig inventarisiert, besitzt aber keine nachweisbare Freigabe zur selbständigen Agentenausführung. Er bleibt deshalb im Freigabeverzeichnis ausdrücklich als **vorhanden, aber nicht zur selbständigen Agentenausführung freigegeben** gekennzeichnet. Sein `workflow_dispatch`-Trigger bedeutet zugleich, dass normale Branch- und Pull-Request-Schreiboperationen ihn nicht automatisch starten.
 
-Das tatsächliche SHA-Pinning von `actions/checkout@v6`, `actions/setup-java@v5` und `subosito/flutter-action@v2` ist bewusst nicht Teil von #143, weil dies eine Änderung der produktiven Werkzeugkette wäre.
+## Releasevertrag nach Story #144
 
-## Bewusste Abweichungen von der vorgeschlagenen Zielstruktur
+Story #144 ergänzt mit `agent-rules/07-release.md` einen projektspezifischen Vertrag für die Vorbereitung einer Releaseversion. Die Vorlage aus Taugt’s wurde an den tatsächlichen App-Bestand angepasst.
+
+Der Vertrag legt insbesondere fest:
+
+- `pubspec.yaml` ist die zentrale technische Versionsquelle;
+- `CHANGELOG.md` ist der fachliche Master der veröffentlichten Änderungshistorie;
+- aktuelle Versionsangaben in README und Dokumentation werden repositoryweit gesucht und von historischen Angaben unterschieden;
+- Benutzer-, Entwickler-, Architektur-, Sicherheits- und Release-Dokumentation werden auf tatsächliche Deltas seit dem letzten Release geprüft;
+- `ATTRIBUTIONS.md` wird auf neue relevante ausgelieferte Bestandteile geprüft;
+- vor Abschluss werden Version, Changelog, aktuelle Dokumentationsangaben und sichtbare App-Version ausdrücklich auf Konsistenz geprüft;
+- die Vorbereitung erfolgt ausschließlich auf eigenem Branch und per PR gegen `master`;
+- Vorbereitung/Merge und produktive Veröffentlichung über `Android Release APK` bleiben getrennte Vorgänge; die Action darf nur nach der Werkzeugketten-Governance verwendet werden.
+
+Die Developer-Wiki-App besitzt aktuell keine eigene In-App-Änderungshistorie. Deshalb verpflichtet der Vertrag nur dann zu deren Synchronisierung mit dem Changelog, wenn eine solche Ansicht künftig tatsächlich existiert. Story #144 führt keine neue UI ein.
+
+## Bewusste Strukturentscheidungen
 
 - Die Sicherheitsregeln sind in Zugriff, Datenbehandlung, Werkzeugketten sowie Tests/CI/Vorfälle geteilt. Dadurch bleibt jede Regel fachlich eindeutig zugeordnet und besser reviewbar.
 - Architektur ist in fachliche Struktur und Implementierung aufgeteilt, weil diese beiden Regelgruppen unabhängig voneinander umfangreich sind.
 - Qualität und Dokumentation besitzen getrennte normative Module, damit Prüf-/Lizenzregeln nicht mit Dokumentationsregeln vermischt werden.
-- Ein eigenes Release-Regelmodul ist bewusst noch nicht Bestandteil von #141 bis #143. Story #144 führt diesen fachlich separat ein. Bis dahin gelten die allgemeinen Workflow-, Sicherheits-, Werkzeugketten-, Qualitäts- und Dokumentationsregeln auch für Releasearbeiten.
+- Releasevorbereitung besitzt ein eigenes Modul, weil sie mehrere bestehende Verträge koordiniert, ohne deren Sicherheits-, Qualitäts- oder Dokumentationsregeln zu duplizieren.
 
 ## Bewusste Abgrenzungen
 
@@ -73,12 +89,13 @@ Nicht übernommen wurden insbesondere:
 - Taugt’s-spezifische Plattformvorgaben für Windows/Linux sowie dessen Ausschlüsse für Web/iOS;
 - Taugt’s-spezifische MkDocs-, GitHub-Pages- und Workflowvorgaben;
 - die Bootstrap-Pflicht „Name und Logo vor Implementierungsbeginn“, weil die bestehende Developer-Wiki-App diese Identität bereits besitzt;
+- eine neue In-App-Änderungshistorie nur zur Erfüllung des Releasevertrags;
 - Wiki-interne OKF-, Quellenarchiv-, Wissenssynthese-, Retrieval- und `wiki-data`-Regeln aus `Developer-Wiki`;
 - konkrete Freigaben anderer Repositories.
 
 ## Normative Quelle
 
-Die Projektdokumentation erläutert den Harness nur. Normative Regeln stehen ausschließlich in der Root-`AGENTS.md`, den dort gelisteten Modulen oder künftig ausdrücklich referenzierten Spezialverträgen.
+Die Projektdokumentation erläutert den Harness nur. Normative Regeln stehen ausschließlich in der Root-`AGENTS.md`, den dort gelisteten Modulen oder ausdrücklich referenzierten Spezialverträgen.
 
 ## Deterministische Strukturprüfung
 
