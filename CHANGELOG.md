@@ -20,6 +20,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Security
 
+- Eine verbindliche GitHub-Actions- und Werkzeugketten-Governance mit Default-Deny, Triggerprüfung vor schreibenden Repository-Operationen, separaten Werkzeugketten-PRs, menschlicher Review-Lücke, Freigabeverzeichnis und klarer Trennung von Merge und produktiver Ausführung eingeführt; der Android-Release-Workflow bleibt ohne ausdrückliche Owner-Freigabe von selbständiger Agentenausführung ausgeschlossen.
 - Externe Actions des produktiven Android-Release-Workflows auf überprüfte unveränderliche Commit-SHAs gepinnt und Herkunft, Wartungszustand, Lizenz sowie bewusst verbleibende bewegliche Buildbestandteile dokumentiert.
 
 ## [0.1.0+4] - 2026-08-28
