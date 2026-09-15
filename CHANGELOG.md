@@ -7,6 +7,10 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Changed
+
+- Den Agenten-Harness von einer monolithischen `AGENTS.md` auf einen verbindlichen Einstiegspunkt mit thematischen Regelmodulen unter `agent-rules/` umgestellt; Regelpriorität, Wiki-/App-Verantwortungsgrenze und deterministische Harness-Strukturprüfung ergänzt.
+
 ## [0.1.0+4] - 2026-08-28
 
 ### Added
