@@ -9,6 +9,8 @@ Diese Regeln gelten verbindlich für Features, Bugfixes und sonstige Änderungen
 - Architekturübersichten und Architekturdiagramme nach dem C4-Modell strukturieren, soweit dies einen konkreten Nutzen hat.
 - Keine Architektur oder Dokumentation auf Vorrat erzeugen.
 - Änderungen an Architektur, Integrationen, Persistenz, Abläufen oder externen Schnittstellen aktualisieren die zugehörigen Markdown-, Mermaid-, SVG- und C4-Artefakte im selben Pull Request.
+- Änderungen an Nutzerverhalten, sichtbaren Funktionen, Bedienabläufen oder bekannten Einschränkungen aktualisieren die zuständige Benutzerdokumentation im selben Pull Request, sofern eine solche Dokumentation betroffen ist.
+- Sicherheitsrelevante Änderungen aktualisieren die zuständige Sicherheits- oder Entwicklerdokumentation im selben Pull Request.
 - Wenn keine Dokumentationsaktualisierung erforderlich ist, wird dies im Pull Request kurz begründet.
 - Der Pull Request nennt Umsetzung, wesentliche Entscheidungen, Prüfungen, Dokumentationsstatus, offene Akzeptanzkriterien und verbleibende Unsicherheiten.
 - Eine Story wird nicht als vollständig umgesetzt dargestellt, solange Akzeptanzkriterien offen sind.
