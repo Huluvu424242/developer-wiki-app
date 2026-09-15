@@ -32,6 +32,18 @@ Stories beschreiben Ziel, Nutzen, fachliche Anforderungen, Akzeptanzkriterien, A
 - Vollständig erledigte Issues werden mit `Closes`, `Fixes` oder `Resolves` verknüpft; teilweise erledigte Issues nur mit einer nicht schließenden Referenz.
 - Der PR nennt Umsetzung, Prüfungen, Dokumentationsstatus und verbleibende Unsicherheiten.
 
+## Menschliche Review-Lücke und delegierter Merge
+
+- Die Erstellung oder wesentliche Aktualisierung eines Pull Requests beendet den zugehörigen Implementierungsauftrag zunächst. Der KI-Agent führt in demselben Auftrag keinen Merge dieses PRs aus.
+- Nach Bereitstellung des PRs muss eine echte menschliche Review-Lücke bestehen. Der Mensch erhält Gelegenheit, Diff, Prüfungen, Risiken und gegebenenfalls gestapelte Abhängigkeiten zu prüfen.
+- Ein späterer Merge durch den KI-Agenten ist zulässig, wenn der Mensch ihn nach dieser Review-Lücke in einer **neuen, ausdrücklichen Aufgabe** beauftragt.
+- Diese neue Aufgabe darf auch mehrere bereits geprüfte PRs umfassen, insbesondere für gestapelte Merges, notwendige Rebases und konfliktfreie Reihenfolgen.
+- Eine frühere Implementierungsbeauftragung, die bloße PR-Erstellung, ein erfolgreicher CI-Lauf, Schweigen oder eine allgemeine Aussage wie `wenn alles grün ist, merge` im ursprünglichen Implementierungsauftrag ersetzen die spätere neue Merge-Beauftragung nicht.
+- Vor einem delegierten Merge prüft der KI-Agent den aktuellen PR-Stand erneut, einschließlich Reviews, CI/Checks, Mergekonflikten, Branch-Abhängigkeiten und seit der menschlichen Prüfung hinzugekommenen Änderungen.
+- Sind seit der erkennbaren menschlichen Prüfung inhaltlich relevante Änderungen hinzugekommen, wird nicht eigenmächtig gemergt; der Mensch wird auf die Änderung hingewiesen und eine erneute Review-Möglichkeit eingeräumt.
+- Rebase und Konfliktauflösung dürfen Bestandteil der delegierten Merge-Aufgabe sein. Konflikte werden fachlich gelöst; bei unklarer Bedeutung wird nicht geraten.
+- Der Agent darf mehrere freigegebene PRs in einer vom Menschen delegierten Merge-Aufgabe nacheinander rebasen, prüfen und mergen, wenn Abhängigkeiten und Reihenfolge dies erfordern.
+
 ## Rebase
 
 - `master` wird niemals rebased oder per Force Push verändert.
