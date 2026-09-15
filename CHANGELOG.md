@@ -10,6 +10,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 ### Changed
 
 - Den Agenten-Harness von einer monolithischen `AGENTS.md` auf einen verbindlichen Einstiegspunkt mit thematischen Regelmodulen unter `agent-rules/` umgestellt; Regelpriorität, Wiki-/App-Verantwortungsgrenze und deterministische Harness-Strukturprüfung ergänzt.
+- Flutter-, Architektur-, UX-, Barrierefreiheits- und Qualitätsregeln mit den passenden Erkenntnissen aus dem Taugt’s-Harness harmonisiert; insbesondere Lebenszyklusprüfungen nach `await`, sichere `const`-Widgetbäume, Lazy-Formularvalidierung, Scroll-Widgettests, robuste Fehlersammler-Navigation und einheitliche Abschlussstatus präzisiert.
 
 ## [0.1.0+4] - 2026-08-28
 
