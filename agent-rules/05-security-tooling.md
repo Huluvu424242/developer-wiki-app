@@ -6,7 +6,11 @@ Dieses Modul regelt GitHub Actions, CI/CD-Pipelines, Bots, externe Runner und ve
 
 - Es gilt Default-Deny: Eine Werkzeugkette darf nicht eigenmächtig erstellt, verändert, aktiviert, deaktiviert, manuell gestartet, erneut ausgeführt, abgebrochen, geplant oder als Ersatz für fehlende lokale Werkzeuge verwendet werden.
 - Eine Nutzung oder Änderung ist nur zulässig, wenn der konkrete Vorgang bereits durch dieses Freigabeverzeichnis oder einen spezielleren ausdrücklich genehmigten Vertrag gedeckt ist oder der Repository-Owner vorher eine konkrete ausdrückliche Erlaubnis erteilt hat.
-- Ein vorhandener Workflow, ein sichtbarer `Run workflow`-Button, vorhandene Secrets, technische Connector-Berechtigungen, eine allgemeine Umsetzungsbeauftragung, eine frühere Freigabe für einen anderen Lauf oder Schweigen sind keine Erlaubnis.
+- Ausnahme für ausdrücklich als KI-Agenten-Werkzeugketten gekennzeichnete GitHub Actions: Workflows unter `.github/workflows/`, deren Dateiname mit `kiagent-` beginnt und deren YAML-`name` ebenfalls mit `kiagent-` beginnt, sind für den KI-Agenten zur bestimmungsgemäßen Ausführung freigegeben.
+- Diese `kiagent-*`-Freigabe umfasst automatische Ausführungen über die im Workflow definierten Trigger sowie, falls im Workflow vorgesehen, manuelle Starts und Wiederholungen durch den KI-Agenten. Sie erteilt keine darüber hinausgehenden Rechte zum Ändern von Repository-Settings, Secrets, Variablen, Rulesets oder Berechtigungen.
+- Die Freigabe eines `kiagent-*`-Workflows gilt nur für den jeweils im Repository vorhandenen Workflowstand und dessen dokumentierten Zweck, Trigger, Berechtigungen, Inputs, Secrets/Variablen, Datenzugriffe, externen Actions/Tools, Runner, Outputs und schreibende Wirkungen.
+- Workflows ohne `kiagent-`-Präfix bleiben vollständig dem Default-Deny unterworfen, sofern sie nicht an anderer Stelle ausdrücklich freigegeben sind.
+- Ein vorhandener Workflow, ein sichtbarer `Run workflow`-Button, vorhandene Secrets, technische Connector-Berechtigungen, eine allgemeine Umsetzungsbeauftragung, eine frühere Freigabe für einen anderen Lauf oder Schweigen sind außerhalb der ausdrücklich dokumentierten Freigaben keine Erlaubnis.
 - Reines Lesen von Workflow-Dateien, Statusinformationen und vorhandenen Logs ist zulässig, sofern dadurch kein Lauf ausgelöst, kein Zustand verändert und kein Secret offengelegt wird.
 - Fehlt ein erlaubtes Werkzeug, bleibt die technische Prüfung offen. Es wird keine Ersatz-Action oder externe Pipeline eigenmächtig aufgebaut; der Status lautet entsprechend den Workflow-Regeln `Implementiert, technische Prüfung ausstehend`.
 
@@ -15,12 +19,23 @@ Dieses Modul regelt GitHub Actions, CI/CD-Pipelines, Bots, externe Runner und ve
 - Vor jeder schreibenden Repository-Operation wird geprüft, welche vorhandenen Workflows, Bots oder Folgeaktionen dadurch automatisch ausgelöst werden können.
 - Insbesondere sind Pushes, Pull Requests, Reopen/Close, Labels, Kommentare, Tags, Releases, Issue-/PR-Ereignisse und sonstige konfigurierte Trigger zu berücksichtigen.
 - Würde eine Schreiboperation einen nicht freigegebenen Workflow auslösen, wird die betroffene Operation vor Ausführung angehalten und eine ausdrückliche Erlaubnis eingeholt.
-- Automatische Trigger, die im Freigabeverzeichnis für den dokumentierten Workflowstand ausdrücklich freigegeben sind, dürfen bestimmungsgemäß ausgelöst werden.
+- Automatische Trigger von `kiagent-*`-Workflows gelten innerhalb ihrer dokumentierten Konfiguration als freigegeben und dürfen bestimmungsgemäß ausgelöst werden.
+- Automatische Trigger, die im Freigabeverzeichnis für andere dokumentierte Workflowstände ausdrücklich freigegeben sind, dürfen ebenfalls bestimmungsgemäß ausgelöst werden.
 - Erwartete Folgeaktionen werden im Arbeits- oder PR-Bericht benannt, wenn sie für Berechtigungen, Kosten, externe Datenflüsse oder Schreibwirkungen relevant sind.
 
 ## Neue oder geänderte Werkzeugketten
 
-Jede neue oder geänderte ausführbare Werkzeugkette benötigt vor der Implementierung grundsätzlich eine eigene Story und einen separaten Pull Request. Eine Werkzeugkettenänderung wird nicht in einem fachlich unabhängigen Feature- oder Bug-PR versteckt und im selben PR nicht bereits als dauerhaft freigegeben vorausgesetzt.
+Jede neue oder geänderte ausführbare Werkzeugkette benötigt vor der Implementierung grundsätzlich eine eigene Story und einen separaten Pull Request. Eine Werkzeugkettenänderung wird nicht in einem fachlich unabhängigen Feature- oder Bug-PR versteckt.
+
+Für GitHub-Actions-Workflows gilt zusätzlich zwingend:
+
+- Neue Workflow-Dateien dürfen ausschließlich auf einem Arbeitsbranch erstellt und über einen Pull Request gegen den geschützten Zielbranch eingebracht werden.
+- Bestehende Workflow-Dateien dürfen ebenfalls nur über einen eigenen Werkzeugketten-PR geändert werden.
+- Jeder PR, der eine GitHub Action neu erstellt oder verändert, muss vor dem Merge von einem Menschen geprüft werden.
+- Der KI-Agent darf einen solchen PR weder selbst freigeben noch selbst mergen noch per Auto-Merge zum selbständigen Merge vormerken.
+- Eine KI-Agenten-Bewertung, ein erfolgreicher CI-Lauf oder das Fehlen von Review-Kommentaren ersetzt die menschliche Prüfung nicht.
+- Das Präfix `kiagent-` hebt diese Reviewpflicht nicht auf. Es kennzeichnet ausschließlich Workflows, deren bestimmungsgemäße Ausführung durch den KI-Agenten erlaubt ist.
+- Nach menschlicher Prüfung und Merge darf ein `kiagent-*`-Workflow entsprechend seiner gemergten Konfiguration vom KI-Agenten ausgeführt werden. Änderungen an diesem Workflow erfordern erneut den vollständigen Story-/PR-/Human-Review-Prozess.
 
 Die Story dokumentiert mindestens:
 
@@ -40,16 +55,21 @@ Die Story dokumentiert mindestens:
 
 Externe Actions werden vor Aufnahme auf Herkunft, Wartungszustand, Berechtigungen und Lizenz geprüft und soweit praktikabel auf unveränderliche Commit-SHAs gepinnt. Wird stattdessen ein beweglicher Versions-Tag verwendet, muss dies bewusst bewertet und dokumentiert werden.
 
-## Merge ist keine Ausführungsfreigabe
+## Merge und Ausführungsfreigabe
 
-Die verbindliche Reihenfolge lautet:
+Für nicht als `kiagent-*` gekennzeichnete Werkzeugketten gilt weiterhin:
 
-**Story → separater Werkzeugketten-PR → Review/Merge → ausdrückliche Erst- oder Dauerfreigabe → produktive Verwendung**
+**Story → separater Werkzeugketten-PR → menschliche Prüfung/Merge → ausdrückliche Erst- oder Dauerfreigabe → produktive Verwendung**
 
-- Der Merge einer neuen oder geänderten Werkzeugkette erteilt nicht automatisch die Erlaubnis zu ihrer erstmaligen produktiven Ausführung.
+Für `kiagent-*`-Workflows gilt:
+
+**Story → separater Werkzeugketten-PR → verpflichtende menschliche Prüfung → Merge durch einen Menschen → Ausführung gemäß gemergter Workflow-Konfiguration**
+
+- Der Merge einer neuen oder geänderten Werkzeugkette ohne `kiagent-`-Freigabe erteilt nicht automatisch die Erlaubnis zu ihrer erstmaligen produktiven Ausführung.
+- Bei `kiagent-*`-Workflows ist die Ausführungsfreigabe an die reservierte Kennzeichnung und die verpflichtende menschliche Prüfung des Workflow-PRs gebunden.
 - Eine dauerhafte Freigabe gilt nur für den dokumentierten Stand, Zweck, Triggerumfang, Berechtigungen, Secrets/Variablen, Datenzugriffe, externen Actions/Tools, Runner, Inputs, Outputs, Artefakte und schreibenden Wirkungen.
-- Ändert sich eines dieser Gültigkeitsmerkmale, wird vor der nächsten entsprechenden produktiven Verwendung geprüft, ob eine neue ausdrückliche Freigabe erforderlich ist.
-- Das Freigabeverzeichnis beschreibt erteilte Freigaben; seine bloße Änderung erteilt selbst keine Freigabe.
+- Ändert sich eines dieser Gültigkeitsmerkmale, muss die Änderung erneut über Story, separaten PR und menschliche Prüfung laufen.
+- Das Freigabeverzeichnis beschreibt erteilte Freigaben; seine bloße Änderung darf außerhalb der ausdrücklich definierten `kiagent-*`-Regel nicht als implizite Freigabe interpretiert werden.
 
 ## GitHub-Settings und Secrets
 
@@ -60,6 +80,16 @@ Die verbindliche Reihenfolge lautet:
 - Signierschlüssel und Keystore-Inhalte verbleiben ausschließlich in dafür vorgesehenen sicheren Secret Stores.
 
 ## Freigabeverzeichnis
+
+### Pauschalfreigabe für KI-Agenten-Workflows: `kiagent-*`
+
+- **Namenskonvention:** Workflow-Datei unter `.github/workflows/` beginnt mit `kiagent-`; der YAML-Anzeigename `name:` beginnt ebenfalls mit `kiagent-`.
+- **Freigabestatus:** bestimmungsgemäße Ausführung durch den KI-Agenten erlaubt.
+- **Umfang:** automatische Trigger sowie vorhandene manuelle Start-/Wiederholungsmöglichkeiten innerhalb der gemergten Workflow-Konfiguration.
+- **Voraussetzung für neue oder geänderte Workflows:** eigene Story, separater Werkzeugketten-PR und zwingende menschliche Prüfung vor Merge.
+- **Merge:** Der KI-Agent darf Workflow-PRs nicht selbst mergen oder Auto-Merge aktivieren.
+- **Änderungsgrenze:** Jede Änderung an Workflow-Datei, Triggern, Berechtigungen, Inputs, Secrets/Variablen, Datenzugriffen, externen Diensten, Actions/Tools, Runnern, Outputs, Artefakten oder schreibenden Wirkungen erfordert erneut einen menschlich geprüften Werkzeugketten-PR.
+- **Keine impliziten Zusatzrechte:** Die `kiagent-*`-Freigabe ändert keine Repository-Settings, Secrets, Rulesets oder Branch-Protection und erlaubt deren Änderung nicht.
 
 ### Vorhanden, aber nicht zur selbständigen Agentenausführung freigegeben: Android Release APK
 
@@ -86,4 +116,5 @@ Die verbindliche Reihenfolge lautet:
 
 - Eine dokumentierte Freigabe gilt nur innerhalb ihrer ausdrücklich beschriebenen Gültigkeitsgrenzen.
 - Änderungen an Workflow-Datei, externer Action oder deren Commit-SHA, Triggern, Berechtigungen, Secrets/Variablen, Datenzugriffen, externen Diensten, Runnern, Inputs, Outputs, Artefakten, schreibenden Wirkungen oder Zweck werden vor weiterer produktiver Verwendung neu bewertet.
+- Für `kiagent-*`-Workflows erfolgt diese Neubewertung zwingend über eine Story, einen separaten PR und menschliche Prüfung vor dem Merge.
 - Nicht nachweisbar erteilte Freigaben dürfen nicht durch Dokumentation erfunden oder rückwirkend angenommen werden.
