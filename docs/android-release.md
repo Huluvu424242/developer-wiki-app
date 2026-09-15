@@ -11,6 +11,46 @@ Der Workflow:
 - erzeugt eine SHA-256-Prüfsumme,
 - veröffentlicht APK und Prüfsumme als GitHub Release `v<release_version>`.
 
+## Supply-Chain-Härtung des Workflows
+
+Externe GitHub Actions werden im produktiven Release-Workflow nicht über bewegliche Major-Tags, sondern über unveränderliche Commit-SHAs referenziert. Ein lesbarer Versionshinweis bleibt jeweils als Kommentar direkt neben dem SHA erhalten. Dadurch kann ein bereits geprüfter Workflow nicht allein durch das Verschieben eines fremden Tags anderen Action-Code ausführen.
+
+Stand der Prüfung vom 15.09.2026:
+
+| Action | Herkunft und Wartungszustand | Gepinnter Stand | Lizenz |
+| --- | --- | --- | --- |
+| `actions/checkout` | Offizielle GitHub-Action aus der Organisation `actions`; v6 wird weiterhin gepflegt. | `d23441a48e516b6c34aea4fa41551a30e30af803` (`v6.1.0`) | MIT |
+| `actions/setup-java` | Offizielle GitHub-Action aus der Organisation `actions`; der v5-Zweig wurde 2026 weiterhin gepflegt. | `b6effb05e454b25005698d916606bdc6ffcbf961` (`v5`, Major-Tag-Stand am 15.09.2026) | MIT |
+| `subosito/flutter-action` | Öffentliches Community-Projekt; laut Projektbeschreibung aktiv von Bartek Pacia gepflegt und mit aktuellen v2-Releases. | `1a449444c387b1966244ae4d4f8c696479add0b2` (`v2.23.0`) | MIT |
+
+Die Commit-SHAs wurden gegen die jeweiligen GitHub-Tag-Referenzen geprüft. Bei einer späteren Aktualisierung wird nicht nur der Kommentar geändert: Der neue Commit-SHA wird erneut auf Herkunft, Wartungszustand, Lizenz und den erwarteten Versionsstand geprüft und über den vorgeschriebenen Werkzeugketten-PR eingebracht.
+
+### Bewusst verbleibende bewegliche Bestandteile
+
+Das SHA-Pinning der Actions macht den Release nicht vollständig bitgenau reproduzierbar. Folgende Bestandteile bleiben bewusst beweglich:
+
+- `runs-on: ubuntu-latest` folgt dem von GitHub bereitgestellten aktuellen Ubuntu-Runner-Image. Eine Umstellung auf ein anderes Runner-Label würde die Buildumgebung ändern und ist für das reine Action-Pinning nicht erforderlich.
+- `channel: stable` in `subosito/flutter-action` installiert den zum Ausführungszeitpunkt aktuellen stabilen Flutter-Stand. Eine exakte Flutter-Version ist derzeit keine zentrale Projektvorgabe; ein Pin würde daher eine zusätzliche Versionspolitik einführen.
+- `java-version: "21"` mit Temurin kann innerhalb der Java-21-Linie neuere Patchstände auflösen. Der Major-Release bleibt fest, der konkrete JDK-Patchstand nicht.
+- Vorinstallierte Runner-Werkzeuge wie Git und GitHub CLI können sich mit dem GitHub-Runner-Image ändern.
+
+Diese Restbeweglichkeit wird für Story #147 akzeptiert, weil die Story die Supply-Chain-Grenze der **externen GitHub Actions** härtet, ohne Runner-, Flutter- oder JDK-Versionspolitik und damit das fachliche Releaseverhalten gleichzeitig umzubauen. Soll der Build später stärker reproduzierbar werden, ist dafür eine eigene Werkzeugketten-Story mit Kompatibilitätsprüfung sinnvoll.
+
+### Unveränderte Sicherheitsgrenzen
+
+Durch das SHA-Pinning ändern sich nicht:
+
+- Trigger: ausschließlich `workflow_dispatch`;
+- Berechtigung: weiterhin `contents: write`;
+- Inputs: `release_version` und optional `release_notes`;
+- Secret-Namen und deren Verwendung;
+- Checkout mit `fetch-depth: 0`;
+- Analyse-, Test-, Build- und Signierschritte;
+- Release-Artefakte APK und SHA-256-Datei;
+- schreibende Wirkung: Erzeugen von Tag und GitHub Release über `gh release create`.
+
+Der Workflow bleibt **nicht** zur selbständigen Ausführung durch den KI-Agenten freigegeben. Ein Merge einer Workflowänderung ist keine produktive Ausführungsfreigabe. Vor der erstmaligen produktiven Nutzung eines geänderten Workflowstands ist gemäß `agent-rules/05-security-tooling.md` eine ausdrückliche Owner-Freigabe erforderlich; erst danach darf der freigegebene Stand mit seiner Commit-/Blob-Identität im Freigabeverzeichnis als produktiv freigegeben dokumentiert werden.
+
 ## Warum ein stabiler Keystore notwendig ist
 
 Android-APKs müssen signiert sein. Für spätere Updates muss außerdem immer derselbe Signaturschlüssel verwendet werden. Der private Keystore darf deshalb nicht in das Repository eingecheckt werden, sondern wird GitHub Actions verschlüsselt als Secret bereitgestellt.
