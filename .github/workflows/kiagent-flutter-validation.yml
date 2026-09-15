@@ -30,30 +30,7 @@ jobs:
         run: flutter pub get
 
       - name: Check formatting
-        id: formatting
-        shell: bash
-        run: |
-          set +e
-          dart format --set-exit-if-changed lib test
-          format_exit=$?
-          set -e
-          if [ "$format_exit" -ne 0 ]; then
-            changed_files=$(git diff --name-only -- lib test)
-            echo "::group::Required formatting changes"
-            git diff -- lib test
-            echo "::endgroup::"
-            tar -czf /tmp/formatted-files.tgz $changed_files
-            exit "$format_exit"
-          fi
-
-      - name: Export formatted baseline
-        if: failure() && steps.formatting.conclusion == 'failure'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: formatted-baseline
-          path: /tmp/formatted-files.tgz
-          retention-days: 1
-          if-no-files-found: error
+        run: dart format --set-exit-if-changed lib test
 
       - name: Analyze
         run: flutter analyze
