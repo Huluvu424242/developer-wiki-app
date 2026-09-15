@@ -1,0 +1,96 @@
+name: kiagent-format-and-commit
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kiagent-format-and-commit-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  format-and-commit:
+    name: Format Python and Dart files
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Require branch ref
+        env:
+          GITHUB_REF_TYPE_VALUE: ${{ github.ref_type }}
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_REF_TYPE_VALUE}" != "branch" ]; then
+            echo "This workflow may only write to a branch ref." >&2
+            exit 1
+          fi
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install pinned Python formatter
+        run: python3 -m pip install --disable-pip-version-check "black==25.1.0"
+
+      - name: Format tracked Dart and Python files
+        run: |
+          set -euo pipefail
+
+          mapfile -d '' dart_files < <(git ls-files -z -- '*.dart')
+          if (( ${#dart_files[@]} > 0 )); then
+            dart format "${dart_files[@]}"
+          fi
+
+          mapfile -d '' python_files < <(git ls-files -z -- '*.py')
+          if (( ${#python_files[@]} > 0 )); then
+            python3 -m black -- "${python_files[@]}"
+          fi
+
+      - name: Verify formatter-only changes
+        run: |
+          set -euo pipefail
+
+          unexpected=0
+          while IFS= read -r -d '' path; do
+            case "${path}" in
+              *.dart|*.py)
+                ;;
+              *)
+                echo "Unexpected non-formatting change: ${path}" >&2
+                unexpected=1
+                ;;
+            esac
+          done < <(git diff --name-only -z)
+
+          if (( unexpected != 0 )); then
+            exit 1
+          fi
+
+      - name: Commit formatting changes
+        env:
+          TARGET_BRANCH: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+
+          if git diff --quiet; then
+            echo "No formatting changes required."
+            exit 0
+          fi
+
+          mapfile -d '' changed_files < <(git diff --name-only -z)
+          git add -- "${changed_files[@]}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "style: format Python and Dart files"
+          git push origin "HEAD:${TARGET_BRANCH}"
