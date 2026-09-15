@@ -18,3 +18,5 @@
 - Relevante Fehler nicht still ignorieren und keine leeren `catch`-Blöcke verwenden.
 - Nach asynchronen Operationen bei UI-Zugriffen den Widget-Lebenszyklus beachten.
 - Doppelte Seiteneffekte durch Mehrfachauslösung laufender Aktionen verhindern.
+
+Ergänzende Erläuterungen stehen in `docs/agent-harness.md`.
