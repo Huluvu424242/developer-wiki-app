@@ -6,7 +6,7 @@ Diese Datei ist der verbindliche Einstiegspunkt für alle Arbeiten am Repository
 
 Vor jeder Repository-Arbeit müssen der **aktuelle Repository-Stand** dieser `AGENTS.md` und alle nachfolgend gelisteten Regelmodule vollständig gelesen werden. Regeln aus einem früheren Lauf dürfen nicht als ausreichend aktuell vorausgesetzt werden.
 
-Für GitHub-Zugriffe und -Änderungen ist bevorzugt der verbundene GitHub-Connector zu verwenden. Fremde oder nicht zum Auftrag gehörende Änderungen bleiben erhalten.
+Für GitHub-Zugriffe und -Änderungen ist ausschließlich der verbundene GitHub-Connector zu verwenden. Fremde oder nicht zum Auftrag gehörende Änderungen bleiben erhalten.
 
 ## Verbindlicher Regelkatalog
 
