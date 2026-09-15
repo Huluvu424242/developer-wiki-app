@@ -23,11 +23,12 @@ Die Module sind in dieser Reihenfolge zu lesen:
 9. [Sicherheit – Tests, CI und Vorfälle](agent-rules/05-security-ci.md)
 10. [Qualität](agent-rules/06-quality.md)
 11. [Dokumentationspflege](agent-rules/06-documentation.md)
-12. [Wiki-Integration](agent-rules/08-wiki-integration.md)
+12. [Releasevorbereitung](agent-rules/07-release.md)
+13. [Wiki-Integration](agent-rules/08-wiki-integration.md)
 
 Alle gelisteten Dateien sind verbindlicher Bestandteil des Harness. Nicht gelistete Dateien unter `agent-rules/` sind nicht automatisch normativ.
 
-Ein eigenes Release-Regelmodul wird mit Story #144 eingeführt. Bis dahin gelten für Releasearbeiten die allgemeinen Workflow-, Sicherheits-, Werkzeugketten-, Qualitäts- und Dokumentationsregeln dieses Katalogs; Story #143 erteilt insbesondere keine selbständige Ausführungsfreigabe für den vorhandenen Android-Release-Workflow.
+Für Releasearbeiten gilt zusätzlich das Release-Modul. Die Releasevorbereitung im Repository und die produktive Veröffentlichung sind getrennte Vorgänge; eine Ausführung des vorhandenen Android-Release-Workflows richtet sich ausschließlich nach der Werkzeugketten-Governance.
 
 ## Regelpriorität
 
