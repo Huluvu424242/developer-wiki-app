@@ -25,6 +25,8 @@ Stories beschreiben Ziel, Nutzen, fachliche Anforderungen, Akzeptanzkriterien, A
 - Architekturregeln aus [Struktur](03-structure.md) und [Implementierung](03-implementation.md) einhalten.
 - Sicherheits-, UX-, Qualitäts-, Dokumentations- und Wiki-Integrationsregeln der übrigen Module anwenden.
 - Akzeptanzkriterien und erforderliche Prüfungen vor Abschluss kontrollieren.
+- Umfasst ein menschlicher Auftrag ausdrücklich mehrere Stories oder Bugs, werden alle beauftragten Einheiten vollständig bis zu ihren jeweils vorgesehenen Pull Requests bearbeitet, bevor die abschließende menschliche Review-Lücke beginnt.
+- Die Erstellung eines ersten oder weiteren PRs innerhalb eines solchen Mehrfachauftrags beendet den Gesamtauftrag nicht. Der Agent fährt mit den übrigen ausdrücklich beauftragten Stories oder Bugs fort, sofern keine fachliche Blockade oder widersprüchliche Regel dies verhindert.
 
 ## Pull Requests
 
@@ -34,8 +36,10 @@ Stories beschreiben Ziel, Nutzen, fachliche Anforderungen, Akzeptanzkriterien, A
 
 ## Menschliche Review-Lücke und delegierter Merge
 
-- Die Erstellung oder wesentliche Aktualisierung eines Pull Requests beendet den zugehörigen Implementierungsauftrag zunächst. Der KI-Agent führt in demselben Auftrag keinen Merge dieses PRs aus.
-- Nach Bereitstellung des PRs muss eine echte menschliche Review-Lücke bestehen. Der Mensch erhält Gelegenheit, Diff, Prüfungen, Risiken und gegebenenfalls gestapelte Abhängigkeiten zu prüfen.
+- Bei einem Einzelauftrag beginnt die menschliche Review-Lücke nach Bereitstellung des zugehörigen Pull Requests beziehungsweise nach dessen letzter wesentlicher Aktualisierung.
+- Bei einem ausdrücklich mehrere Stories, Bugs oder PRs umfassenden Implementierungsauftrag beginnt die menschliche Review-Lücke erst, nachdem **alle im Auftrag vorgesehenen Implementierungen bis zu ihren jeweiligen Pull Requests bereitgestellt** wurden. Bereits erstellte PRs innerhalb dieses Batches sind kein Grund, die Bearbeitung der übrigen beauftragten Einheiten vorzeitig zu beenden.
+- Die Review-Lücke trennt den gesamten abgeschlossenen Implementierungsauftrag von einer späteren Merge-Aufgabe. Der KI-Agent führt im ursprünglichen Implementierungsauftrag keinen Merge der dabei erzeugten PRs aus.
+- Der Mensch erhält nach Bereitstellung des vollständigen PR-Satzes Gelegenheit, Diffs, Prüfungen, Risiken, Abhängigkeiten und gegebenenfalls die geplante Merge-Reihenfolge zu prüfen.
 - Ein späterer Merge durch den KI-Agenten ist zulässig, wenn der Mensch ihn nach dieser Review-Lücke in einer **neuen, ausdrücklichen Aufgabe** beauftragt.
 - Diese neue Aufgabe darf auch mehrere bereits geprüfte PRs umfassen, insbesondere für gestapelte Merges, notwendige Rebases und konfliktfreie Reihenfolgen.
 - Eine frühere Implementierungsbeauftragung, die bloße PR-Erstellung, ein erfolgreicher CI-Lauf, Schweigen oder eine allgemeine Aussage wie `wenn alles grün ist, merge` im ursprünglichen Implementierungsauftrag ersetzen die spätere neue Merge-Beauftragung nicht.
