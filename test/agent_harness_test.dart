@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   const modules = <String>[
     'agent-rules/01-workflow-collaboration.md',
-    'agent-rules/02.md',
+    'agent-rules/02-project-bootstrap.md',
     'agent-rules/03-structure.md',
     'agent-rules/03-implementation.md',
     'agent-rules/04-ux-accessibility.md',
@@ -38,7 +38,7 @@ void main() {
     expect(listed.toSet().length, listed.length);
   });
 
-  test('local markdown links inside the harness resolve', () {
+  test('local markdown links inside the harness resolve without entry cycles', () {
     final harnessFiles = <String>['AGENTS.md', ...modules];
     final linkPattern = RegExp(r'\[[^\]]+\]\(([^)]+)\)');
 
@@ -55,6 +55,10 @@ void main() {
         final resolved = File('${parent.path}/$cleanTarget');
         expect(resolved.existsSync(), isTrue,
             reason: '$path -> $cleanTarget');
+        if (path != 'AGENTS.md') {
+          expect(cleanTarget, isNot('../AGENTS.md'),
+              reason: '$path must not require AGENTS.md recursively');
+        }
       }
     }
   });
