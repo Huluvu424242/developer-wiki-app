@@ -14,6 +14,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Changed
 
+- `kiagent-format-and-commit` und `kiagent-flutter-validation` verwenden für Dart einheitlich Flutter 3.47.4 sowie denselben Bereich `lib test`; die Formatierungsaction verifiziert nach `dart format lib test` zusätzlich mit exakt `dart format --set-exit-if-changed lib test` den späteren Validation-Check.
 - Den Agenten-Harness von einer monolithischen `AGENTS.md` auf einen verbindlichen Einstiegspunkt mit thematischen Regelmodulen unter `agent-rules/` umgestellt; Regelpriorität, Wiki-/App-Verantwortungsgrenze und deterministische Harness-Strukturprüfung ergänzt.
 - Flutter-, Architektur-, UX-, Barrierefreiheits- und Qualitätsregeln mit den passenden Erkenntnissen aus dem Taugt’s-Harness harmonisiert; insbesondere Lebenszyklusprüfungen nach `await`, sichere `const`-Widgetbäume, Lazy-Formularvalidierung, Scroll-Widgettests, robuste Fehlersammler-Navigation und einheitliche Abschlussstatus präzisiert.
 - Einen verbindlichen Releasevorbereitungs-Vertrag ergänzt: `pubspec.yaml` ist technische Versionsquelle, `CHANGELOG.md` fachlicher Master; Versions-, Dokumentations-, Lizenz- und Konsistenzprüfungen sowie die Trennung zwischen Repository-Vorbereitung und produktiver Veröffentlichung sind festgelegt.
