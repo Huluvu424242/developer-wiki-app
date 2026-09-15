@@ -5,7 +5,7 @@
 - Dart- und Flutter-Konventionen sowie bestehende Linter-Regeln befolgen.
 - Klassen in `UpperCamelCase`, Variablen und Funktionen in `lowerCamelCase`, Dateien in `snake_case.dart` benennen.
 - Sprechende Namen verwenden und unnötige Abkürzungen vermeiden.
-- `const` verwenden, wo dies sinnvoll ist.
+- `const` verwenden, wo dies sinnvoll ist. Für zusammengesetzte Widgetbäume gelten zusätzlich die Flutter-Regeln aus [Architektur – Implementierung](03-implementation.md).
 - Kontrollstrukturen mit geschweiften Klammern schreiben und unnötig lange oder komprimierte Codezeilen vermeiden.
 - Kommentare erklären vor allem das Warum und wiederholen keinen offensichtlichen Code.
 - Strukturierte Daten bevorzugt über klar benannte Modelle statt über lose Maps durch mehrere Schichten reichen.
@@ -15,12 +15,14 @@
 ## Prüfung
 
 - Akzeptanzkriterien gegen die Umsetzung prüfen.
-- `dart format` auf geänderten Dart-Dateien ausführen.
-- `flutter analyze` ausführen und keine neuen Fehler oder Warnungen hinterlassen.
+- Für geänderten Dart-/Flutter-Code sind vor Abschluss `dart format --set-exit-if-changed lib test`, `flutter analyze` und `flutter test` die Standardprüfungen, soweit das Flutter-SDK verfügbar ist.
+- Ein Pull Request mit geändertem Dart- oder Flutter-Code wird nur dann als `Geprüft und mergebereit` gemeldet, wenn die erforderlichen und verfügbaren automatisierten Prüfungen erfolgreich waren.
+- Kann mindestens eine erforderliche automatisierte Prüfung nicht erfolgreich ausgeführt werden, lautet der Status `Implementiert, technische Prüfung ausstehend`.
+- Nicht ausgeführte oder fehlgeschlagene Prüfungen werden mit Grund, Auswirkung und Restrisiko benannt und niemals als Erfolg dargestellt.
 - Geeignete Unit-, Widget- oder Integrationstests ergänzen beziehungsweise ausführen.
-- Fachliche Logik möglichst durch Unit-Tests, relevantes UI-Verhalten durch Widget-Tests und wichtige Integrationspfade durch geeignete Integrationstests absichern.
+- Fachliche Logik möglichst durch Unit-Tests, relevantes UI-Verhalten durch Widget- und Semantiktests und wichtige Integrationspfade durch geeignete Integrationstests absichern.
+- Für lazy Scrollbereiche gelten die Testregeln aus [UX und Barrierefreiheit](04-ux-accessibility.md), insbesondere die Unterscheidung zwischen Widget-Existenz und Viewport-Sichtbarkeit.
 - Tests nicht über beliebige feste Wartezeiten synchronisieren. Wenn möglich auf das Erscheinen oder Verschwinden des erwarteten Zustands warten; feste Zeiten nur als begrenzendes Timeout oder kleine Polling-Schritte verwenden.
-- Nicht ausführbare Prüfungen niemals als erfolgreich darstellen, sondern mit Begründung, Auswirkung und Restrisiko benennen.
 
 ## Lizenzen
 
