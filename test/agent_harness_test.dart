@@ -11,6 +11,7 @@ void main() {
     'agent-rules/04-ux-accessibility.md',
     'agent-rules/05-security-access.md',
     'agent-rules/05-security-data.md',
+    'agent-rules/05-security-tooling.md',
     'agent-rules/05-security-ci.md',
     'agent-rules/06-quality.md',
     'agent-rules/06-documentation.md',
