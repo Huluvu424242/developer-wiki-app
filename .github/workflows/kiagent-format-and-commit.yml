@@ -37,25 +37,26 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
+          flutter-version: '3.47.4'
           channel: stable
           cache: true
 
       - name: Install pinned Python formatter
         run: python3 -m pip install --disable-pip-version-check "black==25.1.0"
 
-      - name: Format tracked Dart and Python files
+      - name: Format Dart and Python files
         run: |
           set -euo pipefail
 
-          mapfile -d '' dart_files < <(git ls-files -z -- '*.dart')
-          if (( ${#dart_files[@]} > 0 )); then
-            dart format "${dart_files[@]}"
-          fi
+          dart format lib test
 
           mapfile -d '' python_files < <(git ls-files -z -- '*.py')
           if (( ${#python_files[@]} > 0 )); then
             python3 -m black -- "${python_files[@]}"
           fi
+
+      - name: Verify Dart formatting
+        run: dart format --set-exit-if-changed lib test
 
       - name: Verify formatter-only changes
         run: |
