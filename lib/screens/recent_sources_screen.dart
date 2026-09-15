@@ -72,7 +72,9 @@ class _RecentSourcesScreenState extends State<RecentSourcesScreen> {
       await _externalUrlService.open(issue.url);
     } catch (error) {
       if (mounted) {
-        setState(() => _errorMessage = 'Issue konnte nicht geöffnet werden: $error');
+        setState(
+          () => _errorMessage = 'Issue konnte nicht geöffnet werden: $error',
+        );
       }
     }
   }

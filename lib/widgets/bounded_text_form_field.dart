@@ -58,7 +58,8 @@ class _BoundedTextFormFieldState extends State<BoundedTextFormField> {
   }
 
   void _handleLength() {
-    final atLimit = widget.controller.text.characters.length >= widget.maxLength;
+    final atLimit =
+        widget.controller.text.characters.length >= widget.maxLength;
     if (atLimit && !_limitAnnounced) {
       _limitAnnounced = true;
       SystemSound.play(SystemSoundType.alert);
@@ -98,24 +99,21 @@ class _BoundedTextFormFieldState extends State<BoundedTextFormField> {
       maxLengthEnforcement: MaxLengthEnforcement.enforced,
       decoration: widget.decoration,
       validator: widget.validator,
-      buildCounter: (
-        context, {
-        required currentLength,
-        required isFocused,
-        maxLength,
-      }) {
-        final remaining = (maxLength ?? widget.maxLength) - currentLength;
-        if (remaining > 10) {
-          return null;
-        }
-        final message =
-            remaining == 0 ? 'Kein Zeichen mehr möglich' : 'noch $remaining Zeichen';
-        return Semantics(
-          liveRegion: remaining == 0,
-          label: message,
-          child: Text(message),
-        );
-      },
+      buildCounter:
+          (context, {required currentLength, required isFocused, maxLength}) {
+            final remaining = (maxLength ?? widget.maxLength) - currentLength;
+            if (remaining > 10) {
+              return null;
+            }
+            final message = remaining == 0
+                ? 'Kein Zeichen mehr möglich'
+                : 'noch $remaining Zeichen';
+            return Semantics(
+              liveRegion: remaining == 0,
+              label: message,
+              child: Text(message),
+            );
+          },
     );
   }
 }

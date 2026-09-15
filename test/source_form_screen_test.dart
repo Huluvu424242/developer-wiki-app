@@ -80,9 +80,7 @@ void main() {
 
   testWidgets('shows a temporary hint when validation fails', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: SourceFormScreen(initialTemplate: sourceTemplates[1]),
-      ),
+      MaterialApp(home: SourceFormScreen(initialTemplate: sourceTemplates[1])),
     );
 
     final saveButton = find.byKey(const Key('source-form-save-button'));
@@ -97,9 +95,7 @@ void main() {
     expect(tappableSaveButton, findsOneWidget);
     await tester.tap(tappableSaveButton);
 
-    final errorSummary = find.byKey(
-      const Key('validation-error-summary'),
-    );
+    final errorSummary = find.byKey(const Key('validation-error-summary'));
     await pumpUntilFound(tester, errorSummary);
 
     final validationHint = find.text('Bitte markierte Pflichtfelder prüfen.');
@@ -129,9 +125,7 @@ void main() {
 
   testWidgets('clears a default value with one tap', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: SourceFormScreen(initialTemplate: sourceTemplates[1]),
-      ),
+      MaterialApp(home: SourceFormScreen(initialTemplate: sourceTemplates[1])),
     );
 
     await tester.scrollUntilVisible(
@@ -153,9 +147,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: MediaQuery(
-          data: const MediaQueryData(
-            viewPadding: EdgeInsets.only(bottom: 24),
-          ),
+          data: const MediaQueryData(viewPadding: EdgeInsets.only(bottom: 24)),
           child: SourceFormScreen(initialTemplate: sourceTemplates[1]),
         ),
       ),
@@ -188,9 +180,8 @@ void main() {
         home: SourceFormScreen(
           initialTemplate: imageSourceTemplate,
           imageInputGateway: gateway,
-          imagePreviewBuilder: (_) => const ColoredBox(
-            color: Colors.transparent,
-          ),
+          imagePreviewBuilder: (_) =>
+              const ColoredBox(color: Colors.transparent),
         ),
       ),
     );
@@ -237,10 +228,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('Bitte markierte Pflichtfelder prüfen.'), findsOneWidget);
-    expect(
-      find.textContaining('Bild-Upload für Issue'),
-      findsNothing,
-    );
+    expect(find.textContaining('Bild-Upload für Issue'), findsNothing);
   });
 
   testWidgets('starts and finalizes the two-step GitHub image upload', (
@@ -262,9 +250,8 @@ void main() {
           initialTemplate: imageSourceTemplate,
           imageInputGateway: inputGateway,
           imageUploadGateway: uploadGateway,
-          imagePreviewBuilder: (_) => const ColoredBox(
-            color: Colors.transparent,
-          ),
+          imagePreviewBuilder: (_) =>
+              const ColoredBox(color: Colors.transparent),
         ),
       ),
     );
@@ -273,10 +260,7 @@ void main() {
       'Architekturdiagramm',
     );
     await tester.tap(find.byKey(const Key('image-source-pick-button')));
-    await pumpUntilFound(
-      tester,
-      find.byKey(const Key('image-source-preview')),
-    );
+    await pumpUntilFound(tester, find.byKey(const Key('image-source-preview')));
     final saveButton = find.byKey(const Key('source-form-save-button'));
     await tester.scrollUntilVisible(
       saveButton,

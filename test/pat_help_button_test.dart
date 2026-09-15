@@ -6,9 +6,7 @@ void main() {
   testWidgets('opens PAT help and shows required permissions', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: Scaffold(
-          body: Center(child: PatHelpButton()),
-        ),
+        home: Scaffold(body: Center(child: PatHelpButton())),
       ),
     );
 

@@ -9,10 +9,10 @@ import 'package:http/testing.dart';
 
 void main() {
   test('Issue-Body entspricht GitHub-Issue-Form-Struktur', () {
-    final body = GitHubService.issueBody(
-      sourceTemplates.first,
-      {'source_title': 'Test', 'urls': 'https://example.org'},
-    );
+    final body = GitHubService.issueBody(sourceTemplates.first, {
+      'source_title': 'Test',
+      'urls': 'https://example.org',
+    });
     expect(
       body,
       '### Titel der Quelle\n\nTest\n\n### Link oder zusammengehörige Links\n\nhttps://example.org',
@@ -92,7 +92,8 @@ void main() {
           return http.Response(
             jsonEncode([
               {
-                'body': '![image](https://github.com/user-attachments/assets/'
+                'body':
+                    '![image](https://github.com/user-attachments/assets/'
                     '123e4567-e89b-12d3-a456-426614174000)',
                 'created_at': '2026-08-25T18:00:00Z',
                 'user': {'login': 'developer'},
@@ -117,64 +118,65 @@ void main() {
       'POST',
       'PATCH',
     ]);
-    expect(
-      jsonDecode(requests[2].body),
-      {'labels': ['quelle']},
-    );
-    expect(
-      jsonDecode(requests[3].body),
-      {'state': 'closed', 'state_reason': 'not_planned'},
-    );
-  });
-
-  test('listRecentSourceIssues loads source issues and excludes pull requests',
-      () async {
-    late http.Request capturedRequest;
-    final client = MockClient((request) async {
-      capturedRequest = request;
-      return http.Response(
-        jsonEncode([
-          {
-            'number': 42,
-            'title': 'Neue Quelle',
-            'state': 'open',
-            'html_url': 'https://github.com/example/wiki/issues/42',
-          },
-          {
-            'number': 41,
-            'title': 'Verarbeitete Quelle',
-            'state': 'closed',
-            'html_url': 'https://github.com/example/wiki/issues/41',
-          },
-          {
-            'number': 40,
-            'title': 'Pull Request',
-            'state': 'open',
-            'html_url': 'https://github.com/example/wiki/pull/40',
-            'pull_request': {'url': 'https://api.github.com/example'},
-          },
-        ]),
-        200,
-      );
+    expect(jsonDecode(requests[2].body), {
+      'labels': ['quelle'],
     });
-    final service = GitHubService(
-      'secret',
-      owner: 'example',
-      repo: 'wiki',
-      client: client,
-    );
-
-    final issues = await service.listRecentSourceIssues();
-
-    expect(capturedRequest.url.queryParameters['labels'], 'quelle');
-    expect(capturedRequest.url.queryParameters['state'], 'all');
-    expect(capturedRequest.url.queryParameters['direction'], 'desc');
-    expect(issues, hasLength(2));
-    expect(issues.first.number, 42);
-    expect(issues.first.title, 'Neue Quelle');
-    expect(issues.first.isOpen, isTrue);
-    expect(issues[1].isOpen, isFalse);
+    expect(jsonDecode(requests[3].body), {
+      'state': 'closed',
+      'state_reason': 'not_planned',
+    });
   });
+
+  test(
+    'listRecentSourceIssues loads source issues and excludes pull requests',
+    () async {
+      late http.Request capturedRequest;
+      final client = MockClient((request) async {
+        capturedRequest = request;
+        return http.Response(
+          jsonEncode([
+            {
+              'number': 42,
+              'title': 'Neue Quelle',
+              'state': 'open',
+              'html_url': 'https://github.com/example/wiki/issues/42',
+            },
+            {
+              'number': 41,
+              'title': 'Verarbeitete Quelle',
+              'state': 'closed',
+              'html_url': 'https://github.com/example/wiki/issues/41',
+            },
+            {
+              'number': 40,
+              'title': 'Pull Request',
+              'state': 'open',
+              'html_url': 'https://github.com/example/wiki/pull/40',
+              'pull_request': {'url': 'https://api.github.com/example'},
+            },
+          ]),
+          200,
+        );
+      });
+      final service = GitHubService(
+        'secret',
+        owner: 'example',
+        repo: 'wiki',
+        client: client,
+      );
+
+      final issues = await service.listRecentSourceIssues();
+
+      expect(capturedRequest.url.queryParameters['labels'], 'quelle');
+      expect(capturedRequest.url.queryParameters['state'], 'all');
+      expect(capturedRequest.url.queryParameters['direction'], 'desc');
+      expect(issues, hasLength(2));
+      expect(issues.first.number, 42);
+      expect(issues.first.title, 'Neue Quelle');
+      expect(issues.first.isOpen, isTrue);
+      expect(issues[1].isOpen, isFalse);
+    },
+  );
 
   test('dispatchWorkflow uses configured workflow and master ref', () async {
     late http.Request capturedRequest;
@@ -196,10 +198,7 @@ void main() {
       'https://api.github.com/repos/example/wiki/actions/workflows/'
       'import-source-issues.yml/dispatches',
     );
-    expect(
-      jsonDecode(capturedRequest.body),
-      {'ref': 'master'},
-    );
+    expect(jsonDecode(capturedRequest.body), {'ref': 'master'});
   });
 
   test('latestWorkflowRun maps matching successful dispatch', () async {
@@ -236,10 +235,7 @@ void main() {
     expect(run, isNotNull);
     expect(run!.id, 77);
     expect(run.state, WorkflowRunState.successful);
-    expect(
-      capturedRequest.url.queryParameters['event'],
-      'workflow_dispatch',
-    );
+    expect(capturedRequest.url.queryParameters['event'], 'workflow_dispatch');
     expect(capturedRequest.url.queryParameters['per_page'], '10');
   });
 

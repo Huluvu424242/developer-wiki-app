@@ -47,10 +47,7 @@ class AppSupportMenu extends StatelessWidget {
           value: _SupportAction.reportBug,
           child: Text('Bug melden'),
         ),
-        PopupMenuItem(
-          value: _SupportAction.about,
-          child: Text('Über'),
-        ),
+        PopupMenuItem(value: _SupportAction.about, child: Text('Über')),
       ],
     );
   }
@@ -148,65 +145,64 @@ Future<void> showAccessibilityStatement(
   BuildContext context, {
   AppInfoGateway? appInfoGateway,
   ExternalUrlService? externalUrlService,
-}) =>
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Barrierefreiheitserklärung'),
-        content: const SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Stand: 26. August 2026',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 12),
-              Text(
-                'Die Developer-Wiki-App wird nach den im Projekt festgelegten '
-                'UX- und Barrierefreiheitsregeln weiterentwickelt. Formulare '
-                'bieten verständliche Beschriftungen, feldnahe Fehler, einen '
-                'Fehlersammler und Unterstützung für vergrößerte Schrift.',
-              ),
-              SizedBox(height: 12),
-              Text(
-                'Bekannte Barrieren',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4),
-              Text(
-                'Die praktische Prüfung mit unterschiedlichen Android-'
-                'Screenreadern und Schaltersteuerungen ist noch nicht für '
-                'jede Gerätekombination abgeschlossen. Externe GitHub-Seiten '
-                'liegen außerhalb des Einflussbereichs dieser App.',
-              ),
-              SizedBox(height: 12),
-              Text(
-                'Barrieren melden',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4),
-              Text(
-                'Über „Bug melden“ kann eine Barriere mit App-Version und '
-                'aktuellem Nutzungskontext gemeldet werden.',
-              ),
-            ],
+}) => showDialog<void>(
+  context: context,
+  builder: (dialogContext) => AlertDialog(
+    title: const Text('Barrierefreiheitserklärung'),
+    content: const SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Stand: 26. August 2026',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-        ),
-        actions: [
-          BugReportButton(
-            contextName: 'Barrierefreiheitserklärung',
-            appInfoGateway: appInfoGateway,
-            externalUrlService: externalUrlService,
+          SizedBox(height: 12),
+          Text(
+            'Die Developer-Wiki-App wird nach den im Projekt festgelegten '
+            'UX- und Barrierefreiheitsregeln weiterentwickelt. Formulare '
+            'bieten verständliche Beschriftungen, feldnahe Fehler, einen '
+            'Fehlersammler und Unterstützung für vergrößerte Schrift.',
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Schließen'),
+          SizedBox(height: 12),
+          Text(
+            'Bekannte Barrieren',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 4),
+          Text(
+            'Die praktische Prüfung mit unterschiedlichen Android-'
+            'Screenreadern und Schaltersteuerungen ist noch nicht für '
+            'jede Gerätekombination abgeschlossen. Externe GitHub-Seiten '
+            'liegen außerhalb des Einflussbereichs dieser App.',
+          ),
+          SizedBox(height: 12),
+          Text(
+            'Barrieren melden',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 4),
+          Text(
+            'Über „Bug melden“ kann eine Barriere mit App-Version und '
+            'aktuellem Nutzungskontext gemeldet werden.',
           ),
         ],
       ),
-    );
+    ),
+    actions: [
+      BugReportButton(
+        contextName: 'Barrierefreiheitserklärung',
+        appInfoGateway: appInfoGateway,
+        externalUrlService: externalUrlService,
+      ),
+      TextButton(
+        onPressed: () => Navigator.pop(dialogContext),
+        child: const Text('Schließen'),
+      ),
+    ],
+  ),
+);
 
 Future<void> showBugReport(
   BuildContext context, {
@@ -223,7 +219,9 @@ Future<void> showBugReport(
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Releaseversion konnte nicht geladen werden: $error')),
+      SnackBar(
+        content: Text('Releaseversion konnte nicht geladen werden: $error'),
+      ),
     );
     return;
   }
@@ -325,16 +323,12 @@ class _BugReportDialogState extends State<_BugReportDialog> {
           ? 'Keine zusätzliche Beschreibung angegeben.'
           : _description.text.trim(),
     ].join('\n');
-    final uri = Uri.https(
-      'github.com',
-      '/$_appRepository/issues/new',
-      {
-        'template': 'app_bug_report.md',
-        'labels': 'bug',
-        'title': title,
-        'body': body,
-      },
-    );
+    final uri = Uri.https('github.com', '/$_appRepository/issues/new', {
+      'template': 'app_bug_report.md',
+      'labels': 'bug',
+      'title': title,
+      'body': body,
+    });
     try {
       await widget.externalUrlService.open(uri.toString());
       if (mounted) {
@@ -344,7 +338,8 @@ class _BugReportDialogState extends State<_BugReportDialog> {
       if (mounted) {
         setState(() {
           _busy = false;
-          _errorMessage = 'Bugreport konnte nicht auf GitHub geöffnet werden: $error';
+          _errorMessage =
+              'Bugreport konnte nicht auf GitHub geöffnet werden: $error';
         });
       }
     }
@@ -374,7 +369,10 @@ class _BugReportDialogState extends State<_BugReportDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                validation.ErrorSummary(errors: _errors, focusNode: _summaryFocus),
+                validation.ErrorSummary(
+                  errors: _errors,
+                  focusNode: _summaryFocus,
+                ),
                 Text('Kontext: ${widget.contextName}'),
                 Text('Releaseversion: ${widget.appInfo.displayVersion}'),
                 const SizedBox(height: 16),

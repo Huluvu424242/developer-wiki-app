@@ -33,10 +33,12 @@ class SourcePrefillService {
       result[urlField] = url;
       final remaining = text.replaceFirst(url, '').trim();
       if (remaining.isNotEmpty) {
-        final notesField = _firstExistingField(
-          template,
-          const ['summary', 'description', 'agent_notes', 'notes'],
-        );
+        final notesField = _firstExistingField(template, const [
+          'summary',
+          'description',
+          'agent_notes',
+          'notes',
+        ]);
         if (notesField != null) {
           result[notesField] = remaining;
         }
@@ -44,10 +46,14 @@ class SourcePrefillService {
       return result;
     }
 
-    final fallbackField = _firstExistingField(
-      template,
-      const ['sources', 'urls', 'description', 'person_notes', 'agent_notes', 'notes'],
-    );
+    final fallbackField = _firstExistingField(template, const [
+      'sources',
+      'urls',
+      'description',
+      'person_notes',
+      'agent_notes',
+      'notes',
+    ]);
     if (fallbackField != null) {
       result[fallbackField] = text;
     }
@@ -55,17 +61,24 @@ class SourcePrefillService {
   }
 
   Map<String, String> _textValues(SourceTemplate template, String text) {
-    final field = _firstExistingField(
-      template,
-      const ['description', 'person_notes', 'summary', 'agent_notes', 'notes', 'sources'],
-    );
+    final field = _firstExistingField(template, const [
+      'description',
+      'person_notes',
+      'summary',
+      'agent_notes',
+      'notes',
+      'sources',
+    ]);
     if (field == null) {
       return const {};
     }
     return {field: text};
   }
 
-  String? _firstExistingField(SourceTemplate template, List<String> candidates) {
+  String? _firstExistingField(
+    SourceTemplate template,
+    List<String> candidates,
+  ) {
     final fieldIds = template.fields.map((field) => field.id).toSet();
     for (final candidate in candidates) {
       if (fieldIds.contains(candidate)) {

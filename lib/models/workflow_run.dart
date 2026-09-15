@@ -14,9 +14,9 @@ class WorkflowRun {
   final DateTime createdAt;
 
   String get label => switch (state) {
-        WorkflowRunState.queued => 'gestartet / wartet',
-        WorkflowRunState.running => 'läuft',
-        WorkflowRunState.successful => 'erfolgreich abgeschlossen',
-        WorkflowRunState.failed => 'fehlgeschlagen',
-      };
+    WorkflowRunState.queued => 'gestartet / wartet',
+    WorkflowRunState.running => 'läuft',
+    WorkflowRunState.successful => 'erfolgreich abgeschlossen',
+    WorkflowRunState.failed => 'fehlgeschlagen',
+  };
 }

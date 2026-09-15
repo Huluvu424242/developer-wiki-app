@@ -22,10 +22,10 @@ class GitHubService {
   final http.Client _client;
 
   Map<String, String> get _headers => {
-        'Accept': 'application/vnd.github+json',
-        'Authorization': 'Bearer $token',
-        'X-GitHub-Api-Version': '2022-11-28',
-      };
+    'Accept': 'application/vnd.github+json',
+    'Authorization': 'Bearer $token',
+    'X-GitHub-Api-Version': '2022-11-28',
+  };
 
   Future<CreatedIssue> createIssue({
     required String title,
@@ -35,11 +35,7 @@ class GitHubService {
     final response = await _client.post(
       Uri.parse('https://api.github.com/repos/$owner/$repo/issues'),
       headers: {..._headers, 'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'title': title,
-        'body': body,
-        'labels': labels,
-      }),
+      body: jsonEncode({'title': title, 'body': body, 'labels': labels}),
     );
     if (response.statusCode != 201) {
       throw Exception(_message(response));
@@ -71,8 +67,8 @@ class GitHubService {
             createdAt: DateTime.parse(comment['created_at'] as String).toUtc(),
             authorLogin:
                 (comment['user'] as Map<String, dynamic>?)?['login']
-                        ?.toString() ??
-                    '',
+                    ?.toString() ??
+                '',
           ),
         )
         .toList(growable: false);
@@ -89,7 +85,9 @@ class GitHubService {
         '$issueNumber/labels',
       ),
       headers: {..._headers, 'Content-Type': 'application/json'},
-      body: jsonEncode({'labels': [label]}),
+      body: jsonEncode({
+        'labels': [label],
+      }),
     );
     if (response.statusCode != 200) {
       throw Exception(_message(response));
@@ -97,16 +95,13 @@ class GitHubService {
   }
 
   Future<void> closeIssue(int issueNumber) async {
-    await _patchIssue(
-      issueNumber,
-      {'state': 'closed', 'state_reason': 'not_planned'},
-    );
+    await _patchIssue(issueNumber, {
+      'state': 'closed',
+      'state_reason': 'not_planned',
+    });
   }
 
-  Future<void> _patchIssue(
-    int issueNumber,
-    Map<String, Object> payload,
-  ) async {
+  Future<void> _patchIssue(int issueNumber, Map<String, Object> payload) async {
     final response = await _client.patch(
       Uri.parse(
         'https://api.github.com/repos/$owner/$repo/issues/$issueNumber',
@@ -122,17 +117,16 @@ class GitHubService {
   Future<List<SourceIssueSummary>> listRecentSourceIssues({
     int limit = 10,
   }) async {
-    final uri = Uri.parse(
-      'https://api.github.com/repos/$owner/$repo/issues',
-    ).replace(
-      queryParameters: {
-        'state': 'all',
-        'labels': 'quelle',
-        'per_page': limit.toString(),
-        'sort': 'created',
-        'direction': 'desc',
-      },
-    );
+    final uri = Uri.parse('https://api.github.com/repos/$owner/$repo/issues')
+        .replace(
+          queryParameters: {
+            'state': 'all',
+            'labels': 'quelle',
+            'per_page': limit.toString(),
+            'sort': 'created',
+            'direction': 'desc',
+          },
+        );
     final response = await _client.get(uri, headers: _headers);
     if (response.statusCode != 200) {
       throw Exception(_message(response));
@@ -176,15 +170,16 @@ class GitHubService {
     DateTime? notBefore,
   }) async {
     final workflowId = _workflowId(workflow);
-    final uri = Uri.parse(
-      'https://api.github.com/repos/$owner/$repo/actions/workflows/'
-      '$workflowId/runs',
-    ).replace(
-      queryParameters: const {
-        'event': 'workflow_dispatch',
-        'per_page': '10',
-      },
-    );
+    final uri =
+        Uri.parse(
+          'https://api.github.com/repos/$owner/$repo/actions/workflows/'
+          '$workflowId/runs',
+        ).replace(
+          queryParameters: const {
+            'event': 'workflow_dispatch',
+            'per_page': '10',
+          },
+        );
     final response = await _client.get(uri, headers: _headers);
     if (response.statusCode != 200) {
       throw Exception(_message(response));
@@ -238,14 +233,10 @@ class GitHubService {
   static String issueBody(
     SourceTemplate template,
     Map<String, String> values,
-  ) =>
-      template.fields
-          .where((field) => (values[field.id] ?? '').trim().isNotEmpty)
-          .map(
-            (field) =>
-                '### ${field.label}\n\n${values[field.id]!.trim()}',
-          )
-          .join('\n\n');
+  ) => template.fields
+      .where((field) => (values[field.id] ?? '').trim().isNotEmpty)
+      .map((field) => '### ${field.label}\n\n${values[field.id]!.trim()}')
+      .join('\n\n');
 
   static String _workflowId(String workflow) {
     final trimmed = workflow.trim();
