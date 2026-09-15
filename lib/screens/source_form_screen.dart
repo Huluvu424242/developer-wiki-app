@@ -149,15 +149,14 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
         final configuration = await _configurationService.load();
         final repository = _repositoryFrom(configuration);
         final map = values.map((key, value) => MapEntry(key, value.text));
-        final issue =
-            await GitHubService(
-              configuration.token,
-              owner: repository.owner,
-              repo: repository.name,
-            ).createIssue(
-              title: '${template.titlePrefix}${title.text.trim()}',
-              body: GitHubService.issueBody(template, map),
-            );
+        final issue = await GitHubService(
+          configuration.token,
+          owner: repository.owner,
+          repo: repository.name,
+        ).createIssue(
+          title: '${template.titlePrefix}${title.text.trim()}',
+          body: GitHubService.issueBody(template, map),
+        );
         if (mounted) {
           setState(() => _createdIssue = issue);
         }
@@ -211,8 +210,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
       errors.add('Issue-Titel: Pflichtfeld');
     }
     for (final field in template.fields) {
-      final missing =
-          field.required &&
+      final missing = field.required &&
           (field.kind == FieldKind.image
               ? _image == null
               : values[field.id]!.text.trim().isEmpty);
@@ -530,10 +528,10 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
                 busy
                     ? 'Wird erstellt …'
                     : template == imageSourceTemplate
-                    ? _pendingUpload == null
-                          ? 'Upload auf GitHub starten'
-                          : 'Upload prüfen und Quelle veröffentlichen'
-                    : 'Quelle speichern',
+                        ? _pendingUpload == null
+                            ? 'Upload auf GitHub starten'
+                            : 'Upload prüfen und Quelle veröffentlichen'
+                        : 'Quelle speichern',
               ),
             ),
             SizedBox(
@@ -716,8 +714,7 @@ class _SourceFormScreenState extends State<SourceFormScreen> {
                       key: const Key('image-source-preview'),
                       width: double.infinity,
                       height: 220,
-                      child:
-                          widget.imagePreviewBuilder?.call(image) ??
+                      child: widget.imagePreviewBuilder?.call(image) ??
                           Image.file(
                             File(image.path),
                             fit: BoxFit.contain,

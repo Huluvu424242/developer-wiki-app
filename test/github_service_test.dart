@@ -92,8 +92,7 @@ void main() {
           return http.Response(
             jsonEncode([
               {
-                'body':
-                    '![image](https://github.com/user-attachments/assets/'
+                'body': '![image](https://github.com/user-attachments/assets/'
                     '123e4567-e89b-12d3-a456-426614174000)',
                 'created_at': '2026-08-25T18:00:00Z',
                 'user': {'login': 'developer'},

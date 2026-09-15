@@ -18,18 +18,18 @@ class PendingImageUpload {
   final ImageSourceFile image;
 
   Map<String, Object> toJson() => {
-    'issueNumber': issueNumber,
-    'issueUrl': issueUrl,
-    'createdAt': createdAt.toUtc().toIso8601String(),
-    'title': title,
-    'values': values,
-    'image': {
-      'path': image.path,
-      'name': image.name,
-      'mimeType': image.mimeType,
-      'sizeBytes': image.sizeBytes,
-    },
-  };
+        'issueNumber': issueNumber,
+        'issueUrl': issueUrl,
+        'createdAt': createdAt.toUtc().toIso8601String(),
+        'title': title,
+        'values': values,
+        'image': {
+          'path': image.path,
+          'name': image.name,
+          'mimeType': image.mimeType,
+          'sizeBytes': image.sizeBytes,
+        },
+      };
 
   factory PendingImageUpload.fromJson(Map<String, dynamic> json) {
     final rawValues = json['values'] as Map<String, dynamic>? ?? const {};
