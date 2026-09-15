@@ -22,7 +22,7 @@ Dieses Modul regelt GitHub Actions, CI/CD-Pipelines, Bots, externe Runner und ve
 - Würde eine Schreiboperation einen nicht freigegebenen Workflow auslösen, wird die betroffene Operation vor Ausführung angehalten und eine ausdrückliche Erlaubnis eingeholt.
 - Automatische Trigger von `kiagent-*`-Workflows gelten innerhalb ihrer dokumentierten Konfiguration als freigegeben und dürfen bestimmungsgemäß ausgelöst werden.
 - Automatische Trigger, die im Freigabeverzeichnis für andere dokumentierte Workflowstände ausdrücklich freigegeben sind, dürfen ebenfalls bestimmungsgemäß ausgelöst werden.
-- Erwartete Folgeaktionen werden im Arbeits- oder PR-Bericht benannt, wenn sie für Berechtigungen, Kosten, externe Datenflüsse oder Schreibwirkungen relevant sind.
+- Erwartete Folgeaktionen werden im Arbeits- oder PR-Bericht benannt, wenn sie für Berechtigungen, Kosten, externe Datenflüsse oder schreibende Wirkungen relevant sind.
 
 ## Neue oder geänderte Werkzeugketten
 
@@ -33,9 +33,10 @@ Für GitHub-Actions-Workflows gilt zusätzlich zwingend:
 - Neue Workflow-Dateien dürfen ausschließlich auf einem Arbeitsbranch erstellt und über einen Pull Request gegen den geschützten Zielbranch eingebracht werden.
 - Bestehende Workflow-Dateien dürfen ebenfalls nur über einen eigenen Werkzeugketten-PR geändert werden.
 - Jeder PR, der eine GitHub Action neu erstellt oder verändert, muss vor dem Merge von einem Menschen geprüft werden. Diese Prüfung muss als ausdrückliche menschliche Review-/Freigabeentscheidung erkennbar sein; ein bloß fehlender Widerspruch genügt nicht.
-- Der Implementierungsauftrag endet nach Bereitstellung des Workflow-PRs. Innerhalb dieses ursprünglichen Auftrags darf der KI-Agent den PR weder mergen noch Auto-Merge aktivieren.
+- Bei einem Einzelauftrag endet der Implementierungsauftrag nach Bereitstellung des zugehörigen Workflow-PRs. Innerhalb dieses ursprünglichen Auftrags darf der KI-Agent den PR weder mergen noch Auto-Merge aktivieren.
+- Umfasst ein menschlicher Auftrag ausdrücklich mehrere Workflow-Stories oder sonstige Werkzeugkettenänderungen, werden **alle im Auftrag enthaltenen Änderungen jeweils bis zu ihrem eigenen PR** umgesetzt, bevor die menschliche Review-Lücke für diesen Batch beginnt. Die Bereitstellung des ersten oder eines weiteren Workflow-PRs beendet den Mehrfachauftrag nicht.
 - Nach einer echten menschlichen Review-Lücke darf der Mensch den Merge in einer **neuen, ausdrücklichen Aufgabe** an den KI-Agenten delegieren. Diese Delegation darf Rebase, Konfliktauflösung, erneute Prüfungen und den abschließenden Merge umfassen.
-- Eine solche spätere Merge-Delegation ersetzt nicht die menschliche Reviewpflicht: Der Mensch muss vor der Delegation Gelegenheit zur Prüfung des PRs gehabt haben und die Merge-Aufgabe bewusst neu erteilen.
+- Eine solche spätere Merge-Delegation ersetzt nicht die menschliche Reviewpflicht: Der Mensch muss vor der Delegation Gelegenheit zur Prüfung des vollständigen im Auftrag erzeugten PR-Satzes gehabt haben und die Merge-Aufgabe bewusst neu erteilen.
 - Eine KI-Agenten-Bewertung, ein erfolgreicher CI-Lauf oder das Fehlen von Review-Kommentaren ersetzt die menschliche Prüfung nicht.
 - Das Präfix `kiagent-` hebt diese Reviewpflicht nicht auf. Es kennzeichnet ausschließlich Workflows, deren bestimmungsgemäße Ausführung durch den KI-Agenten erlaubt ist.
 - Neue oder geänderte `kiagent-*`-Workflows dürfen auf ihrem PR-Branch für technische Prüfungen bestimmungsgemäß laufen beziehungsweise vom KI-Agenten gestartet oder wiederholt werden, sofern der Workflow dies vorsieht. Ein erfolgreicher Lauf ist keine Merge-Freigabe.
@@ -65,14 +66,15 @@ Externe Actions werden vor Aufnahme auf Herkunft, Wartungszustand, Berechtigunge
 
 Für nicht als `kiagent-*` gekennzeichnete Werkzeugketten gilt weiterhin:
 
-**Story → separater Werkzeugketten-PR → menschliche Review-Lücke → neue ausdrückliche Merge-Aufgabe oder manueller Merge → gegebenenfalls separate Ausführungsfreigabe → produktive Verwendung**
+**Story beziehungsweise beauftragter Story-Batch → separater Werkzeugketten-PR je Änderung → menschliche Review-Lücke nach Bereitstellung des vollständigen PR-Satzes → neue ausdrückliche Merge-Aufgabe oder manueller Merge → gegebenenfalls separate Ausführungsfreigabe → produktive Verwendung**
 
 Für `kiagent-*`-Workflows gilt:
 
-**Story → separater Werkzeugketten-PR → technische Ausführung im PR erlaubt → menschliche Review-Lücke → neue ausdrückliche Merge-Aufgabe oder manueller Merge → weitere Ausführung gemäß gemergter Workflow-Konfiguration**
+**Story beziehungsweise beauftragter Story-Batch → separater Werkzeugketten-PR je Änderung → technische Ausführung im PR erlaubt → menschliche Review-Lücke nach Bereitstellung des vollständigen PR-Satzes → neue ausdrückliche Merge-Aufgabe oder manueller Merge → weitere Ausführung gemäß gemergter Workflow-Konfiguration**
 
 - Der KI-Agent darf Erstellung und Merge eines neuen oder geänderten Workflow-PRs nicht als einen durchgehenden Auftrag behandeln.
-- Eine Merge-Delegation muss zeitlich und auftragsmäßig nach der PR-Bereitstellung und menschlichen Review-Möglichkeit erfolgen.
+- Bei einem Mehrfachauftrag gehört die Erstellung aller ausdrücklich beauftragten PRs noch zum selben Implementierungsauftrag; die Review-Lücke wird erst nach Bereitstellung des vollständigen beauftragten PR-Batches eingelegt.
+- Eine Merge-Delegation muss zeitlich und auftragsmäßig nach dieser PR-Bereitstellung und menschlichen Review-Möglichkeit erfolgen.
 - Der Mensch darf nach seinem Review ausdrücklich entscheiden, einen oder mehrere Merges einschließlich notwendiger Rebases vollständig an den KI-Agenten zu delegieren.
 - Der KI-Agent darf eine solche neue Merge-Aufgabe ausführen, sofern keine neuen ungeprüften inhaltlichen Änderungen, offenen Blocker oder unauflösbaren Konflikte bestehen.
 - Der Merge einer neuen oder geänderten Werkzeugkette ohne `kiagent-`-Freigabe erteilt nicht automatisch die Erlaubnis zu ihrer erstmaligen produktiven Ausführung.
@@ -97,6 +99,7 @@ Für `kiagent-*`-Workflows gilt:
 - **Freigabestatus:** bestimmungsgemäße Ausführung durch den KI-Agenten erlaubt.
 - **Umfang:** automatische Trigger sowie vorhandene manuelle Start-/Wiederholungsmöglichkeiten innerhalb der jeweiligen Workflow-Konfiguration; dies umfasst auch technische Validierungsläufe auf dem zugehörigen Werkzeugketten-PR-Branch.
 - **Voraussetzung für neue oder geänderte Workflows:** eigene Story, separater Werkzeugketten-PR und zwingende menschliche Review-Möglichkeit vor Merge.
+- **Mehrfachauftrag:** Sind mehrere Workflow-Stories ausdrücklich in einem Auftrag beauftragt, werden zunächst alle zugehörigen PRs erstellt; die menschliche Review-Lücke beginnt erst danach.
 - **Merge:** Im ursprünglichen Implementierungsauftrag kein Merge und kein Auto-Merge durch den KI-Agenten. Nach menschlicher Review-Lücke darf der Mensch den Merge in einer neuen ausdrücklichen Aufgabe an den KI-Agenten delegieren.
 - **Gestapelte Merges:** Eine spätere Merge-Aufgabe darf mehrere menschlich geprüfte PRs, erforderliche Rebases und eine konfliktfreie Merge-Reihenfolge umfassen.
 - **Änderungsgrenze:** Jede Änderung an Workflow-Datei, Triggern, Berechtigungen, Inputs, Secrets/Variablen, Datenzugriffen, externen Diensten, Actions/Tools, Runnern, Outputs, Artefakten oder schreibenden Wirkungen erfordert erneut einen menschlich geprüften Werkzeugketten-PR.
