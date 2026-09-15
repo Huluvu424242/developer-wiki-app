@@ -6,11 +6,10 @@ import '../models/pending_image_upload.dart';
 
 class PendingImageUploadStore {
   PendingImageUploadStore({FlutterSecureStorage? storage})
-    : _storage =
-          storage ??
-          const FlutterSecureStorage(
-            aOptions: AndroidOptions(encryptedSharedPreferences: true),
-          );
+      : _storage = storage ??
+            const FlutterSecureStorage(
+              aOptions: AndroidOptions(encryptedSharedPreferences: true),
+            );
 
   static const _key = 'pending_image_upload';
   final FlutterSecureStorage _storage;

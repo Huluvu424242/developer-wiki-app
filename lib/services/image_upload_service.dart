@@ -31,10 +31,10 @@ class GitHubImageUploadService implements ImageUploadGateway {
     ExternalUrlService? externalUrlService,
     PendingImageUploadStore? store,
     GitHubAttachmentParser? parser,
-  }) : _configurationService = configurationService ?? ConfigurationService(),
-       _externalUrlService = externalUrlService ?? ExternalUrlService(),
-       _store = store ?? PendingImageUploadStore(),
-       _parser = parser ?? GitHubAttachmentParser();
+  })  : _configurationService = configurationService ?? ConfigurationService(),
+        _externalUrlService = externalUrlService ?? ExternalUrlService(),
+        _store = store ?? PendingImageUploadStore(),
+        _parser = parser ?? GitHubAttachmentParser();
 
   static const pendingContent =
       'Bild-Upload ausstehend. Bitte dieses Issue nicht importieren.';

@@ -53,19 +53,18 @@ class ImageValidationService {
   bool _matchesSignature(String mimeType, List<int> bytes) {
     return switch (mimeType) {
       'image/png' => _startsWith(bytes, const [
-        0x89,
-        0x50,
-        0x4e,
-        0x47,
-        0x0d,
-        0x0a,
-        0x1a,
-        0x0a,
-      ]),
+          0x89,
+          0x50,
+          0x4e,
+          0x47,
+          0x0d,
+          0x0a,
+          0x1a,
+          0x0a,
+        ]),
       'image/jpeg' => _startsWith(bytes, const [0xff, 0xd8, 0xff]),
-      'image/gif' =>
-        _startsWith(bytes, 'GIF87a'.codeUnits) ||
-            _startsWith(bytes, 'GIF89a'.codeUnits),
+      'image/gif' => _startsWith(bytes, 'GIF87a'.codeUnits) ||
+          _startsWith(bytes, 'GIF89a'.codeUnits),
       _ => false,
     };
   }

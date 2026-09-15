@@ -323,7 +323,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               validator: _required,
               decoration: InputDecoration(
                 labelText: 'Fine-grained PAT',
-                helperText: 'Das Token wird nur im geschützten lokalen Speicher abgelegt.',
+                helperText:
+                    'Das Token wird nur im geschützten lokalen Speicher abgelegt.',
                 suffixIcon: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

@@ -32,18 +32,18 @@ void main() {
     ]);
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) async {
-          expect(call.method, 'getInitialShare');
-          return {
-            'kind': 'image',
-            'path': file.path,
-            'name': 'shared.png',
-            'mimeType': 'image/png',
-            'sizeBytes': 8,
-          };
-        });
+      expect(call.method, 'getInitialShare');
+      return {
+        'kind': 'image',
+        'path': file.path,
+        'name': 'shared.png',
+        'mimeType': 'image/png',
+        'sizeBytes': 8,
+      };
+    });
 
-    final content = await ShareIntentService(channel: channel)
-        .initialize((_) {});
+    final content =
+        await ShareIntentService(channel: channel).initialize((_) {});
 
     expect(content?.kind, SharedContentKind.image);
     expect(content?.image?.name, 'shared.png');
@@ -52,12 +52,12 @@ void main() {
   test('turns native image errors into user-visible shared content', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-          channel,
-          (_) async => {'kind': 'image_error', 'text': 'Datei zu groß'},
-        );
+      channel,
+      (_) async => {'kind': 'image_error', 'text': 'Datei zu groß'},
+    );
 
-    final content = await ShareIntentService(channel: channel)
-        .initialize((_) {});
+    final content =
+        await ShareIntentService(channel: channel).initialize((_) {});
 
     expect(content?.kind, SharedContentKind.imageError);
     expect(content?.text, 'Datei zu groß');
@@ -66,15 +66,15 @@ void main() {
   test('handles an asynchronous missing plugin error while mapping', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-          channel,
-          (_) async => {
-            'kind': 'image',
-            'path': '/private/shared.png',
-            'name': 'shared.png',
-            'mimeType': 'image/png',
-            'sizeBytes': 8,
-          },
-        );
+      channel,
+      (_) async => {
+        'kind': 'image',
+        'path': '/private/shared.png',
+        'name': 'shared.png',
+        'mimeType': 'image/png',
+        'sizeBytes': 8,
+      },
+    );
 
     final content = await ShareIntentService(
       channel: channel,

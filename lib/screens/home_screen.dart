@@ -220,23 +220,21 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final configuration = await _configurationService.load();
       final repository = _repositoryFrom(configuration);
-      final run =
-          await GitHubService(
-            configuration.token,
-            owner: repository.owner,
-            repo: repository.name,
-          ).latestWorkflowRun(
-            workflow: configuration.workflowFile,
-            notBefore: notBefore,
-          );
+      final run = await GitHubService(
+        configuration.token,
+        owner: repository.owner,
+        repo: repository.name,
+      ).latestWorkflowRun(
+        workflow: configuration.workflowFile,
+        notBefore: notBefore,
+      );
       if (!mounted) {
         return;
       }
       setState(() {
         _workflowRun = run;
-        _importMessage = run == null
-            ? 'Noch kein passender Workflow-Lauf gefunden.'
-            : null;
+        _importMessage =
+            run == null ? 'Noch kein passender Workflow-Lauf gefunden.' : null;
       });
     } catch (error) {
       if (mounted) {

@@ -10,8 +10,8 @@ class SharedContent {
   final ImageSourceFile? image;
 
   bool get isEmpty => switch (kind) {
-    SharedContentKind.image => image == null,
-    SharedContentKind.imageError => text.trim().isEmpty,
-    SharedContentKind.link || SharedContentKind.text => text.trim().isEmpty,
-  };
+        SharedContentKind.image => image == null,
+        SharedContentKind.imageError => text.trim().isEmpty,
+        SharedContentKind.link || SharedContentKind.text => text.trim().isEmpty,
+      };
 }

@@ -4,11 +4,10 @@ import '../models/wiki_configuration.dart';
 
 class ConfigurationService {
   ConfigurationService({FlutterSecureStorage? storage})
-    : _storage =
-          storage ??
-          const FlutterSecureStorage(
-            aOptions: AndroidOptions(encryptedSharedPreferences: true),
-          );
+      : _storage = storage ??
+            const FlutterSecureStorage(
+              aOptions: AndroidOptions(encryptedSharedPreferences: true),
+            );
 
   static const _tokenKey = 'github_pat';
   static const _repositoryKey = 'wiki_repository_url';
@@ -18,11 +17,9 @@ class ConfigurationService {
 
   Future<WikiConfiguration> load() async {
     final token = await _storage.read(key: _tokenKey) ?? '';
-    final repositoryUrl =
-        await _storage.read(key: _repositoryKey) ??
+    final repositoryUrl = await _storage.read(key: _repositoryKey) ??
         WikiConfiguration.defaultRepositoryUrl;
-    final workflowFile =
-        await _storage.read(key: _workflowKey) ??
+    final workflowFile = await _storage.read(key: _workflowKey) ??
         WikiConfiguration.defaultWorkflowFile;
     return WikiConfiguration(
       repositoryUrl: repositoryUrl,

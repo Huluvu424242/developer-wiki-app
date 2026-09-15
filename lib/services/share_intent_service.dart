@@ -8,8 +8,8 @@ class ShareIntentService {
   ShareIntentService({
     MethodChannel? channel,
     ImageValidationService? validationService,
-  }) : _channel = channel ?? const MethodChannel('developer_wiki/share'),
-       _validationService = validationService ?? ImageValidationService();
+  })  : _channel = channel ?? const MethodChannel('developer_wiki/share'),
+        _validationService = validationService ?? ImageValidationService();
 
   final MethodChannel _channel;
   final ImageValidationService _validationService;

@@ -39,7 +39,8 @@ const agentInstruction =
 const imageSourceTemplate = SourceTemplate(
   name: '🖼️ Bild-Quelle',
   titlePrefix: '[Bild-Quelle]: ',
-  description: 'Ein Bild oder einen Screenshot als eigenständige Originalquelle erfassen.',
+  description:
+      'Ein Bild oder einen Screenshot als eigenständige Originalquelle erfassen.',
   fields: [
     SourceField(
       id: 'content',
@@ -265,7 +266,8 @@ const sourceTemplates = <SourceTemplate>[
         id: 'prompt_additions',
         label: 'Promptergänzungen',
         kind: FieldKind.textarea,
-        initialValue: 'Behandle die beschriebene Person als öffentliche Person. Du darfst fehlende oder aktuelle Informationen im Internet recherchieren. Bevorzuge offizielle Primärquellen, belege ergänzte Aussagen nachvollziehbar und kennzeichne Unsicherheiten oder Namensgleichheiten. Falls im Wiki eine private Quelle zur selben Person existiert, verknüpfe beide Datensätze gegenseitig, halte private und öffentlich belegte Informationen jedoch in getrennten Wiki-Datensätzen und übernimm keine Aussagen zwischen ihnen.',
+        initialValue:
+            'Behandle die beschriebene Person als öffentliche Person. Du darfst fehlende oder aktuelle Informationen im Internet recherchieren. Bevorzuge offizielle Primärquellen, belege ergänzte Aussagen nachvollziehbar und kennzeichne Unsicherheiten oder Namensgleichheiten. Falls im Wiki eine private Quelle zur selben Person existiert, verknüpfe beide Datensätze gegenseitig, halte private und öffentlich belegte Informationen jedoch in getrennten Wiki-Datensätzen und übernimm keine Aussagen zwischen ihnen.',
       ),
     ],
   ),
@@ -300,7 +302,8 @@ const sourceTemplates = <SourceTemplate>[
         id: 'prompt_additions',
         label: 'Promptergänzungen',
         kind: FieldKind.textarea,
-        initialValue: 'Behandle die beschriebene Person als Privatperson. Recherchiere weder zu ihr noch zu den gemachten Angaben im Internet und rufe keine externen Quellen zur Ergänzung oder Bestätigung ab. Verwende ausschließlich den fachlichen Inhalt dieser privaten Quelle. Falls im Wiki eine öffentliche Quelle zur selben Person existiert, verknüpfe beide Datensätze gegenseitig, halte private und öffentlich belegte Informationen jedoch in getrennten Wiki-Datensätzen und übernimm keine Aussagen zwischen ihnen.',
+        initialValue:
+            'Behandle die beschriebene Person als Privatperson. Recherchiere weder zu ihr noch zu den gemachten Angaben im Internet und rufe keine externen Quellen zur Ergänzung oder Bestätigung ab. Verwende ausschließlich den fachlichen Inhalt dieser privaten Quelle. Falls im Wiki eine öffentliche Quelle zur selben Person existiert, verknüpfe beide Datensätze gegenseitig, halte private und öffentlich belegte Informationen jedoch in getrennten Wiki-Datensätzen und übernimm keine Aussagen zwischen ihnen.',
       ),
     ],
   ),
