@@ -15,6 +15,7 @@ import java.util.UUID
 class MainActivity : FlutterActivity() {
     private companion object {
         const val IMAGE_PICK_REQUEST = 4201
+        const val DOCUMENT_PICK_REQUEST = 4202
         const val MAX_IMAGE_BYTES = 10L * 1024L * 1024L
         val SUPPORTED_IMAGE_TYPES = setOf("image/png", "image/gif", "image/jpeg")
     }
@@ -22,6 +23,9 @@ class MainActivity : FlutterActivity() {
     private var shareChannel: MethodChannel? = null
     private var pendingShare: Map<String, Any>? = null
     private var imagePickerResult: MethodChannel.Result? = null
+    private var documentPickerResult: MethodChannel.Result? = null
+    private var documentMimeTypes: Set<String> = emptySet()
+    private var documentMaxBytes: Long = 0L
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -29,14 +33,18 @@ class MainActivity : FlutterActivity() {
         configureAppInfoChannel(flutterEngine)
         configureShareChannel(flutterEngine)
         configureImageChannel(flutterEngine)
+        configureDocumentChannel(flutterEngine)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode != IMAGE_PICK_REQUEST) {
-            return
+        when (requestCode) {
+            IMAGE_PICK_REQUEST -> finishImagePicker(resultCode, data)
+            DOCUMENT_PICK_REQUEST -> finishDocumentPicker(resultCode, data)
         }
+    }
 
+    private fun finishImagePicker(resultCode: Int, data: Intent?) {
         val result = imagePickerResult
         imagePickerResult = null
         if (result == null) {
@@ -47,11 +55,38 @@ class MainActivity : FlutterActivity() {
             result.success(null)
             return
         }
-
         try {
             result.success(copyImageToPrivateCache(uri))
         } catch (error: Exception) {
             result.error("image_copy_failed", error.message, null)
+        }
+    }
+
+    private fun finishDocumentPicker(resultCode: Int, data: Intent?) {
+        val result = documentPickerResult
+        val mimeTypes = documentMimeTypes
+        val maxBytes = documentMaxBytes
+        documentPickerResult = null
+        documentMimeTypes = emptySet()
+        documentMaxBytes = 0L
+        if (result == null) {
+            return
+        }
+        val uri = data?.data
+        if (resultCode != Activity.RESULT_OK || uri == null) {
+            result.success(null)
+            return
+        }
+        try {
+            result.success(
+                copyDocumentToPrivateCache(
+                    uri = uri,
+                    allowedMimeTypes = mimeTypes,
+                    maxBytes = maxBytes
+                )
+            )
+        } catch (error: Exception) {
+            result.error("document_copy_failed", error.message, null)
         }
     }
 
@@ -154,7 +189,47 @@ class MainActivity : FlutterActivity() {
                         return@setMethodCallHandler
                     }
                     try {
-                        discardCachedImage(path)
+                        discardCachedFile(path, "image_sources", "Bilddatei")
+                        result.success(null)
+                    } catch (error: Exception) {
+                        result.error("discard_failed", error.message, null)
+                    }
+                }
+                else -> result.notImplemented()
+            }
+        }
+    }
+
+    private fun configureDocumentChannel(flutterEngine: FlutterEngine) {
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            "developer_wiki/document"
+        ).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "pickDocument" -> {
+                    val mimeTypes = call.argument<List<String>>("mimeTypes")
+                        ?.filter { it.isNotBlank() }
+                        ?.toSet()
+                        .orEmpty()
+                    val maxBytes = call.argument<Number>("maxBytes")?.toLong() ?: 0L
+                    if (mimeTypes.isEmpty() || maxBytes <= 0L) {
+                        result.error(
+                            "invalid_contract",
+                            "Der Dokumentvertrag enthält keinen gültigen Dateityp oder Größenwert.",
+                            null
+                        )
+                    } else {
+                        openDocumentPicker(result, mimeTypes, maxBytes)
+                    }
+                }
+                "discardDocument" -> {
+                    val path = call.argument<String>("path")
+                    if (path.isNullOrBlank()) {
+                        result.error("invalid_path", "Dokumentpfad fehlt.", null)
+                        return@setMethodCallHandler
+                    }
+                    try {
+                        discardCachedFile(path, "document_sources", "Dokumentdatei")
                         result.success(null)
                     } catch (error: Exception) {
                         result.error("discard_failed", error.message, null)
@@ -187,25 +262,96 @@ class MainActivity : FlutterActivity() {
         }
     }
 
+    private fun openDocumentPicker(
+        result: MethodChannel.Result,
+        mimeTypes: Set<String>,
+        maxBytes: Long
+    ) {
+        if (documentPickerResult != null) {
+            result.error("picker_busy", "Die Dokumentauswahl ist bereits geöffnet.", null)
+            return
+        }
+        documentPickerResult = result
+        documentMimeTypes = mimeTypes
+        documentMaxBytes = maxBytes
+        val picker = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = if (mimeTypes.size == 1) mimeTypes.first() else "*/*"
+            if (mimeTypes.size > 1) {
+                putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes.toTypedArray())
+            }
+        }
+        try {
+            startActivityForResult(picker, DOCUMENT_PICK_REQUEST)
+        } catch (error: Exception) {
+            documentPickerResult = null
+            documentMimeTypes = emptySet()
+            documentMaxBytes = 0L
+            result.error("picker_failed", error.message, null)
+        }
+    }
+
     private fun copyImageToPrivateCache(uri: Uri): Map<String, Any> {
         val mimeType = contentResolver.getType(uri)?.lowercase()
             ?: throw IllegalArgumentException("Der Bildtyp konnte nicht ermittelt werden.")
         if (mimeType !in SUPPORTED_IMAGE_TYPES) {
             throw IllegalArgumentException("Unterstützt werden PNG-, GIF- und JPEG-Bilder.")
         }
+        return copyToPrivateCache(
+            uri = uri,
+            mimeType = mimeType,
+            directoryName = "image_sources",
+            fallbackName = "image",
+            maxBytes = MAX_IMAGE_BYTES,
+            emptyMessage = "Die ausgewählte Bilddatei ist leer.",
+            tooLargeMessage = "Das Bild darf höchstens 10 MiB groß sein."
+        )
+    }
 
-        val displayName = displayName(uri)
+    private fun copyDocumentToPrivateCache(
+        uri: Uri,
+        allowedMimeTypes: Set<String>,
+        maxBytes: Long
+    ): Map<String, Any> {
+        val mimeType = contentResolver.getType(uri)?.lowercase()
+            ?: throw IllegalArgumentException("Der Dokumenttyp konnte nicht ermittelt werden.")
+        if (mimeType !in allowedMimeTypes) {
+            throw IllegalArgumentException(
+                "Der Dateityp $mimeType wird für diese Dokument-Quelle nicht unterstützt."
+            )
+        }
+        return copyToPrivateCache(
+            uri = uri,
+            mimeType = mimeType,
+            directoryName = "document_sources",
+            fallbackName = "document",
+            maxBytes = maxBytes,
+            emptyMessage = "Die ausgewählte Dokumentdatei ist leer.",
+            tooLargeMessage = "Die Dokumentdatei überschreitet das zulässige Größenlimit."
+        )
+    }
+
+    private fun copyToPrivateCache(
+        uri: Uri,
+        mimeType: String,
+        directoryName: String,
+        fallbackName: String,
+        maxBytes: Long,
+        emptyMessage: String,
+        tooLargeMessage: String
+    ): Map<String, Any> {
+        val displayName = displayName(uri, fallbackName)
         val safeName = displayName
             .replace(Regex("[^A-Za-z0-9._-]"), "_")
             .takeLast(100)
-            .ifBlank { "image" }
-        val directory = File(cacheDir, "image_sources").apply { mkdirs() }
+            .ifBlank { fallbackName }
+        val directory = File(cacheDir, directoryName).apply { mkdirs() }
         val target = File(directory, "${UUID.randomUUID()}-$safeName")
         var total = 0L
 
         try {
             contentResolver.openInputStream(uri).use { input ->
-                requireNotNull(input) { "Das Bild konnte nicht geöffnet werden." }
+                requireNotNull(input) { "Die Datei konnte nicht geöffnet werden." }
                 FileOutputStream(target).use { output ->
                     val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
                     while (true) {
@@ -214,10 +360,8 @@ class MainActivity : FlutterActivity() {
                             break
                         }
                         total += read
-                        if (total > MAX_IMAGE_BYTES) {
-                            throw IllegalArgumentException(
-                                "Das Bild darf höchstens 10 MiB groß sein."
-                            )
+                        if (total > maxBytes) {
+                            throw IllegalArgumentException(tooLargeMessage)
                         }
                         output.write(buffer, 0, read)
                     }
@@ -230,7 +374,7 @@ class MainActivity : FlutterActivity() {
 
         if (total == 0L) {
             target.delete()
-            throw IllegalArgumentException("Die ausgewählte Bilddatei ist leer.")
+            throw IllegalArgumentException(emptyMessage)
         }
         return mapOf(
             "path" to target.absolutePath,
@@ -240,7 +384,7 @@ class MainActivity : FlutterActivity() {
         )
     }
 
-    private fun displayName(uri: Uri): String {
+    private fun displayName(uri: Uri, fallback: String = "image"): String {
         contentResolver.query(
             uri,
             arrayOf(OpenableColumns.DISPLAY_NAME),
@@ -251,22 +395,22 @@ class MainActivity : FlutterActivity() {
             if (cursor.moveToFirst()) {
                 val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                 if (index >= 0) {
-                    return cursor.getString(index) ?: "image"
+                    return cursor.getString(index) ?: fallback
                 }
             }
         }
-        return uri.lastPathSegment ?: "image"
+        return uri.lastPathSegment ?: fallback
     }
 
-    private fun discardCachedImage(path: String) {
-        val directory = File(cacheDir, "image_sources").canonicalFile
-        val image = File(path).canonicalFile
+    private fun discardCachedFile(path: String, directoryName: String, label: String) {
+        val directory = File(cacheDir, directoryName).canonicalFile
+        val file = File(path).canonicalFile
         val allowedPrefix = directory.path + File.separator
-        require(image.path.startsWith(allowedPrefix)) {
-            "Nur temporäre Bilddateien der App dürfen entfernt werden."
+        require(file.path.startsWith(allowedPrefix)) {
+            "Nur temporäre $label der App dürfen entfernt werden."
         }
-        if (image.exists() && !image.delete()) {
-            throw IllegalStateException("Die temporäre Bilddatei konnte nicht entfernt werden.")
+        if (file.exists() && !file.delete()) {
+            throw IllegalStateException("Die temporäre $label konnte nicht entfernt werden.")
         }
     }
 
