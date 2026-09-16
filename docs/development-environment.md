@@ -1,6 +1,6 @@
 # Entwicklungsumgebung und Android-Toolchain
 
-Diese Datei beschreibt den für die Developer-Wiki-App vorgesehenen Entwicklungsstand. Die im Repository versionierten Gradle-/AGP-Versionen sind die technische Referenz; lokale Werkzeuge sollen dazu kompatibel sein.
+Diese Datei beschreibt den für die Developer-Wiki-App vorgesehenen Entwicklungsstand. Die im Repository versionierten Gradle-/AGP-/Kotlin-Versionen sind die technische Referenz; lokale Werkzeuge sollen dazu kompatibel sein.
 
 ## Referenzstand
 
@@ -16,7 +16,7 @@ Stand: 2026-09-16
 | Android SDK Build Tools | `36.0.0` oder kompatibler neuerer Stand | AGP 9.0.1 verwendet 36.0.0 als Standard |
 | Android Gradle Plugin | `9.0.1` | in `android/settings.gradle.kts` versioniert |
 | Gradle | `9.1.0` | über den Gradle Wrapper versioniert |
-| Kotlin | AGP-9 Built-in Kotlin | kein separates `org.jetbrains.kotlin.android`-Plugin mehr |
+| Kotlin | Built-in Kotlin mit KGP-Runtime `2.2.20` | kein `org.jetbrains.kotlin.android`-Plugin in der App |
 
 AGP 9.0.1 benötigt mindestens Gradle 9.1.0 und JDK 17. Das Projekt verwendet JDK 21 für die Build-JVM; `sourceCompatibility`, `targetCompatibility` und Kotlin-`jvmTarget` bleiben auf 17.
 
@@ -24,7 +24,19 @@ AGP 9.0.1 benötigt mindestens Gradle 9.1.0 und JDK 17. Das Projekt verwendet JD
 
 Die App ist auf den von Flutter 3.47 unterstützten AGP-9-Pfad mit Built-in Kotlin migriert. Das frühere Plugin `org.jetbrains.kotlin.android` wird nicht mehr angewendet. Die Kotlin-Compilerkonfiguration liegt außerhalb des `android`-Blocks in der modernen `kotlin.compilerOptions`-DSL.
 
-Für die AGP-DSL gilt bei Flutter 3.47.4 jedoch weiterhin der von Flutter bereitgestellte Legacy-Kompatibilitätsmodus. Der Flutter-Gradle-Plugin-Code verwendet intern noch Legacy-AGP-Typen; mit `android.newDsl=true` kann deshalb bereits beim Anwenden von `dev.flutter.flutter-gradle-plugin` ein Typ-Cast fehlschlagen.
+AGP 9.0.1 bringt für Built-in Kotlin standardmäßig KGP `2.2.10` als Runtime-Abhängigkeit mit. Flutter 3.47.4 akzeptiert jedoch erst Kotlin `2.2.20` und neuer. Deshalb hebt `android/build.gradle.kts` die Runtime-Abhängigkeit explizit auf `2.2.20` an:
+
+```kotlin
+buildscript {
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20")
+    }
+}
+```
+
+Das ist keine Rückkehr zum alten Kotlin-Android-Plugin: `org.jetbrains.kotlin.android` bleibt entfernt; die höhere KGP-Version wird ausschließlich als Runtime für AGP Built-in Kotlin bereitgestellt.
+
+Für die AGP-DSL gilt bei Flutter 3.47.4 weiterhin der von Flutter bereitgestellte Legacy-Kompatibilitätsmodus. Der Flutter-Gradle-Plugin-Code verwendet intern noch Legacy-AGP-Typen; mit `android.newDsl=true` kann deshalb bereits beim Anwenden von `dev.flutter.flutter-gradle-plugin` ein Typ-Cast fehlschlagen.
 
 In `android/gradle.properties` ist daher bewusst folgende Kombination versioniert:
 
@@ -98,7 +110,7 @@ cd android
 cd ..
 ```
 
-`gradlew.bat --version` soll Gradle `9.1.0` melden. AGP wird nicht separat lokal installiert; seine Version kommt aus `android/settings.gradle.kts`. Ein separates Kotlin-Gradle-Plugin wird nicht mehr konfiguriert, da AGP 9 Built-in Kotlin verwendet.
+`gradlew.bat --version` soll Gradle `9.1.0` melden. AGP wird nicht separat lokal installiert; seine Version kommt aus `android/settings.gradle.kts`. Auch KGP wird nicht lokal installiert; die für Built-in Kotlin benötigte Runtime-Version `2.2.20` ist im Top-Level-Buildskript versioniert.
 
 ### 5. Android-Lauf prüfen
 
@@ -117,6 +129,10 @@ Ein erfolgreicher Gradle-Sync in Android Studio und ein erfolgreicher `flutter r
 
 Symptome sind unterschiedliche Ergebnisse zwischen IDE-Sync und `flutter build` beziehungsweise Meldungen zu nicht unterstützten Java-/Gradle-Versionen. `flutter doctor -v`, `java -version` und die Android-Studio-Einstellung `Gradle JDK` auf denselben JDK-21-Stand bringen.
 
+### Flutter meldet Kotlin 2.2.10 als zu alt
+
+AGP 9.0.1 bringt standardmäßig KGP 2.2.10 für Built-in Kotlin mit. Flutter 3.47.4 verlangt mindestens 2.2.20. Deshalb ist die KGP-Runtime im Top-Level-Buildskript auf 2.2.20 angehoben. Diese Abhängigkeit nicht entfernen, solange AGP selbst noch eine ältere Runtime mitbringt.
+
 ### `android.newDsl=true` führt zu einem Typ-Cast im Flutter-Gradle-Plugin
 
 Flutter 3.47 unterstützt Built-in Kotlin, nutzt für AGP 9 aber weiterhin eine Legacy-kompatible DSL-Brücke. Ein Fehler wie `ApplicationExtensionImpl... cannot be cast to ... AbstractAppExtension` beim Anwenden von `dev.flutter.flutter-gradle-plugin` weist darauf hin, dass die neue AGP-DSL zu früh aktiviert wurde. Für diesen Projektstand muss `android.newDsl=false` bleiben.
@@ -131,4 +147,4 @@ Eine systemweit installierte Gradle-Version ist für dieses Projekt nicht maßge
 
 ## Quellen für die Versionsentscheidung
 
-Die Migration orientiert sich an Flutter Stable 3.47.4, der Flutter-Anleitung zur AGP-9-/Built-in-Kotlin-Migration sowie der offiziellen AGP-9.0.1-Kompatibilitätsmatrix. Die konkreten Projektversionen bleiben im Repository versioniert, damit lokale Entwicklung und CI denselben Stand verwenden.
+Die Migration orientiert sich an Flutter Stable 3.47.4, der Flutter-Anleitung zur AGP-9-/Built-in-Kotlin-Migration sowie der offiziellen AGP-9.0.1-Dokumentation. Die konkreten Projektversionen bleiben im Repository versioniert, damit lokale Entwicklung und CI denselben Stand verwenden.
