@@ -26,8 +26,8 @@ android {
 
     defaultConfig {
         applicationId = "de.huluvu.developer_wiki_source_capture"
-        minSdk = flutter.minSdkVersion
-        targetSdk = 35
+        minSdk = 24
+        targetSdk = 36
         versionCode = 3
         versionName = "0.1.0"
     }
