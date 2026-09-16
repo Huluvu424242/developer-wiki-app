@@ -9,6 +9,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Added
 
+- Quellenarten und Formularfelder werden aus dem versionierten Quellen-Erfassungsvertrag des konfigurierten Developer-Wikis geladen; der letzte gültige Stand wird repositorybezogen gecacht und bei fehlendem beziehungsweise inkompatiblem Remote-Vertrag durch einen klar gekennzeichneten kompatiblen Bundle-Fallback ersetzt. Unbekannte Schema-Versionen, Feldarten und erforderliche Transportfähigkeiten werden nicht stillschweigend degradiert.
 - Einen verbindlichen Lifecycle-Wartungsvertrag für Flutter, Dart, Android-Toolchain und native Plugins ergänzt: spätestens alle drei Monate einen neuen Lifecycle-Wartungszeitpunkt erfassen; existiert bereits eine offene Lifecycle-Story, wird sie auch über mehrjährige Ruhe-/Sarkophag-Betriebsphasen hinweg statt einer Dublette um einen datierten Quartalshinweis erweitert. Der konkrete Prüf- und Umsetzungsumfang wird stets aus dem jeweils aktuellen Harness abgeleitet; für nicht dringende Flutter-Stable-Releases gilt eine 2–4-wöchige Stabilisierungsphase sowie die definierte Upgrade-Governance.
 - Eine quartalsweise `kiagent-quarterly-lifecycle-story`-GitHub-Action erfasst den Lifecycle-Wartungszeitpunkt automatisch: ohne offene Lifecycle-Story legt sie eine neue Story an, bei einer bereits offenen Story ergänzt sie genau einen datierten Hinweis je Quartal statt weitere offene Dubletten zu erzeugen.
 - Eine schlanke `kiagent-flutter-validation`-GitHub-Action prüft bei jeder Pull-Request-Erstellung Formatierung, statische Analyse und Tests mit minimalen Leserechten und ohne Secrets oder Repository-Schreibwirkungen.
@@ -16,6 +17,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Changed
 
+- Die PAT-Hilfe nennt für das dynamische Laden des privaten Wiki-Vertrags zusätzlich `Contents: Read-only` und grenzt den App-PAT ausdrücklich von den internen Wiki-Secrets `SOURCE_IMAGE_TOKEN` und `SOURCE_ATTACHMENT_TOKEN` ab; ein Classic PAT für den Wiki-internen Dokumentdownload ist keine App-Anforderung.
 - Die Android-Build-Toolchain auf den aktuellen Flutter-3.47.4-Template-Stand angehoben: Gradle 9.3.1, Android Gradle Plugin 9.1.0 und Kotlin Gradle Plugin 2.4.0; Android `minSdk` auf 24 und `targetSdk` auf 36 angehoben, die App verwendet `kotlin.compilerOptions`, während die von Flutter Stable weiterhin erzeugten AGP-9-Kompatibilitätsflags `android.newDsl=false` und `android.builtInKotlin=false` bewusst beibehalten werden. JDK 21 ist als lokaler und Release-Referenzstand dokumentiert.
 - `flutter_secure_storage` von 9.x auf 10.3.4 aktualisiert, damit der Android-Pluginanteil Java 17 verwendet; die bisherige `encryptedSharedPreferences`-Konfiguration wird über den vorgesehenen 10.x-Migrationspfad mit aktivierter Algorithmusmigration und Backup-Schutz weitergeführt, bevor ein späteres Upgrade auf 11.x erfolgen darf.
 - Den veralteten `android.enableJetifier=true`-Schalter entfernt; das Projekt verwendet ausschließlich AndroidX-Abhängigkeiten und soll keinen Legacy-Support-Library-Übersetzer mehr aktivieren.
