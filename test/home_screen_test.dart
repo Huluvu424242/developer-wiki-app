@@ -49,7 +49,8 @@ void main() {
     expect(find.text(template.description), findsOneWidget);
   });
 
-  testWidgets('shared link opens metadata source form directly', (tester) async {
+  testWidgets('shared link opens metadata source form directly',
+      (tester) async {
     const sharedContent = SharedContent(
       kind: SharedContentKind.link,
       text: 'https://example.org/source',
