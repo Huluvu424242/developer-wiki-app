@@ -73,6 +73,19 @@ class GitHubService {
         .toList(growable: false);
   }
 
+  Future<String> issueBodyFor(int issueNumber) async {
+    final response = await _client.get(
+      Uri.parse(
+          'https://api.github.com/repos/$owner/$repo/issues/$issueNumber'),
+      headers: _headers,
+    );
+    if (response.statusCode != 200) {
+      throw Exception(_message(response));
+    }
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    return data['body']?.toString() ?? '';
+  }
+
   Future<void> updateIssueBody(int issueNumber, String body) async {
     await _patchIssue(issueNumber, {'body': body});
   }
