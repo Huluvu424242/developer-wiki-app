@@ -19,6 +19,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Changed
 
+- Die Ersteinrichtung und PAT-Hilfe führen jetzt durch Repository, Wiki-PAT und Import-Workflow, erklären die erforderlichen Least-Privilege-Berechtigungen sowie ausdrücklich nicht benötigte Wiki-interne Secrets und prüfen Repository, Quellenmodell, Issues-Lesezugriff und Workflow-Sichtbarkeit vor dem Speichern.
 - Die PAT-Hilfe nennt für das dynamische Laden des privaten Wiki-Vertrags zusätzlich `Contents: Read-only` und grenzt den App-PAT ausdrücklich von den internen Wiki-Secrets `SOURCE_IMAGE_TOKEN` und `SOURCE_ATTACHMENT_TOKEN` ab; ein Classic PAT für den Wiki-internen Dokumentdownload ist keine App-Anforderung.
 - Die Android-Build-Toolchain auf den aktuellen Flutter-3.47.4-Template-Stand angehoben: Gradle 9.3.1, Android Gradle Plugin 9.1.0 und Kotlin Gradle Plugin 2.4.0; Android `minSdk` auf 24 und `targetSdk` auf 36 angehoben, die App verwendet `kotlin.compilerOptions`, während die von Flutter Stable weiterhin erzeugten AGP-9-Kompatibilitätsflags `android.newDsl=false` und `android.builtInKotlin=false` bewusst beibehalten werden. JDK 21 ist als lokaler und Release-Referenzstand dokumentiert.
 - `flutter_secure_storage` von 9.x auf 10.3.4 aktualisiert, damit der Android-Pluginanteil Java 17 verwendet; die bisherige `encryptedSharedPreferences`-Konfiguration wird über den vorgesehenen 10.x-Migrationspfad mit aktivierter Algorithmusmigration und Backup-Schutz weitergeführt, bevor ein späteres Upgrade auf 11.x erfolgen darf.

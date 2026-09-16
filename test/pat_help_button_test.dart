@@ -22,7 +22,11 @@ void main() {
     expect(find.text('• Metadata: Read-only'), findsOneWidget);
     expect(find.textContaining('Only select repositories'), findsOneWidget);
     expect(find.textContaining('Generate new token'), findsOneWidget);
-    expect(find.textContaining('SOURCE_IMAGE_TOKEN'), findsOneWidget);
+    expect(find.textContaining('SOURCE_IMAGE_TOKEN'), findsWidgets);
+    expect(find.textContaining('SOURCE_ATTACHMENT_TOKEN'), findsWidgets);
+    expect(find.textContaining('kein PAT für das Repository'), findsOneWidget);
+    expect(find.textContaining('14. Erst nach erfolgreichem Test'),
+        findsOneWidget);
     expect(find.text('Schließen'), findsOneWidget);
   });
 }

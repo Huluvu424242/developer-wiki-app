@@ -33,30 +33,36 @@ class _PatHelpDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Verwende ein Fine-grained personal access token und beschränke '
-              'es nach dem Least-Privilege-Prinzip auf dein Developer-Wiki.',
+              'Für den normalen Betrieb brauchst du genau ein Fine-grained '
+              'Personal Access Token für dein persönliches Developer-Wiki.',
             ),
             SizedBox(height: 16),
             Text(
-              'Benötigte Repository-Berechtigungen',
+              'Benötigt',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
+            Text('• Fine-grained PAT nur für das persönliche Developer-Wiki.'),
             Text('• Actions: Read and write'),
             Text('• Contents: Read-only'),
             Text('• Issues: Read and write'),
             Text('• Metadata: Read-only'),
-            SizedBox(height: 8),
+            SizedBox(height: 16),
             Text(
-              'Contents wird benötigt, um den versionierten Quellen-'
-              'Erfassungsvertrag aus dem privaten Wiki zu laden. Die internen '
-              'Wiki-Secrets SOURCE_IMAGE_TOKEN und SOURCE_ATTACHMENT_TOKEN '
-              'werden von der App weder benötigt noch verwendet.',
+              'Nicht benötigt',
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
+            Text('• kein PAT für das Repository developer-wiki-app'),
+            Text('• kein SOURCE_IMAGE_TOKEN'),
+            Text('• kein SOURCE_ATTACHMENT_TOKEN'),
+            Text('• keine GitHub-Actions- oder Repository-Secrets'),
+            SizedBox(height: 8),
             Text(
-              'Zusätzliche Account Permissions sind für den aktuellen '
-              'Funktionsumfang nicht erforderlich.',
+              'SOURCE_IMAGE_TOKEN und SOURCE_ATTACHMENT_TOKEN sind '
+              'ausschließlich interne Secrets des Wiki-Imports. Der Wiki-PAT '
+              'der App darf nicht für Bugreports oder andere Repositories '
+              'wiederverwendet werden.',
             ),
             SizedBox(height: 16),
             Text(
@@ -64,31 +70,65 @@ class _PatHelpDialog extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
-            Text('1. GitHub → Settings → Developer settings öffnen.'),
+            Text('1. GitHub öffnen und Settings aufrufen.'),
+            Text('2. Developer settings öffnen.'),
+            Text('3. Personal access tokens → Fine-grained tokens öffnen.'),
+            Text('4. Generate new token wählen.'),
             Text(
-              '2. Personal access tokens → Fine-grained tokens → '
-              'Generate new token wählen.',
+              '5. Einen eindeutigen Namen und eine möglichst begrenzte '
+              'Gültigkeitsdauer festlegen.',
             ),
             Text(
-              '3. Als Resource owner den Owner des Ziel-Wiki-Repositories '
-              'auswählen.',
+              '6. Als Resource owner den Owner deines persönlichen '
+              'Developer-Wiki-Repositories auswählen.',
+            ),
+            Text('7. Repository access → Only select repositories wählen.'),
+            Text('8. Ausschließlich dein Developer-Wiki auswählen.'),
+            Text(
+              '9. Repository permissions setzen: Actions und Issues auf '
+              'Read and write, Contents auf Read-only; Metadata bleibt '
+              'Read-only.',
             ),
             Text(
-              '4. Bei Repository access „Only select repositories“ wählen '
-              'und nur das Developer-Wiki auswählen.',
+              '10. Keine zusätzlichen Account Permissions vergeben, solange '
+              'sie nicht ausdrücklich benötigt werden.',
             ),
             Text(
-              '5. Unter Repository permissions Actions und Issues auf '
-              '„Read and write“, Contents auf „Read-only“ setzen; Metadata '
-              'bleibt „Read-only“.',
+                '11. Token erzeugen und den einmal angezeigten Wert kopieren.'),
+            Text(
+              '12. In der App unter Einstellungen bzw. Ersteinrichtung in '
+              'Fine-grained PAT einfügen.',
             ),
-            Text('6. Token erzeugen und einmalig in diese App kopieren.'),
+            Text(
+              '13. GitHub Wiki und Import-Workflow kontrollieren und '
+              '„Verbindung und Rechte testen“ ausführen.',
+            ),
+            Text('14. Erst nach erfolgreichem Test Speichern wählen.'),
+            SizedBox(height: 16),
+            Text(
+              'Wofür die Felder stehen',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'GitHub Wiki: Repository-URL oder owner/repo des persönlichen '
+              'Developer-Wikis.',
+            ),
+            Text(
+              'Fine-grained PAT: Zugang nur zu diesem Wiki. Er wird '
+              'ausschließlich im geschützten lokalen App-Speicher abgelegt.',
+            ),
+            Text(
+              'Import-Workflow: Dateiname des workflow_dispatch-Workflows, '
+              'den die App über „Quellen ins Wiki importieren“ startet.',
+            ),
             SizedBox(height: 16),
             Text('Sicherheit', style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
             Text(
-              'Das Token nur in den App-Einstellungen speichern. Nicht in '
-              'Quellcode, Screenshots, Issues oder Logs veröffentlichen.',
+              'Das Token nicht in Quellcode, Screenshots, Issues, Logs, '
+              'Dokumentation oder URLs veröffentlichen. Bei Verdacht auf '
+              'Offenlegung den Token auf GitHub widerrufen und neu erstellen.',
             ),
           ],
         ),
