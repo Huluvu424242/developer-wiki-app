@@ -6,7 +6,10 @@ class ConfigurationService {
   ConfigurationService({FlutterSecureStorage? storage})
       : _storage = storage ??
             const FlutterSecureStorage(
-              aOptions: AndroidOptions(encryptedSharedPreferences: true),
+              aOptions: AndroidOptions(
+                migrateOnAlgorithmChange: true,
+                migrateWithBackup: true,
+              ),
             );
 
   static const _tokenKey = 'github_pat';
