@@ -47,8 +47,10 @@ void main() {
   test('lädt Vertrag aus konfiguriertem Repository und cached ihn', () async {
     final cache = _MemoryCache();
     final client = MockClient((request) async {
-      expect(request.url.path,
-          '/repos/example/private-wiki/contents/src/config/source-capture.json');
+      expect(
+        request.url.path,
+        '/repos/example/private-wiki/contents/src/config/source-capture.json',
+      );
       expect(request.url.queryParameters['ref'], 'master');
       expect(request.headers['Authorization'], 'Bearer test-token');
       return http.Response(
@@ -65,6 +67,64 @@ void main() {
     expect(loaded.origin, SourceTemplateOrigin.remote);
     expect(loaded.templates.single.id, 'wiki-information');
     expect(cache.value, _contract);
+  });
+
+  test('prüft beim Verbindungstest den echten Remote-Vertrag', () async {
+    late http.Request capturedRequest;
+    final service = SourceTemplateService(
+      cache: _MemoryCache(),
+      client: MockClient((request) async {
+        capturedRequest = request;
+        return http.Response(
+          jsonEncode({
+            'encoding': 'base64',
+            'content': base64Encode(utf8.encode(_contract)),
+          }),
+          200,
+        );
+      }),
+    );
+
+    await service.verifyRemoteAccess(_configuration);
+
+    expect(
+      capturedRequest.url.path,
+      '/repos/example/private-wiki/contents/src/config/source-capture.json',
+    );
+    expect(capturedRequest.url.queryParameters['ref'], 'master');
+    expect(capturedRequest.headers['Authorization'], 'Bearer test-token');
+  });
+
+  test('meldet bei HTTP 403 das benötigte Contents-Leserecht', () async {
+    final service = SourceTemplateService(
+      cache: _MemoryCache(),
+      client: MockClient((_) async => http.Response('forbidden', 403)),
+    );
+
+    await expectLater(
+      service.verifyRemoteAccess(_configuration),
+      throwsA(
+        predicate(
+          (error) =>
+              error.toString().contains('HTTP 403') &&
+              error.toString().contains('Contents: Read-only') &&
+              !error.toString().contains('test-token'),
+        ),
+      ),
+    );
+  });
+
+  test('Fallback-Warnung erklärt fehlendes Contents-Leserecht', () async {
+    final service = SourceTemplateService(
+      cache: _MemoryCache(),
+      client: MockClient((_) async => http.Response('forbidden', 403)),
+    );
+
+    final loaded = await service.load(_configuration);
+
+    expect(loaded.origin, SourceTemplateOrigin.bundledFallback);
+    expect(loaded.warning, contains('Contents: Read-only'));
+    expect(loaded.warning, isNot(contains('test-token')));
   });
 
   test('verwendet letzten gültigen Cache bei Netzwerkfehler', () async {
