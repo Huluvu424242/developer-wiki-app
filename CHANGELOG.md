@@ -26,6 +26,10 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 - Flutter-, Architektur-, UX-, Barrierefreiheits- und Qualitätsregeln mit den passenden Erkenntnissen aus dem Taugt’s-Harness harmonisiert; insbesondere Lebenszyklusprüfungen nach `await`, sichere `const`-Widgetbäume, Lazy-Formularvalidierung, Scroll-Widgettests, robuste Fehlersammler-Navigation und einheitliche Abschlussstatus präzisiert.
 - Einen verbindlichen Releasevorbereitungs-Vertrag ergänzt: `pubspec.yaml` ist technische Versionsquelle, `CHANGELOG.md` fachlicher Master; Versions-, Dokumentations-, Lizenz- und Konsistenzprüfungen sowie die Trennung zwischen Repository-Vorbereitung und produktiver Veröffentlichung sind festgelegt.
 
+### Fixed
+
+- „Verbindung testen“ prüft nun auch den tatsächlich benötigten Zugriff auf `src/config/source-capture.json`; bei fehlendem `Contents: Read-only` wird die Verbindung nicht als erfolgreich markiert und der 403-Hinweis nennt die benötigte Fine-grained-PAT-Berechtigung konkret.
+
 ### Security
 
 - Eine verbindliche GitHub-Actions- und Werkzeugketten-Governance mit Default-Deny, Triggerprüfung vor schreibenden Repository-Operationen, separaten Werkzeugketten-PRs, menschlicher Review-Lücke, Freigabeverzeichnis und klarer Trennung von Merge und produktiver Ausführung eingeführt; der Android-Release-Workflow bleibt ohne ausdrückliche Owner-Freigabe von selbständiger Agentenausführung ausgeschlossen.
