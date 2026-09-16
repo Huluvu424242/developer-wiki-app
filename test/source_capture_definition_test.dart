@@ -43,12 +43,14 @@ void main() {
   });
 
   test('lehnt unbekannte Schema-Version ab', () {
-    final invalid = _valid.replaceFirst('"schemaVersion": 1', '"schemaVersion": 2');
+    final invalid =
+        _valid.replaceFirst('"schemaVersion": 1', '"schemaVersion": 2');
     expect(() => SourceCaptureDefinition.parse(invalid), throwsFormatException);
   });
 
   test('lehnt unbekannte Feldart ab', () {
-    final invalid = _valid.replaceFirst('"kind": "image"', '"kind": "document"');
+    final invalid =
+        _valid.replaceFirst('"kind": "image"', '"kind": "document"');
     expect(() => SourceCaptureDefinition.parse(invalid), throwsFormatException);
   });
 
