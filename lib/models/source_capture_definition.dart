@@ -12,6 +12,7 @@ class SourceCaptureDefinition {
   static const supportedSchemaVersion = 1;
   static const supportedCapabilities = {
     'guided-github-issue-image-attachment-v1',
+    'guided-github-issue-file-attachment-v1',
   };
 
   final int schemaVersion;
@@ -87,6 +88,7 @@ class SourceCaptureDefinition {
       'textarea' => FieldKind.textarea,
       'dropdown' => FieldKind.dropdown,
       'image' => FieldKind.image,
+      'file' => FieldKind.file,
       _ => throw FormatException('Unbekannte Feldart: $kindName.'),
     };
     final transport = raw['transport']?.toString();
@@ -101,13 +103,15 @@ class SourceCaptureDefinition {
         'Dropdown ${raw['id']} enthält keine Auswahlwerte.',
       );
     }
-    if (kind == FieldKind.image) {
+    if (kind == FieldKind.image || kind == FieldKind.file) {
       if (raw['maxFiles'] != 1 ||
           raw['maxBytes'] is! int ||
           _stringList(raw['mimeTypes']).isEmpty ||
-          transport == null) {
+          transport == null ||
+          transport.isEmpty) {
         throw FormatException(
-          'Bildfeld ${raw['id']} besitzt keinen vollständigen Transportvertrag.',
+          'Attachment-Feld ${raw['id']} besitzt keinen vollständigen '
+          'Transportvertrag.',
         );
       }
     }
