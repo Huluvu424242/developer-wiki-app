@@ -41,6 +41,8 @@ Der aktuelle Wiki-Import erkennt Anhänge formatbasiert. Das Präfix `[Bild-Quel
 
 Für ein privates Wiki benötigt der in der App konfigurierte Fine-grained PAT nun zusätzlich **Contents: Read-only**, damit `src/config/source-capture.json` gelesen werden kann. Die bisher benötigten Rechte für Issues und Actions bleiben davon unberührt.
 
+Der Button **„Verbindung testen“** prüft deshalb nicht nur Anmeldung und Repository-Zugriff, sondern liest und validiert auch genau diesen Quellen-Erfassungsvertrag. Erst wenn dieser Zugriff funktioniert, gilt die Verbindung als erfolgreich geprüft. Liefert GitHub dabei HTTP 403, weist die App konkret auf das benötigte Recht `Contents: Read-only` hin.
+
 Die Wiki-internen Secrets `SOURCE_IMAGE_TOKEN` und `SOURCE_ATTACHMENT_TOKEN` gehören ausschließlich zu den GitHub-Actions des Developer-Wikis. Sie werden von der App weder benötigt noch gelesen. Insbesondere macht die Classic-PAT-Anforderung des Wiki-internen privaten Dokumentdownloads keinen Classic PAT für die App erforderlich.
 
 ## Verantwortungsgrenze
