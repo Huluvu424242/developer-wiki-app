@@ -8,7 +8,10 @@ class PendingImageUploadStore {
   PendingImageUploadStore({FlutterSecureStorage? storage})
       : _storage = storage ??
             const FlutterSecureStorage(
-              aOptions: AndroidOptions(encryptedSharedPreferences: true),
+              aOptions: AndroidOptions(
+                migrateOnAlgorithmChange: true,
+                migrateWithBackup: true,
+              ),
             );
 
   static const _key = 'pending_image_upload';
