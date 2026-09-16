@@ -41,9 +41,9 @@ Haftungs- und Gewährleistungsausschlüsse der CC0-Erklärung bleiben unberührt
 | [Flutter Framework und Engine](https://github.com/flutter/flutter) | UI-Framework und Laufzeit | [BSD-3-Clause](https://github.com/flutter/flutter/blob/master/LICENSE), © 2014 The Flutter Authors |
 | [Dart SDK](https://github.com/dart-lang/sdk) | Sprache und Laufzeit | [BSD-3-Clause](https://github.com/dart-lang/sdk/blob/main/LICENSE), © 2012 The Dart project authors |
 | [`http` 1.6.0](https://pub.dev/packages/http/versions/1.6.0) | HTTP-Kommunikation mit GitHub | [BSD-3-Clause](https://github.com/dart-lang/http/blob/master/LICENSE), © 2014 The Dart project authors |
-| [`flutter_secure_storage` 9.2.4](https://pub.dev/packages/flutter_secure_storage/versions/9.2.4) | Geschützte lokale Speicherung | [BSD-3-Clause](https://pub.dev/packages/flutter_secure_storage/versions/9.2.4/license), © 2017 German Saprykin |
+| [`flutter_secure_storage` 10.3.4](https://pub.dev/packages/flutter_secure_storage/versions/10.3.4) | Geschützte lokale Speicherung einschließlich Migration vom bisherigen 9.x-Speicherformat | [BSD-3-Clause](https://pub.dev/packages/flutter_secure_storage/versions/10.3.4/license), © 2017 German Saprykin |
 | [Material Icons](https://github.com/google/material-design-icons) | Über Flutter eingebundene App-Symbole | [Apache-2.0](https://github.com/google/material-design-icons/blob/master/LICENSE), Google LLC und Mitwirkende |
-| [Gradle Wrapper 8.14](https://docs.gradle.org/8.14/userguide/gradle_wrapper.html) | Im Repository enthaltene Android-Buildskripte und Wrapper-JAR | [Apache-2.0](https://github.com/gradle/gradle/blob/master/LICENSE), Gradle, Inc. und Mitwirkende |
+| [Gradle Wrapper 9.3.1](https://docs.gradle.org/9.3.1/userguide/gradle_wrapper.html) | Im Repository enthaltene Android-Buildskripte und Wrapper-JAR | [Apache-2.0](https://github.com/gradle/gradle/blob/master/LICENSE), Gradle, Inc. und Mitwirkende |
 
 Die jeweils vollständigen Lizenztexte der verwendeten Flutter-, Dart- und
 Pub-Pakete werden vom Flutter-Build in die Asset-Datei `NOTICES` aufgenommen.
