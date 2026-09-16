@@ -5,10 +5,28 @@ Dieses Modul regelt die planmäßige technische Wartung der Flutter-/Android-Ent
 ## Wartungsrhythmus
 
 - Eine bewusste Lifecycle-Prüfung erfolgt grundsätzlich **quartalsweise**, bevorzugt im zeitlichen Umfeld eines neuen Flutter-Stable-Releases.
-- Zwischen zwei bewussten Lifecycle-Prüfungen beziehungsweise dokumentierten Upgrade-Entscheidungen sollen im Normalfall **nicht mehr als sechs Monate** liegen.
-- Zwölfmonatige oder noch längere Sammel-Upgrades mehrerer Flutter-/Android-Toolchain-Generationen werden vermieden, sofern nicht ein ausdrücklich dokumentierter Ausnahmegrund entgegensteht.
+- **Spätestens alle drei Monate wird eine neue Lifecycle-Story angelegt.** Der Standardrhythmus sind die vier Kalenderquartale Januar–März, April–Juni, Juli–September und Oktober–Dezember.
+- Die quartalsweise Story ist nicht nur ein Prüfticket. Sie beauftragt die Ermittlung des zum Bearbeitungszeitpunkt aktuellen Lifecycle-Handlungsbedarfs und – soweit die übrigen Repository-Regeln dies innerhalb derselben Story zulassen – die anschließende Umsetzung dieses Handlungsbedarfs.
+- Zwischen zwei bewussten Lifecycle-Prüfungen beziehungsweise dokumentierten Upgrade-Entscheidungen sollen im Normalfall **nicht mehr als drei Monate** liegen. Sechs Monate sind nur bei einem ausdrücklich dokumentierten Ausnahmegrund vertretbar; zwölfmonatige oder noch längere Sammel-Upgrades mehrerer Flutter-/Android-Toolchain-Generationen werden vermieden.
 - Pub-/Flutter-Abhängigkeiten werden häufiger, typischerweise **monatlich bis zweimonatlich**, auf relevante Updates, Deprecations, Supportgrenzen und Sicherheitsbedarf geprüft. Besonderes Augenmerk gilt Plugins mit nativen Android-Anteilen.
 - Sicherheitsupdates, angekündigte Support-Enden, konkrete Lifecycle-Warnungen und Deprecations mit absehbarer Build-Auswirkung werden **außerplanmäßig** bewertet und bei Bedarf zeitnah bearbeitet; sie warten nicht zwingend bis zum nächsten Quartalstermin.
+
+## Verbindlicher Vertrag für die quartalsweise Lifecycle-Story
+
+Die quartalsweise Story besitzt bewusst **keine kopierte statische Toolchain-Checkliste und keine feste Versionsmatrix**. Die einzige normative Quelle für Inhalt und Prüfpflichten ist die zum Bearbeitungszeitpunkt auf dem Zielbranch gültige Fassung dieses Moduls `agent-rules/09-lifecycle-maintenance.md` zusammen mit den übrigen über `AGENTS.md` eingebundenen Regeln.
+
+Jede manuell oder automatisiert erzeugte quartalsweise Lifecycle-Story enthält daher nur einen stabilen Meta-Auftrag mit folgenden Pflichten:
+
+1. `AGENTS.md` und alle dort aktuell gelisteten Regelmodule vollständig lesen.
+2. Die aktuelle Fassung dieses Lifecycle-Moduls als verbindlichen Prüf- und Umsetzungsvertrag anwenden.
+3. Den aktuellen Projekt-, Flutter-, Android-, JDK-, Build-Toolchain- und Dependency-Stand ermitteln und gegen die aktuell unterstützten beziehungsweise vorgesehenen Zielstände bewerten.
+4. Aus dem **aktuellen** Lifecycle-Vertrag die für diesen Lauf tatsächlich erforderlichen Prüfschritte und Änderungen ableiten, statt eine im Issue gespeicherte ältere Checkliste abzuarbeiten.
+5. Das Ergebnis als nachvollziehbare Entscheidung dokumentieren: `jetzt aktualisieren`, `gezielt aufschieben` oder `kein Handlungsbedarf`.
+6. Bei `jetzt aktualisieren` die ermittelten und nach der übrigen Governance zulässigen Änderungen im Rahmen des Lifecycle-Auftrags tatsächlich umsetzen und die vom aktuellen Harness geforderten Prüfungen durchführen.
+7. Verlangt eine erkannte Änderung nach den Werkzeugketten-, Release- oder sonstigen Regeln eine eigene Story oder einen separaten Pull Request, wird diese Trennung eingehalten und im Lifecycle-Batch verlinkt; die quartalsweise Story darf die speziellere Governance nicht umgehen.
+8. Noch offene, nicht ausführbare oder bewusst aufgeschobene Punkte mit Begründung, Auswirkung und geplantem Folgeschritt dokumentieren.
+
+Damit gilt ausdrücklich: **Bei einem Widerspruch zwischen dem Text einer älteren Lifecycle-Story und dem aktuellen Harness hat der aktuelle Harness Vorrang.** Ein automatischer Story-Erzeuger darf feste Versionsnummern, eine vollständige technische Prüfliste oder andere normative Lifecycle-Regeln nicht duplizieren. Ändert sich der Lifecycle-Vertrag, wirkt die Änderung dadurch automatisch auf künftig bearbeitete quartalsweise Stories.
 
 ## Flutter als Taktgeber
 
@@ -43,7 +61,7 @@ Die Lifecycle-Prüfung ist eine Bewertung und verpflichtet nicht dazu, jede verf
 
 ## Story- und Änderungsumfang
 
-- Eine tatsächliche Toolchain-Migration erhält vor der Umsetzung eine eigene Lifecycle-Story mit prüfbaren Akzeptanzkriterien.
+- Die quartalsweise Lifecycle-Story erfüllt bereits die Pflicht, vor einer tatsächlich erforderlichen Lifecycle-Migration einen fachlichen Wartungsauftrag anzulegen. Für die aus dieser Prüfung unmittelbar hervorgehende normale Toolchain-Migration muss daher nicht künstlich eine zweite gleichartige Lifecycle-Story erzeugt werden.
 - Major-Migrationen von Flutter, AGP, Gradle, Kotlin/KGP, JDK oder Android SDK sowie Änderungen an Build- oder Release-Infrastruktur werden nicht beiläufig in fachfremde Bugfixes oder Feature-Stories aufgenommen.
 - Zusammengehörige Versionen dürfen in einer Lifecycle-Story bewusst als koordinierter Satz aktualisiert werden, wenn ihre Kompatibilität voneinander abhängt.
 - Ein Versionssprung wird nicht mit einem Skip-/Disable-Flag „grün gemacht“, wenn dadurch eine echte Kompatibilitätsprüfung umgangen wird. Notwendige Übergangsflags sind nur zulässig, wenn sie von der verwendeten Flutter-/Android-Toolchain ausdrücklich vorgesehen und dokumentiert sind.
@@ -82,6 +100,14 @@ Zusätzlich gelten:
 - bei Release-relevanten Änderungen die erforderlichen Releaseprüfungen gemäß [Releasevorbereitung](07-release.md), ohne dadurch automatisch eine produktive Veröffentlichung auszulösen.
 
 Nicht ausführbare Prüfungen werden nach den allgemeinen Qualitätsregeln ausdrücklich als offen gemeldet und nicht als erfolgreich angenommen.
+
+## Automatisierte Story-Anlage
+
+- Eine GitHub Action darf die quartalsweise Lifecycle-Story automatisch anlegen, sofern sie als eigene Werkzeugkettenänderung gemäß [Sicherheit und Werkzeugketten](05-security-tooling.md) eingeführt und menschlich geprüft wurde.
+- Der automatische Lauf soll quartalsweise in einem deterministischen Kalenderrhythmus erfolgen und zusätzlich idempotent sein: Ein wiederholter oder verspäteter Lauf darf für dasselbe Kalenderquartal keine zweite gleichartige Lifecycle-Story erzeugen.
+- Die Action darf ausschließlich die Story-Anlage automatisieren. Sie führt keine Toolchain-Upgrades, Merges, Releases oder sonstigen Repository-Codeänderungen selbst aus.
+- Der automatisch erzeugte Storytext verweist auf dieses Modul als aktuelle normative Quelle und enthält nur den oben definierten Meta-Auftrag. Er dupliziert keine feste technische Checkliste oder Versionsmatrix.
+- Ein manueller Ausfall oder eine Deaktivierung der Action hebt die Harness-Pflicht zur dreimonatlichen Story-Anlage nicht auf. Die Harness-Regel bleibt die fachliche Pflicht; die Action ist nur deren technische Erinnerung und Umsetzungshilfe.
 
 ## Trennung von Wartung und Veröffentlichung
 
