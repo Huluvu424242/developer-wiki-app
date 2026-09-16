@@ -47,7 +47,8 @@ void main() {
   test('lädt Vertrag aus konfiguriertem Repository und cached ihn', () async {
     final cache = _MemoryCache();
     final client = MockClient((request) async {
-      expect(request.url.path, '/repos/example/private-wiki/contents/src/config/source-capture.json');
+      expect(request.url.path,
+          '/repos/example/private-wiki/contents/src/config/source-capture.json');
       expect(request.url.queryParameters['ref'], 'master');
       expect(request.headers['Authorization'], 'Bearer test-token');
       return http.Response(
