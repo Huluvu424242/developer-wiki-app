@@ -16,7 +16,7 @@ Stand: 2026-09-16
 | Android Gradle Plugin | `9.1.0` | aktueller Flutter-3.47.4-Templatewert |
 | Gradle | `9.3.1` | aktueller Flutter-3.47.4-Templatewert |
 | Kotlin Gradle Plugin | `2.4.0` | aktueller Flutter-3.47.4-Templatewert |
-| flutter_secure_storage | `10.3.4` | Android-Teil auf Java 17; bewusster Migrationsschritt von 9.x vor einem späteren 11.x-Upgrade |
+| flutter_secure_storage | `10.3.1` | Android-Teil auf Java 17; bewusster Migrationsschritt von 9.x vor einem späteren 11.x-Upgrade |
 
 Flutter 3.47.4 erzeugt für AGP 9 derzeit weiterhin die Kompatibilitätsflags `android.newDsl=false` und `android.builtInKotlin=false`. Das ist bewusst: Die Stable-Templates deklarieren KGP 2.4.0 und verwenden vorerst noch die Legacy-Kompatibilitätsbrücken.
 
@@ -67,7 +67,7 @@ kotlin {
 
 ## Secure-Storage-Migration von 9.x auf 10.x
 
-`flutter_secure_storage` wird bewusst zunächst auf `10.3.4` und nicht direkt auf 11.x aktualisiert. Version 10 migriert Android von der veralteten Jetpack-Security-Implementierung auf die aktuelle Cipher-Implementierung und verwendet seit 10.1.0 Java 17. Der Hersteller verlangt für Daten aus Versionen vor v10 ausdrücklich diesen Zwischenschritt, bevor auf 11.x gewechselt wird.
+`flutter_secure_storage` wird bewusst zunächst auf `10.3.1` und nicht direkt auf 11.x aktualisiert. Version 10 migriert Android von der veralteten Jetpack-Security-Implementierung auf die aktuelle Cipher-Implementierung und verwendet seit 10.1.0 Java 17. Der Hersteller verlangt für Daten aus Versionen vor v10 ausdrücklich diesen Zwischenschritt, bevor auf 11.x gewechselt wird.
 
 Die App hatte unter 9.x `encryptedSharedPreferences: true` verwendet. Für 10.x wird die veraltete Option entfernt und die vorgesehene Migration explizit aktiviert:
 
