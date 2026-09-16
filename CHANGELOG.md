@@ -9,6 +9,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Added
 
+- Android-Teilen behält den fachlichen Quellentyp für Links, Text, Bilder und PDF-Dokumente bei; ein eigenes Dokument-Share-Ziel führt PDF-Dateien in die Dokument-Quelle, während unbekannte Dateitypen ohne stillen Fallback abgelehnt werden.
 - Lokale PDF-Dateien können über die dynamische `Dokument-Quelle` ausgewählt, gegen MIME-Typ und Größenlimit des Wiki-Vertrags geprüft und in einem unterbrechbaren GitHub-Attachment-Flow erfasst werden; das Label `quelle` wird erst nach verifiziertem Attachment sowie rückgelesenem finalem Issue-Body gesetzt.
 - Quellenarten und Formularfelder werden aus dem versionierten Quellen-Erfassungsvertrag des konfigurierten Developer-Wikis geladen; der letzte gültige Stand wird repositorybezogen gecacht und bei fehlendem beziehungsweise inkompatiblem Remote-Vertrag durch einen klar gekennzeichneten kompatiblen Bundle-Fallback ersetzt. Unbekannte Schema-Versionen, Feldarten und erforderliche Transportfähigkeiten werden nicht stillschweigend degradiert.
 - Einen verbindlichen Lifecycle-Wartungsvertrag für Flutter, Dart, Android-Toolchain und native Plugins ergänzt: spätestens alle drei Monate einen neuen Lifecycle-Wartungszeitpunkt erfassen; existiert bereits eine offene Lifecycle-Story, wird sie auch über mehrjährige Ruhe-/Sarkophag-Betriebsphasen hinweg statt einer Dublette um einen datierten Quartalshinweis erweitert. Der konkrete Prüf- und Umsetzungsumfang wird stets aus dem jeweils aktuellen Harness abgeleitet; für nicht dringende Flutter-Stable-Releases gilt eine 2–4-wöchige Stabilisierungsphase sowie die definierte Upgrade-Governance.
@@ -49,7 +50,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 - Die Architekturleitplanken strukturieren Anwendungscode künftig zuerst nach fachlichen Features und erst innerhalb dieser Features nach technischen Rollen; Bezeichner unterscheiden bewusst zwischen technischer englischer Terminologie und der Sprache der Fachdomäne.
 - KI-Agenten kommunizieren mit menschlichen Entwicklern verbindlich auf Deutsch, formulieren insbesondere Stories, Bug-Issues und Pull Requests auf Deutsch und melden nach Arbeiten Ergebnis, Stand und relevante GitHub-Links zurück.
-- Der Bugreport weist vor dem Wechsel zu GitHub darauf hin, dass zum endgültigen Absenden eine GitHub-Anmeldung erforderlich ist und der vorbereitete Bericht dort zunächst geprüft werden kann.
+- Der Bugreport weist vor dem Wechsel zu GitHub darauf hin, dass zum endgültigen Absenden eine GitHub-Anmeldung erforderlich ist und der vorbereitete Bericht dort zunächst geprüft oder verworfen werden kann.
 - Das importierbare Branch-Ruleset schützt neben `master` jetzt auch alle Branches unter `release/**`.
 - Einstellungen verwenden jetzt feldnahe Validierung, temporäre Hinweise und reservierten Platz unter den Aktionsschaltflächen.
 

@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 
+import '../models/document_source_file.dart';
 import '../models/image_source_file.dart';
 import '../models/shared_content.dart';
 import 'image_validation_service.dart';
@@ -46,6 +47,12 @@ class ShareIntentService {
     if (kindValue == 'image_error') {
       return SharedContent(kind: SharedContentKind.imageError, text: text);
     }
+    if (kindValue == 'document_error') {
+      return SharedContent(kind: SharedContentKind.documentError, text: text);
+    }
+    if (kindValue == 'unsupported_file') {
+      return SharedContent(kind: SharedContentKind.unsupportedFile, text: text);
+    }
     if (kindValue == 'image') {
       final image = ImageSourceFile(
         path: value['path']?.toString() ?? '',
@@ -70,6 +77,27 @@ class ShareIntentService {
           text: error.message.toString(),
         );
       }
+    }
+    if (kindValue == 'document') {
+      final document = DocumentSourceFile(
+        path: value['path']?.toString() ?? '',
+        name: value['name']?.toString() ?? '',
+        mimeType: value['mimeType']?.toString() ?? '',
+        sizeBytes: _asInt(value['sizeBytes']),
+      );
+      if (document.path.isEmpty ||
+          document.name.isEmpty ||
+          document.mimeType.isEmpty ||
+          document.sizeBytes <= 0) {
+        return const SharedContent(
+          kind: SharedContentKind.documentError,
+          text: 'Das geteilte Dokument ist unvollständig.',
+        );
+      }
+      return SharedContent(
+        kind: SharedContentKind.document,
+        document: document,
+      );
     }
     final kind = switch (kindValue) {
       'link' => SharedContentKind.link,

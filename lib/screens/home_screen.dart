@@ -9,6 +9,7 @@ import '../services/configuration_service.dart';
 import '../services/external_url_service.dart';
 import '../services/github_service.dart';
 import '../services/image_upload_service.dart';
+import '../services/share_source_router.dart';
 import '../widgets/app_support.dart';
 import 'document_source_screen.dart';
 import 'recent_sources_screen.dart';
@@ -36,13 +37,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _configurationService = ConfigurationService();
   final _externalUrlService = ExternalUrlService();
+  final _shareRouter = const ShareSourceRouter();
   bool _importBusy = false;
   bool _statusBusy = false;
   String? _importMessage;
   bool _importFailed = false;
   DateTime? _lastDispatchAt;
   WorkflowRun? _workflowRun;
-  String? _openedSharedImagePath;
+  String? _openedSharedKey;
   late final ImageUploadGateway _imageUploadGateway;
   PendingImageUpload? _pendingImageUpload;
 
@@ -52,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _imageUploadGateway =
         widget.imageUploadGateway ?? GitHubImageUploadService();
     _loadPendingImageUpload();
-    _scheduleSharedImage();
+    _scheduleSharedContent();
   }
 
   Future<void> _loadPendingImageUpload() async {
@@ -88,22 +90,28 @@ class _HomeScreenState extends State<HomeScreen> {
   void didUpdateWidget(covariant HomeScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.sharedContent != widget.sharedContent) {
-      _scheduleSharedImage();
+      _scheduleSharedContent();
     }
   }
 
-  void _scheduleSharedImage() {
+  void _scheduleSharedContent() {
     final content = widget.sharedContent;
-    final path = content?.image?.path;
-    if (content?.kind != SharedContentKind.image ||
-        path == null ||
-        path == _openedSharedImagePath) {
+    if (content == null || content.isEmpty) {
       return;
     }
-    _openedSharedImagePath = path;
+    final key =
+        '${content.kind}:${content.image?.path ?? content.document?.path ?? content.text}';
+    if (key == _openedSharedKey) {
+      return;
+    }
+    final template = _shareRouter.templateFor(content, sourceTemplates);
+    if (template == null) {
+      return;
+    }
+    _openedSharedKey = key;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        _openSource(imageSourceTemplate);
+        _openSource(template);
       }
     });
   }
@@ -113,7 +121,13 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => DocumentSourceScreen(template: template),
+          builder: (_) => DocumentSourceScreen(
+            template: template,
+            initialDocument:
+                widget.sharedContent?.kind == SharedContentKind.document
+                    ? widget.sharedContent?.document
+                    : null,
+          ),
         ),
       );
       return;
@@ -196,9 +210,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ).dispatchWorkflow(workflow: configuration.workflowFile);
       if (mounted) {
         setState(() {
-          _lastDispatchAt = dispatchStartedAt.subtract(
-            const Duration(seconds: 5),
-          );
+          _lastDispatchAt =
+              dispatchStartedAt.subtract(const Duration(seconds: 5));
           _importMessage = 'Import gestartet. Status kann aktualisiert werden.';
           _importFailed = false;
         });
@@ -280,8 +293,7 @@ class _HomeScreenState extends State<HomeScreen> {
   GitHubRepository _repositoryFrom(WikiConfiguration configuration) {
     if (!configuration.isComplete) {
       throw const FormatException(
-        'Wiki-Konfiguration ist unvollständig. Einstellungen prüfen.',
-      );
+          'Wiki-Konfiguration ist unvollständig. Einstellungen prüfen.');
     }
     if (configuration.workflowFile.trim().isEmpty) {
       throw const FormatException('Import-Workflow ist nicht konfiguriert.');
@@ -289,9 +301,32 @@ class _HomeScreenState extends State<HomeScreen> {
     return GitHubRepository.parse(configuration.repositoryUrl);
   }
 
+  String? _shareErrorText() {
+    final content = widget.sharedContent;
+    if (content == null) {
+      return null;
+    }
+    return switch (content.kind) {
+      SharedContentKind.imageError =>
+        'Geteiltes Bild konnte nicht übernommen werden: ${content.text}',
+      SharedContentKind.documentError =>
+        'Geteiltes Dokument konnte nicht übernommen werden: ${content.text}',
+      SharedContentKind.unsupportedFile =>
+        'Diese Datei kann mit der aktuellen Wiki-Konfiguration nicht als Quelle erfasst werden. ${content.text}',
+      SharedContentKind.link ||
+      SharedContentKind.text ||
+      SharedContentKind.image ||
+      SharedContentKind.document =>
+        _shareRouter.templateFor(content, sourceTemplates) == null
+            ? 'Für den geteilten Inhalt bietet das verbundene Wiki keine kompatible Quellenart an.'
+            : null,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final isShared = widget.sharedContent != null;
+    final shareError = _shareErrorText();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Developer Wiki'),
@@ -313,8 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 key: const Key('pending-image-upload'),
                 leading: const Icon(Icons.cloud_upload_outlined),
                 title: Text(
-                  'Bild-Upload #${_pendingImageUpload!.issueNumber} fortsetzen',
-                ),
+                    'Bild-Upload #${_pendingImageUpload!.issueNumber} fortsetzen'),
                 subtitle: Text(_pendingImageUpload!.image.name),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: _openPendingImageUpload,
@@ -322,15 +356,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 16),
           ],
-          if (widget.sharedContent?.kind == SharedContentKind.imageError) ...[
+          if (shareError != null) ...[
             Card(
               color: Theme.of(context).colorScheme.errorContainer,
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Text(
-                  'Geteiltes Bild konnte nicht übernommen werden: '
-                  '${widget.sharedContent!.text}',
-                ),
+                child: Semantics(liveRegion: true, child: Text(shareError)),
               ),
             ),
             const SizedBox(height: 16),
@@ -342,7 +373,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 8),
           Text(
             isShared
-                ? 'Welche Quellenart ist das?'
+                ? 'Die passende Quellenart wird anhand des geteilten Inhalts vorausgewählt.'
                 : 'Wähle die passende Quellenart aus.',
           ),
           const SizedBox(height: 16),
@@ -370,11 +401,9 @@ class _HomeScreenState extends State<HomeScreen> {
           FilledButton.tonalIcon(
             onPressed: _importBusy ? null : _requestImport,
             icon: const Icon(Icons.sync),
-            label: Text(
-              _importBusy
-                  ? 'Import wird gestartet …'
-                  : 'Quellen ins Wiki importieren',
-            ),
+            label: Text(_importBusy
+                ? 'Import wird gestartet …'
+                : 'Quellen ins Wiki importieren'),
           ),
           if (_lastDispatchAt != null) ...[
             const SizedBox(height: 16),
@@ -407,10 +436,8 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Letzter gestarteter Import',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text('Letzter gestarteter Import',
+                style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             Text(run?.label ?? 'gestartet / wartet'),
             if (run != null) Text('GitHub Actions #${run.id}'),
@@ -422,11 +449,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 OutlinedButton.icon(
                   onPressed: _statusBusy ? null : _refreshImportStatus,
                   icon: const Icon(Icons.refresh),
-                  label: Text(
-                    _statusBusy
-                        ? 'Wird aktualisiert …'
-                        : 'Status aktualisieren',
-                  ),
+                  label: Text(_statusBusy
+                      ? 'Wird aktualisiert …'
+                      : 'Status aktualisieren'),
                 ),
                 if (run != null)
                   OutlinedButton.icon(
