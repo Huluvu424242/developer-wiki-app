@@ -7,7 +7,7 @@ Für gestapelte Pull Requests werden zwei technisch unterschiedliche Verfahren b
 1. **Manueller Rebase-Merge:** Der Reviewer prüft jeden final auf `master` rebasierten Branch einzeln und übernimmt ihn mit `Rebase and merge`.
 2. **Delegierter Stack-Merge mit Merge-Commits:** Nach abgeschlossener menschlicher Review-Lücke kann der Mensch den bereits geprüften Stack in einer neuen Aufgabe an den KI-Agenten zum Merge delegieren. Dabei können Merge-Commits gezielt genutzt werden, um die Parent-Historie des Stacks zu erhalten.
 
-Die verbindlichen Regeln für Review-Lücke, Merge-Delegation, erneute Prüfung und Konfliktbehandlung stehen in [`AGENTS.md`](../AGENTS.md) und insbesondere in [`agent-rules/01-workflow-collaboration.md`](../agent-rules/01-workflow-collaboration.md). Dieses Dokument beschreibt die praktische Durchführung und ersetzt diese normativen Regeln nicht.
+Die verbindlichen Regeln für Review-Lücke, Merge-Delegation, erneute Prüfung und Konfliktbehandlung stehen in [`AGENTS.md`](https://github.com/Huluvu424242/developer-wiki-app/blob/master/AGENTS.md) und insbesondere in [`agent-rules/01-workflow-collaboration.md`](https://github.com/Huluvu424242/developer-wiki-app/blob/master/agent-rules/01-workflow-collaboration.md). Dieses Dokument beschreibt die praktische Durchführung und ersetzt diese normativen Regeln nicht.
 
 ## Grundprinzip
 
