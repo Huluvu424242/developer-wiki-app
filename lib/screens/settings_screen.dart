@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/wiki_configuration.dart';
 import '../services/configuration_service.dart';
 import '../services/github_service.dart';
+import '../services/source_template_service.dart';
 import '../widgets/app_support.dart';
 import '../widgets/bounded_text_form_field.dart';
 import '../widgets/error_summary.dart' as validation;
@@ -31,6 +32,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _tokenController = TextEditingController();
   final _workflowController = TextEditingController();
   final _configurationService = ConfigurationService();
+  final _sourceTemplateService = SourceTemplateService();
 
   bool _busy = false;
   bool _obscure = true;
@@ -155,6 +157,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       return;
     }
     final repository = GitHubRepository.parse(_repositoryController.text);
+    final token = _tokenController.text.trim();
     setState(() {
       _busy = true;
       _status = 'Verbindung wird geprüft …';
@@ -163,10 +166,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
     try {
       final login = await GitHubService(
-        _tokenController.text.trim(),
+        token,
         owner: repository.owner,
         repo: repository.name,
       ).verifyRepositoryAccess();
+      await _sourceTemplateService.verifyRemoteAccess(
+        WikiConfiguration(
+          repositoryUrl: repository.url,
+          token: token,
+          workflowFile: _workflowController.text.trim(),
+        ),
+      );
       if (mounted) {
         setState(() {
           _connectionVerified = true;
