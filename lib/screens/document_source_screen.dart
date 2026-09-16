@@ -58,7 +58,8 @@ class _DocumentSourceScreenState extends State<DocumentSourceScreen> {
   void initState() {
     super.initState();
     if (!widget.template.isFileSource) {
-      throw ArgumentError('DocumentSourceScreen benötigt eine Datei-Quellenart.');
+      throw ArgumentError(
+          'DocumentSourceScreen benötigt eine Datei-Quellenart.');
     }
     _documentField = widget.template.fields.firstWhere(
       (field) => field.kind == FieldKind.file,
@@ -78,7 +79,9 @@ class _DocumentSourceScreenState extends State<DocumentSourceScreen> {
   Future<void> _loadPending() async {
     try {
       final pending = await _uploadGateway.loadPending();
-      if (!mounted || pending == null || pending.templateId != widget.template.id) {
+      if (!mounted ||
+          pending == null ||
+          pending.templateId != widget.template.id) {
         return;
       }
       setState(() {
@@ -153,7 +156,8 @@ class _DocumentSourceScreenState extends State<DocumentSourceScreen> {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
-          const SnackBar(content: Text('Bitte markierte Pflichtfelder prüfen.')),
+          const SnackBar(
+              content: Text('Bitte markierte Pflichtfelder prüfen.')),
         );
       await _scrollController.animateTo(
         0,
@@ -204,7 +208,8 @@ class _DocumentSourceScreenState extends State<DocumentSourceScreen> {
       }
     } catch (error) {
       if (mounted) {
-        setState(() => _errorMessage = 'Quelle konnte nicht erstellt werden: $error');
+        setState(() =>
+            _errorMessage = 'Quelle konnte nicht erstellt werden: $error');
       }
     } finally {
       if (mounted) {
@@ -259,7 +264,8 @@ class _DocumentSourceScreenState extends State<DocumentSourceScreen> {
       await _uploadGateway.open(pending);
     } catch (error) {
       if (mounted) {
-        setState(() => _errorMessage = 'Pending-Issue konnte nicht geöffnet werden: $error');
+        setState(() => _errorMessage =
+            'Pending-Issue konnte nicht geöffnet werden: $error');
       }
     }
   }
@@ -284,7 +290,8 @@ class _DocumentSourceScreenState extends State<DocumentSourceScreen> {
       }
     } catch (error) {
       if (mounted) {
-        setState(() => _errorMessage = 'Upload konnte nicht verworfen werden: $error');
+        setState(() =>
+            _errorMessage = 'Upload konnte nicht verworfen werden: $error');
       }
     } finally {
       if (mounted) {
@@ -302,7 +309,8 @@ class _DocumentSourceScreenState extends State<DocumentSourceScreen> {
       await _externalUrlService.open(issue.url);
     } catch (error) {
       if (mounted) {
-        setState(() => _errorMessage = 'Issue konnte nicht geöffnet werden: $error');
+        setState(
+            () => _errorMessage = 'Issue konnte nicht geöffnet werden: $error');
       }
     }
   }
@@ -333,7 +341,8 @@ class _DocumentSourceScreenState extends State<DocumentSourceScreen> {
       appBar: AppBar(
         title: const Text('Dokument-Quelle erfassen'),
         actions: [
-          AppSupportMenu(contextName: 'Quellendialog – ${widget.template.name}'),
+          AppSupportMenu(
+              contextName: 'Quellendialog – ${widget.template.name}'),
         ],
       ),
       body: Form(
@@ -353,7 +362,8 @@ class _DocumentSourceScreenState extends State<DocumentSourceScreen> {
                   )
                   .toList(growable: false),
             ),
-            Text(widget.template.name, style: Theme.of(context).textTheme.titleLarge),
+            Text(widget.template.name,
+                style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 4),
             Text(widget.template.description),
             const SizedBox(height: 16),
@@ -410,12 +420,14 @@ class _DocumentSourceScreenState extends State<DocumentSourceScreen> {
             helperText: field.description,
           ),
           items: field.options
-              .map((option) => DropdownMenuItem(value: option, child: Text(option)))
+              .map((option) =>
+                  DropdownMenuItem(value: option, child: Text(option)))
               .toList(),
           onChanged: _busy || _pending != null
               ? null
               : (value) => controller.text = value ?? '',
-          validator: (value) => field.required && value == null ? 'Pflichtfeld' : null,
+          validator: (value) =>
+              field.required && value == null ? 'Pflichtfeld' : null,
         ),
       );
     }
@@ -450,7 +462,8 @@ class _DocumentSourceScreenState extends State<DocumentSourceScreen> {
         child: FormField<DocumentSourceFile>(
           key: const Key('document-source-field'),
           initialValue: document,
-          validator: (_) => field.required && _document == null ? 'Pflichtfeld' : null,
+          validator: (_) =>
+              field.required && _document == null ? 'Pflichtfeld' : null,
           builder: (formField) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -467,7 +480,8 @@ class _DocumentSourceScreenState extends State<DocumentSourceScreen> {
                       ? null
                       : _pickDocument,
                   icon: const Icon(Icons.picture_as_pdf),
-                  label: Text(_fileBusy ? 'Wird ausgewählt …' : 'PDF auswählen'),
+                  label:
+                      Text(_fileBusy ? 'Wird ausgewählt …' : 'PDF auswählen'),
                 )
               else
                 Card(
