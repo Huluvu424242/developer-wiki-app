@@ -1,7 +1,7 @@
 # App-Logo und Launcher-Icons
 
 Das offizielle Logo der Developer-Wiki-App liegt als transparentes PNG-Master
-unter [`assets/branding/developer-wiki-app-logo.png`](../assets/branding/developer-wiki-app-logo.png).
+unter [`assets/branding/developer-wiki-app-logo.png`](https://github.com/Huluvu424242/developer-wiki-app/blob/master/assets/branding/developer-wiki-app-logo.png).
 Es verbindet eine Wiki-Seite, eine eingehende Quellenkarte und vernetzte
 Wissensknoten. Das Motiv ist eigenständig und verwendet keine GitHub- oder
 Wikipedia-Markenzeichen.
