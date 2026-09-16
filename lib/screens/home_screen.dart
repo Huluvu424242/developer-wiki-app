@@ -10,6 +10,7 @@ import '../services/external_url_service.dart';
 import '../services/github_service.dart';
 import '../services/image_upload_service.dart';
 import '../widgets/app_support.dart';
+import 'document_source_screen.dart';
 import 'recent_sources_screen.dart';
 import 'settings_screen.dart';
 import 'source_form_screen.dart';
@@ -108,6 +109,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _openSource(SourceTemplate template) {
+    if (template.isFileSource) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => DocumentSourceScreen(template: template),
+        ),
+      );
+      return;
+    }
     final customBuilder = widget.sourceFormBuilder;
     Navigator.push(
       context,
