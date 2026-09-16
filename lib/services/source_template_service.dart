@@ -24,6 +24,12 @@ class SourceTemplateService implements SourceTemplateLoader {
   final http.Client _client;
   final SourceTemplateCache _cache;
 
+  Future<void> verifyRemoteAccess(WikiConfiguration configuration) async {
+    final repository = GitHubRepository.parse(configuration.repositoryUrl);
+    final raw = await _fetchContract(repository, configuration.token);
+    SourceCaptureDefinition.parse(raw);
+  }
+
   @override
   Future<LoadedSourceTemplates> load(WikiConfiguration configuration) async {
     final repository = GitHubRepository.parse(configuration.repositoryUrl);
@@ -84,13 +90,20 @@ class SourceTemplateService implements SourceTemplateLoader {
         'X-GitHub-Api-Version': '2022-11-28',
       },
     );
+    if (response.statusCode == 403) {
+      throw Exception(
+        'Quellenmodell: HTTP 403 – der Fine-grained PAT benötigt für dieses '
+        'Wiki Contents: Read-only.',
+      );
+    }
     if (response.statusCode != 200) {
       throw Exception('Quellenmodell: HTTP ${response.statusCode}');
     }
     final data = jsonDecode(response.body);
     if (data is! Map<String, dynamic> || data['content'] is! String) {
       throw const FormatException(
-          'GitHub lieferte kein lesbares Quellenmodell.');
+        'GitHub lieferte kein lesbares Quellenmodell.',
+      );
     }
     final encoding = data['encoding']?.toString();
     if (encoding != 'base64') {
