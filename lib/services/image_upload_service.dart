@@ -44,6 +44,11 @@ class GitHubImageUploadService implements ImageUploadGateway {
   final PendingImageUploadStore _store;
   final GitHubAttachmentParser _parser;
 
+  SourceTemplate get _imageTemplate => sourceTemplates.firstWhere(
+        (template) => template.id == imageSourceTemplate.id,
+        orElse: () => imageSourceTemplate,
+      );
+
   @override
   Future<PendingImageUpload?> loadPending() => _store.load();
 
@@ -56,10 +61,11 @@ class GitHubImageUploadService implements ImageUploadGateway {
     final configuration = await _configurationService.load();
     final service = _githubService(configuration);
     final startedAt = DateTime.now().toUtc();
+    final template = _imageTemplate;
     final pendingValues = {...values, 'content': pendingContent};
     final issue = await service.createIssue(
-      title: '${imageSourceTemplate.titlePrefix}${title.trim()}',
-      body: GitHubService.issueBody(imageSourceTemplate, pendingValues),
+      title: '${template.titlePrefix}${title.trim()}',
+      body: GitHubService.issueBody(template, pendingValues),
       labels: const [],
     );
     final upload = PendingImageUpload(
@@ -114,7 +120,7 @@ class GitHubImageUploadService implements ImageUploadGateway {
     };
     await service.updateIssueBody(
       upload.issueNumber,
-      GitHubService.issueBody(imageSourceTemplate, values),
+      GitHubService.issueBody(_imageTemplate, values),
     );
     await service.addIssueLabel(upload.issueNumber, 'quelle');
     await _store.clear();
