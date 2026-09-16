@@ -9,6 +9,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Added
 
+- Ein verlinktes Benutzerhandbuch beschreibt Ersteinrichtung, PAT, manuelle Quellen, Android-Teilen, lokale PDFs, Pending-Attachments, Importkontrolle und typische Fehlerfälle vollständig als Text und mit versionskontrollierten Mockups/Wireframes ohne echte Secrets oder private Inhalte.
 - Android-Teilen behält den fachlichen Quellentyp für Links, Text, Bilder und PDF-Dokumente bei; ein eigenes Dokument-Share-Ziel führt PDF-Dateien in die Dokument-Quelle, während unbekannte Dateitypen ohne stillen Fallback abgelehnt werden.
 - Lokale PDF-Dateien können über die dynamische `Dokument-Quelle` ausgewählt, gegen MIME-Typ und Größenlimit des Wiki-Vertrags geprüft und in einem unterbrechbaren GitHub-Attachment-Flow erfasst werden; das Label `quelle` wird erst nach verifiziertem Attachment sowie rückgelesenem finalem Issue-Body gesetzt.
 - Quellenarten und Formularfelder werden aus dem versionierten Quellen-Erfassungsvertrag des konfigurierten Developer-Wikis geladen; der letzte gültige Stand wird repositorybezogen gecacht und bei fehlendem beziehungsweise inkompatiblem Remote-Vertrag durch einen klar gekennzeichneten kompatiblen Bundle-Fallback ersetzt. Unbekannte Schema-Versionen, Feldarten und erforderliche Transportfähigkeiten werden nicht stillschweigend degradiert.
