@@ -5,7 +5,7 @@ on:
     paths:
       - docs/**
       - mkdocs.yml
-      - requirements-docs.txt
+      - pyproject.toml
       - .github/workflows/kiagent-documentation-pages.yml
   push:
     branches:
@@ -13,7 +13,7 @@ on:
     paths:
       - docs/**
       - mkdocs.yml
-      - requirements-docs.txt
+      - pyproject.toml
       - .github/workflows/kiagent-documentation-pages.yml
   workflow_dispatch:
 
@@ -38,10 +38,13 @@ jobs:
         with:
           python-version: '3.13'
           cache: pip
-          cache-dependency-path: requirements-docs.txt
+          cache-dependency-path: pyproject.toml
+
+      - name: pip mit Dependency-Groups-Unterstützung bereitstellen
+        run: python -m pip install --disable-pip-version-check --upgrade 'pip>=25.1,<27'
 
       - name: Dokumentationsabhängigkeiten installieren
-        run: python -m pip install --disable-pip-version-check --requirement requirements-docs.txt
+        run: python -m pip install --disable-pip-version-check --group docs
 
       - name: Dokumentation bauen
         run: mkdocs build --strict
