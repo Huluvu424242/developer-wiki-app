@@ -8,7 +8,7 @@ Diese Dokumentation ergänzt die kompakte Projektübersicht in der Root-`README.
 - [Agenten-Harness](agent-harness.md) – modulare Regelstruktur, Migrationsmatrix und deterministische Strukturprüfung.
 - [Barrierefreiheit und UX](accessibility.md) – App-Menü, Fehlersammler, Zeichenzähler, About und sicherer Bugreport.
 - [App-Logo und Launcher-Icons](app-icon.md) – Masterdatei, Android-Ressourcen und reproduzierbare Ableitung.
-- [Entwicklungsumgebung und Android-Toolchain](development-environment.md) – Referenzversionen, lokale Einrichtung und Prüfkommandos.
+- [Entwicklungsumgebung und Android-Toolchain](development-environment.md) – Referenzversionen, Built-in-Kotlin-/AGP-9-Konfiguration, lokale Einrichtung und Prüfkommandos.
 - [Android-Release](android-release.md) – reproduzierbarer, signierter APK-Release über GitHub Actions.
 - [Bild-Quellen und GitHub-Attachments](image-sources.md) – Eingänge,
   zweistufiger Upload, Wiederaufnahme und Datenschutz.
