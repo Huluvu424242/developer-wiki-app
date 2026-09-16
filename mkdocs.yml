@@ -46,7 +46,6 @@ nav:
       - App-Logo und Launcher-Icons: app-icon.md
   - UX und Barrierefreiheit:
       - Barrierefreiheit und UX: accessibility.md
-  - Markdown-Übersicht: README.md
   - Projekt auf GitHub: https://github.com/Huluvu424242/developer-wiki-app
 
 markdown_extensions:
