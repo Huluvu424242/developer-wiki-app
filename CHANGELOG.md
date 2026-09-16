@@ -7,6 +7,8 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.1.0+5] - 2026-09-16
+
 ### Added
 
 - Eine reproduzierbare MkDocs-Material-Dokumentationswebsite bündelt die vollständige Markdown-Projektdokumentation unter `docs/`; die neue `kiagent-documentation-pages`-Action validiert dokumentationsrelevante Pull Requests per Strict-Build und veröffentlicht den `master`-Stand über GitHub Pages.
@@ -114,6 +116,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 - Pflichtfelder werden beim Speichern unabhängig von ihrer aktuellen Sichtbarkeit im scrollbaren Quellenformular geprüft.
 - Snackbar-Widget-Test prüft nur den globalen Validierungshinweis und setzt keine gleichzeitig sichtbaren Inline-Feldfehler voraus.
 
-[Unreleased]: https://github.com/Huluvu424242/developer-wiki-app/compare/v0.1.0+4...HEAD
+[Unreleased]: https://github.com/Huluvu424242/developer-wiki-app/compare/v0.1.0+5...HEAD
+[0.1.0+5]: https://github.com/Huluvu424242/developer-wiki-app/compare/v0.1.0+4...v0.1.0+5
 [0.1.0+4]: https://github.com/Huluvu424242/developer-wiki-app/compare/v0.1.0+3...v0.1.0+4
 [0.1.0+3]: https://github.com/Huluvu424242/developer-wiki-app/compare/v0.1.0+2...v0.1.0+3
