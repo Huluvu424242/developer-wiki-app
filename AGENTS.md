@@ -25,10 +25,13 @@ Die Module sind in dieser Reihenfolge zu lesen:
 11. [Dokumentationspflege](agent-rules/06-documentation.md)
 12. [Releasevorbereitung](agent-rules/07-release.md)
 13. [Wiki-Integration](agent-rules/08-wiki-integration.md)
+14. [Lifecycle-Wartung](agent-rules/09-lifecycle-maintenance.md)
 
 Alle gelisteten Dateien sind verbindlicher Bestandteil des Harness. Nicht gelistete Dateien unter `agent-rules/` sind nicht automatisch normativ.
 
 Für Releasearbeiten gilt zusätzlich das Release-Modul. Die Releasevorbereitung im Repository und die produktive Veröffentlichung sind getrennte Vorgänge; eine Ausführung des vorhandenen Android-Release-Workflows richtet sich ausschließlich nach der Werkzeugketten-Governance.
+
+Für geplante Flutter-/Android-Toolchain- und Dependency-Wartung gilt zusätzlich das Lifecycle-Modul. Es legt Rhythmus, Upgrade-Entscheidung und Mindestprüfungen fest, ohne Release- oder Werkzeugketten-Governance zu ersetzen.
 
 ## Regelpriorität
 
