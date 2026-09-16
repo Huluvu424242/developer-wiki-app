@@ -50,6 +50,13 @@ class SourceTemplate {
   final List<String> requiredCapabilities;
 
   bool get isImageSource => fields.any((field) => field.kind == FieldKind.image);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is SourceTemplate && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 const agentInstruction =
@@ -76,28 +83,13 @@ const imageSourceTemplate = SourceTemplate(
       transport: 'guided-github-issue-image-attachment-v1',
       inputMethods: ['file-picker', 'android-share'],
     ),
-    SourceField(
-      id: 'description',
-      label: 'Beschreibung',
-      kind: FieldKind.textarea,
-    ),
-    SourceField(
-      id: 'agent_notes',
-      label: 'Hinweise an den KI-Agenten',
-      kind: FieldKind.textarea,
-    ),
-    SourceField(
-      id: 'prompt_additions',
-      label: 'Promptergänzungen',
-      kind: FieldKind.textarea,
-      initialValue: agentInstruction,
-    ),
+    SourceField(id: 'description', label: 'Beschreibung', kind: FieldKind.textarea),
+    SourceField(id: 'agent_notes', label: 'Hinweise an den KI-Agenten', kind: FieldKind.textarea),
+    SourceField(id: 'prompt_additions', label: 'Promptergänzungen', kind: FieldKind.textarea, initialValue: agentInstruction),
   ],
 );
 
-/// Gebündelte kompatible Rückfall-Definition. Der Normalfall wird zur Laufzeit
-/// aus `src/config/source-capture.json` des konfigurierten Wikis geladen.
-const sourceTemplates = <SourceTemplate>[
+const bundledSourceTemplates = <SourceTemplate>[
   SourceTemplate(
     id: 'source-metadata',
     name: '🌐 Quellenmetadaten erfassen',
@@ -165,3 +157,15 @@ const sourceTemplates = <SourceTemplate>[
   ),
   imageSourceTemplate,
 ];
+
+final sourceTemplates = <SourceTemplate>[...bundledSourceTemplates];
+
+void replaceSourceTemplates(Iterable<SourceTemplate> templates) {
+  final replacement = templates.toList(growable: false);
+  if (replacement.isEmpty) {
+    return;
+  }
+  sourceTemplates
+    ..clear()
+    ..addAll(replacement);
+}
