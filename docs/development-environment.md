@@ -16,7 +16,7 @@ Stand: 2026-09-16
 | Android Gradle Plugin | `9.1.0` | aktueller Flutter-3.47.4-Templatewert |
 | Gradle | `9.3.1` | aktueller Flutter-3.47.4-Templatewert |
 | Kotlin Gradle Plugin | `2.4.0` | aktueller Flutter-3.47.4-Templatewert |
-| flutter_secure_storage | `10.3.1` | Android-Teil auf Java 17; bewusster Migrationsschritt von 9.x vor einem späteren 11.x-Upgrade |
+| flutter_secure_storage | `10.3.4` | Android-Teil auf Java 17; bewusster Migrationsschritt von 9.x vor einem späteren 11.x-Upgrade |
 
 Flutter 3.47.4 erzeugt für AGP 9 derzeit weiterhin die Kompatibilitätsflags `android.newDsl=false` und `android.builtInKotlin=false`. Das ist bewusst: Die Stable-Templates deklarieren KGP 2.4.0 und verwenden vorerst noch die Legacy-Kompatibilitätsbrücken.
 
@@ -38,6 +38,8 @@ In `android/gradle.properties` bleiben die von Flutter 3.47.4 vorgesehenen Über
 android.newDsl=false
 android.builtInKotlin=false
 ```
+
+`android.enableJetifier` wird nicht mehr gesetzt. Die App verwendet AndroidX und soll keinen veralteten Übersetzer für die frühere Android-Support-Library aktivieren.
 
 Die App selbst verwendet die moderne Kotlin-Compilerkonfiguration und Android API 24 bis 36 als unterstützten Bereich:
 
@@ -67,7 +69,7 @@ kotlin {
 
 ## Secure-Storage-Migration von 9.x auf 10.x
 
-`flutter_secure_storage` wird bewusst zunächst auf `10.3.1` und nicht direkt auf 11.x aktualisiert. Version 10 migriert Android von der veralteten Jetpack-Security-Implementierung auf die aktuelle Cipher-Implementierung und verwendet seit 10.1.0 Java 17. Der Hersteller verlangt für Daten aus Versionen vor v10 ausdrücklich diesen Zwischenschritt, bevor auf 11.x gewechselt wird.
+`flutter_secure_storage` wird bewusst zunächst auf 10.x und nicht direkt auf 11.x aktualisiert. Der lokal mit Flutter 3.47.4 aufgelöste Stand ist `10.3.4`. Version 10 migriert Android von der veralteten Jetpack-Security-Implementierung auf die aktuelle Cipher-Implementierung und verwendet seit 10.1.0 Java 17. Der Hersteller verlangt für Daten aus Versionen vor v10 ausdrücklich diesen Zwischenschritt, bevor auf 11.x gewechselt wird.
 
 Die App hatte unter 9.x `encryptedSharedPreferences: true` verwendet. Für 10.x wird die veraltete Option entfernt und die vorgesehene Migration explizit aktiviert:
 
@@ -137,6 +139,8 @@ cd ..
 
 `gradlew.bat --version` soll Gradle `9.3.1` und JDK 21 melden. AGP und KGP werden nicht separat lokal installiert; ihre Versionen kommen aus `android/settings.gradle.kts`.
 
+Am 2026-09-16 wurde dieser Stand lokal mit Flutter 3.47.4, JDK 21 und Gradle 9.3.1 geprüft: `flutter analyze` meldete keine Probleme, `flutter test` lief mit 45 Tests erfolgreich und `assembleDebug` endete erfolgreich. Die nachfolgend beschriebenen Übergangswarnungen bleiben hiervon getrennt.
+
 ### 5. Android-Lauf und Secure-Storage-Migration prüfen
 
 ```powershell
@@ -148,11 +152,17 @@ Für eine bestehende Installation mit gespeicherter Konfiguration muss nach dem 
 
 Ein erfolgreicher Gradle-Sync, `assembleDebug`, `flutter run` und der erfolgreiche Zugriff auf die vor dem Upgrade gespeicherte Konfiguration schließen die lokale Migrationsprüfung ab.
 
-## Warum Built-in Kotlin noch nicht erzwungen wird
+## Erwartbare Übergangswarnungen
+
+### Built-in Kotlin und neue AGP-DSL
 
 Flutter 3.47 unterstützt Built-in Kotlin grundsätzlich. In der aktuellen Stable-Version 3.47.4 existiert jedoch weiterhin ein Problem in der Flutter-Abhängigkeitsprüfung: Bei `android.builtInKotlin=true` wird die von AGP eingebettete Kotlin-Version ausgewertet und eine extern angehobene KGP-Version nicht zuverlässig berücksichtigt. Der Projektstand folgt daher bewusst dem offiziellen Flutter-3.47.4-Template statt diesen Checker mit `--android-skip-build-dependency-validation` zu umgehen.
 
-Sobald Flutter Stable die vollständige Built-in-Kotlin-/New-DSL-Migration ohne diese Übergangsflags ausliefert, sollte diese Konfiguration in einer eigenen Lifecycle-Story erneut geprüft werden.
+Warnungen zu `android.newDsl=false`, `android.builtInKotlin=false` beziehungsweise zum weiterhin verwendeten `org.jetbrains.kotlin.android`-Plugin sind deshalb in diesem Projektstand erwartbar. Sie werden erst in einer späteren Lifecycle-Migration behoben, wenn Flutter Stable die vollständige Built-in-Kotlin-/New-DSL-Konfiguration zuverlässig unterstützt.
+
+### Warnungen aus transitiven Flutter-Plugins
+
+Einzelne Flutter-Plugins können während des Android-Builds noch eigene AGP-/Manifest-Deprecations melden. Solange sie aus einer transitiven Paketversion stammen und der Build erfolgreich ist, werden sie nicht durch Änderungen im Pub-Cache überschrieben. Stattdessen wird bei einer späteren Abhängigkeitsaktualisierung geprüft, ob eine neuere kompatible Paketversion die Warnung beseitigt.
 
 ## Quellen für die Versionsentscheidung
 
