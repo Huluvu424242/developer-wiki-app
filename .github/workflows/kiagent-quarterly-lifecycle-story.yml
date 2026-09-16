@@ -1,0 +1,103 @@
+name: kiagent-quarterly-lifecycle-story
+
+on:
+  workflow_dispatch:
+  schedule:
+    # GitHub Actions cron runs in UTC. The first day of Jan/Apr/Jul/Oct
+    # provides the deterministic three-month cadence required by the harness.
+    - cron: '17 6 1 1,4,7,10 *'
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: kiagent-quarterly-lifecycle-story
+  cancel-in-progress: false
+
+jobs:
+  create-lifecycle-story:
+    name: Create quarterly lifecycle story
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Show GitHub CLI version
+        run: gh --version
+
+      - name: Create lifecycle story if missing
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          year="$(date -u +%Y)"
+          month="$(date -u +%-m)"
+          quarter="$(( (month - 1) / 3 + 1 ))"
+          period="${year}-Q${quarter}"
+          title="Lifecycle-Wartung ${period}"
+
+          echo "Lifecycle period: ${period}"
+          echo "Expected issue title: ${title}"
+
+          existing_url="$(
+            gh api --paginate \
+              "repos/${GITHUB_REPOSITORY}/issues?state=all&per_page=100" \
+              --jq ".[] | select(.pull_request == null and .title == \"${title}\") | .html_url" \
+              | head -n 1
+          )"
+
+          if [[ -n "${existing_url}" ]]; then
+            echo "Lifecycle story already exists for ${period}: ${existing_url}"
+            exit 0
+          fi
+
+          body_file="$(mktemp)"
+          trap 'rm -f "${body_file}"' EXIT
+
+          cat >"${body_file}" <<EOF
+          <!-- kiagent-quarterly-lifecycle-story:${period} -->
+
+          ## Auftrag
+
+          Führe die quartalsweise Lifecycle-Wartung für **${period}** vollständig aus.
+
+          ## Verbindliche Quelle
+
+          Der konkrete Prüf- und Umsetzungsumfang wird **nicht in dieser Story eingefroren**. Lies zu Beginn der Bearbeitung den dann aktuellen `AGENTS.md` auf dem Zielbranch sowie alle dort gelisteten Regelmodule vollständig.
+
+          Für die Lifecycle-Wartung ist insbesondere die dann aktuelle Fassung von `agent-rules/09-lifecycle-maintenance.md` verbindlich. Sie ist die einzige normative Quelle für Rhythmus, Prüfumfang, Upgrade-Entscheidung und technische Mindestprüfungen. Bei einem Widerspruch zwischen dieser Story und dem aktuellen Harness gilt der aktuelle Harness.
+
+          ## Arbeitsauftrag
+
+          - Ermittle anhand des aktuellen Harness den für diesen Lauf tatsächlich erforderlichen Prüf- und Umsetzungsumfang.
+          - Ermittle den aktuellen Projekt- und Toolchain-Stand sowie die aktuell unterstützten beziehungsweise vorgesehenen Zielstände.
+          - Dokumentiere die Lifecycle-Entscheidung nachvollziehbar als `jetzt aktualisieren`, `gezielt aufschieben` oder `kein Handlungsbedarf`.
+          - Bei `jetzt aktualisieren` setze den ermittelten Handlungsbedarf innerhalb dieses Lifecycle-Auftrags tatsächlich um und führe die vom **aktuellen** Harness verlangten Prüfungen durch.
+          - Erfordern erkannte Änderungen nach spezielleren Repository-Regeln eine eigene Story oder einen separaten Pull Request, halte diese Trennung ein und verlinke die zugehörigen Arbeiten als Teil des Lifecycle-Batches.
+          - Dokumentiere nicht ausführbare, bewusst aufgeschobene oder verbleibende Punkte mit Begründung, Auswirkung und geplantem Folgeschritt.
+
+          ## Akzeptanzkriterien
+
+          - [ ] Der aktuelle `AGENTS.md` und alle dort gelisteten Regelmodule wurden vor der Bearbeitung gelesen.
+          - [ ] Die aktuelle `agent-rules/09-lifecycle-maintenance.md` wurde als verbindlicher Lifecycle-Vertrag angewendet.
+          - [ ] Ist-Stand, relevante Zielstände und daraus abgeleiteter Handlungsbedarf wurden aktuell ermittelt und dokumentiert.
+          - [ ] Die Lifecycle-Entscheidung wurde nachvollziehbar dokumentiert.
+          - [ ] Erforderliche und nach der aktuellen Governance zulässige Änderungen wurden umgesetzt oder mit nachvollziehbarer Begründung gezielt aufgeschoben.
+          - [ ] Die nach dem aktuellen Harness erforderlichen Prüfungen wurden ausgeführt beziehungsweise offen und transparent dokumentiert.
+          - [ ] Erforderliche separate Stories/PRs aus speziellerer Governance wurden verlinkt.
+          - [ ] Dokumentation und Changelog wurden soweit durch die tatsächlich vorgenommenen Änderungen erforderlich aktualisiert.
+
+          > Diese Story enthält bewusst keine kopierte technische Lifecycle-Checkliste und keine festen Versionsnummern. Maßgeblich ist immer der aktuelle Harness zum Bearbeitungszeitpunkt.
+          EOF
+
+          issue_url="$(
+            gh issue create \
+              --repo "${GITHUB_REPOSITORY}" \
+              --title "${title}" \
+              --label story \
+              --body-file "${body_file}"
+          )"
+
+          echo "Created lifecycle story for ${period}: ${issue_url}"
