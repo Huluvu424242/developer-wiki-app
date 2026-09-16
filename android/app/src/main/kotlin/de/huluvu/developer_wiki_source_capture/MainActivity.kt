@@ -17,7 +17,9 @@ class MainActivity : FlutterActivity() {
         const val IMAGE_PICK_REQUEST = 4201
         const val DOCUMENT_PICK_REQUEST = 4202
         const val MAX_IMAGE_BYTES = 10L * 1024L * 1024L
+        const val MAX_SHARED_DOCUMENT_BYTES = 10L * 1024L * 1024L
         val SUPPORTED_IMAGE_TYPES = setOf("image/png", "image/gif", "image/jpeg")
+        val SUPPORTED_DOCUMENT_TYPES = setOf("application/pdf")
     }
 
     private var shareChannel: MethodChannel? = null
@@ -420,7 +422,7 @@ class MainActivity : FlutterActivity() {
         }
         val mimeType = sourceIntent.type?.lowercase()
         if (mimeType in SUPPORTED_IMAGE_TYPES) {
-            val uri = sharedImageUri(sourceIntent) ?: return mapOf(
+            val uri = sharedStreamUri(sourceIntent) ?: return mapOf(
                 "kind" to "image_error",
                 "text" to "Das geteilte Bild konnte nicht gelesen werden."
             )
@@ -433,8 +435,34 @@ class MainActivity : FlutterActivity() {
                 )
             }
         }
+        if (mimeType in SUPPORTED_DOCUMENT_TYPES) {
+            val uri = sharedStreamUri(sourceIntent) ?: return mapOf(
+                "kind" to "document_error",
+                "text" to "Das geteilte Dokument konnte nicht gelesen werden."
+            )
+            return try {
+                copyDocumentToPrivateCache(
+                    uri = uri,
+                    allowedMimeTypes = SUPPORTED_DOCUMENT_TYPES,
+                    maxBytes = MAX_SHARED_DOCUMENT_BYTES
+                ) + ("kind" to "document")
+            } catch (error: Exception) {
+                mapOf(
+                    "kind" to "document_error",
+                    "text" to (error.message ?: "Das Dokument konnte nicht übernommen werden.")
+                )
+            }
+        }
         if (mimeType != "text/plain") {
-            return null
+            val stream = sharedStreamUri(sourceIntent)
+            return if (stream != null || !mimeType.isNullOrBlank()) {
+                mapOf(
+                    "kind" to "unsupported_file",
+                    "text" to "Dateityp ${mimeType ?: "unbekannt"} wird nicht unterstützt."
+                )
+            } else {
+                null
+            }
         }
         val text = sourceIntent.getStringExtra(Intent.EXTRA_TEXT)?.trim().orEmpty()
         if (text.isEmpty()) {
@@ -447,7 +475,7 @@ class MainActivity : FlutterActivity() {
     }
 
     @Suppress("DEPRECATION")
-    private fun sharedImageUri(sourceIntent: Intent): Uri? {
+    private fun sharedStreamUri(sourceIntent: Intent): Uri? {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             sourceIntent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
         } else {
