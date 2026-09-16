@@ -9,6 +9,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Added
 
+- Android-Teilen behält den fachlichen Quellentyp für Links, Text, Bilder und PDF-Dokumente bei; ein eigenes Dokument-Share-Ziel führt PDF-Dateien in die Dokument-Quelle, während unbekannte Dateitypen ohne stillen Fallback abgelehnt werden.
 - Lokale PDF-Dateien können über die dynamische `Dokument-Quelle` ausgewählt, gegen MIME-Typ und Größenlimit des Wiki-Vertrags geprüft und in einem unterbrechbaren GitHub-Attachment-Flow erfasst werden; das Label `quelle` wird erst nach verifiziertem Attachment sowie rückgelesenem finalem Issue-Body gesetzt.
 - Quellenarten und Formularfelder werden aus dem versionierten Quellen-Erfassungsvertrag des konfigurierten Developer-Wikis geladen; der letzte gültige Stand wird repositorybezogen gecacht und bei fehlendem beziehungsweise inkompatiblem Remote-Vertrag durch einen klar gekennzeichneten kompatiblen Bundle-Fallback ersetzt. Unbekannte Schema-Versionen, Feldarten und erforderliche Transportfähigkeiten werden nicht stillschweigend degradiert.
 - Einen verbindlichen Lifecycle-Wartungsvertrag für Flutter, Dart, Android-Toolchain und native Plugins ergänzt: spätestens alle drei Monate einen neuen Lifecycle-Wartungszeitpunkt erfassen; existiert bereits eine offene Lifecycle-Story, wird sie auch über mehrjährige Ruhe-/Sarkophag-Betriebsphasen hinweg statt einer Dublette um einen datierten Quartalshinweis erweitert. Der konkrete Prüf- und Umsetzungsumfang wird stets aus dem jeweils aktuellen Harness abgeleitet; für nicht dringende Flutter-Stable-Releases gilt eine 2–4-wöchige Stabilisierungsphase sowie die definierte Upgrade-Governance.
@@ -18,6 +19,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Changed
 
+- Die Ersteinrichtung und PAT-Hilfe führen jetzt durch Repository, Wiki-PAT und Import-Workflow, erklären die erforderlichen Least-Privilege-Berechtigungen sowie ausdrücklich nicht benötigte Wiki-interne Secrets und prüfen Repository, Quellenmodell, Issues-Lesezugriff und Workflow-Sichtbarkeit vor dem Speichern.
 - Die PAT-Hilfe nennt für das dynamische Laden des privaten Wiki-Vertrags zusätzlich `Contents: Read-only` und grenzt den App-PAT ausdrücklich von den internen Wiki-Secrets `SOURCE_IMAGE_TOKEN` und `SOURCE_ATTACHMENT_TOKEN` ab; ein Classic PAT für den Wiki-internen Dokumentdownload ist keine App-Anforderung.
 - Die Android-Build-Toolchain auf den aktuellen Flutter-3.47.4-Template-Stand angehoben: Gradle 9.3.1, Android Gradle Plugin 9.1.0 und Kotlin Gradle Plugin 2.4.0; Android `minSdk` auf 24 und `targetSdk` auf 36 angehoben, die App verwendet `kotlin.compilerOptions`, während die von Flutter Stable weiterhin erzeugten AGP-9-Kompatibilitätsflags `android.newDsl=false` und `android.builtInKotlin=false` bewusst beibehalten werden. JDK 21 ist als lokaler und Release-Referenzstand dokumentiert.
 - `flutter_secure_storage` von 9.x auf 10.3.4 aktualisiert, damit der Android-Pluginanteil Java 17 verwendet; die bisherige `encryptedSharedPreferences`-Konfiguration wird über den vorgesehenen 10.x-Migrationspfad mit aktivierter Algorithmusmigration und Backup-Schutz weitergeführt, bevor ein späteres Upgrade auf 11.x erfolgen darf.
@@ -49,7 +51,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 - Die Architekturleitplanken strukturieren Anwendungscode künftig zuerst nach fachlichen Features und erst innerhalb dieser Features nach technischen Rollen; Bezeichner unterscheiden bewusst zwischen technischer englischer Terminologie und der Sprache der Fachdomäne.
 - KI-Agenten kommunizieren mit menschlichen Entwicklern verbindlich auf Deutsch, formulieren insbesondere Stories, Bug-Issues und Pull Requests auf Deutsch und melden nach Arbeiten Ergebnis, Stand und relevante GitHub-Links zurück.
-- Der Bugreport weist vor dem Wechsel zu GitHub darauf hin, dass zum endgültigen Absenden eine GitHub-Anmeldung erforderlich ist und der vorbereitete Bericht dort zunächst geprüft werden kann.
+- Der Bugreport weist vor dem Wechsel zu GitHub darauf hin, dass zum endgültigen Absenden eine GitHub-Anmeldung erforderlich ist und der vorbereitete Bericht dort zunächst geprüft oder verworfen werden kann.
 - Das importierbare Branch-Ruleset schützt neben `master` jetzt auch alle Branches unter `release/**`.
 - Einstellungen verwenden jetzt feldnahe Validierung, temporäre Hinweise und reservierten Platz unter den Aktionsschaltflächen.
 
