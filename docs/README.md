@@ -18,7 +18,7 @@ Diese Dokumentation ergänzt die kompakte Projektübersicht in der Root-`README.
 - [App-Logo und Launcher-Icons](app-icon.md) – Masterdatei, Android-Ressourcen und reproduzierbare Ableitung.
 - [Entwicklungsumgebung und Android-Toolchain](development-environment.md) – Referenzversionen, Built-in-Kotlin-/AGP-9-Konfiguration, lokale Einrichtung und Prüfkommandos.
 - [Android-Release](android-release.md) – reproduzierbarer, signierter APK-Release über GitHub Actions.
-- [Menschliche PR-Abnahme](human-review.md) – lokale Prüfung, Rebase-Merge und Vorgehen bei gestapelten Branches.
+- [Menschliche PR-Abnahme](human-review.md) – lokale Prüfung sowie manuelle Rebase-Merges und delegierte Merge-Commit-Verfahren für gestapelte Pull Requests.
 
 ## Dokumentationsregeln
 
