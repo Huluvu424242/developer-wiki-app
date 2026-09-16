@@ -1,0 +1,61 @@
+site_name: Developer-Wiki-App Dokumentation
+site_description: Benutzer-, Entwickler-, Architektur- und Betriebsdokumentation der Developer-Wiki-App
+site_url: https://huluvu424242.github.io/developer-wiki-app/
+repo_url: https://github.com/Huluvu424242/developer-wiki-app
+repo_name: Huluvu424242/developer-wiki-app
+edit_uri: edit/master/docs/
+docs_dir: docs
+site_dir: site
+strict: true
+
+theme:
+  name: material
+  language: de
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+
+plugins:
+  - search:
+      lang: de
+
+nav:
+  - Start: index.md
+  - Benutzerhandbuch:
+      - Überblick: benutzerhandbuch/index.md
+      - Ersteinrichtung: benutzerhandbuch/ersteinrichtung.md
+      - Quellen erfassen: benutzerhandbuch/quellen-erfassen.md
+      - Android-Teilen: benutzerhandbuch/teilen.md
+      - Fehlerbehebung: benutzerhandbuch/fehlerbehebung.md
+  - Quellen und Wiki-Anbindung:
+      - Fine-grained PAT einrichten: pat-setup.md
+      - Dynamische Quellenmodelle: dynamic-source-models.md
+      - PDF-Dokumentquellen: document-sources.md
+      - Bildquellen: image-sources.md
+      - Android-Share-Ziele: share-targets.md
+  - Entwicklung und Architektur:
+      - Architektur: architecture.md
+      - Entwicklungsumgebung: development-environment.md
+      - Agenten-Harness: agent-harness.md
+      - Menschliche PR-Abnahme: human-review.md
+      - Dokumentationswerkzeugkette: documentation-toolchain.md
+      - Android-Release: android-release.md
+      - App-Logo und Launcher-Icons: app-icon.md
+  - UX und Barrierefreiheit:
+      - Barrierefreiheit und UX: accessibility.md
+  - Markdown-Übersicht: README.md
+  - Projekt auf GitHub: https://github.com/Huluvu424242/developer-wiki-app
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - toc:
+      permalink: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
