@@ -1,7 +1,7 @@
 # Barrierefreiheit und UX
 
 Die Developer-Wiki-App setzt die verbindlichen UX- und
-Barrierefreiheitsregeln aus der [AGENTS.md](../AGENTS.md) über gemeinsame,
+Barrierefreiheitsregeln aus der [AGENTS.md](https://github.com/Huluvu424242/developer-wiki-app/blob/master/AGENTS.md) über gemeinsame,
 wiederverwendbare Komponenten um.
 
 ## In der App verfügbare Hilfen
