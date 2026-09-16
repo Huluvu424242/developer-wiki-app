@@ -2,7 +2,15 @@
 
 Diese Dokumentation ergänzt die kompakte Projektübersicht in der Root-`README.md`.
 
-## Inhalt
+## Für Nutzer
+
+- [Benutzerhandbuch](benutzerhandbuch/index.md) – Ersteinrichtung und typische End-to-End-Szenarien für Link, Text, Bild, lokale PDF und Android-Teilen mit Mockups.
+- [Fine-grained PAT einrichten](pat-setup.md) – benötigte und nicht benötigte Tokens, Berechtigungen und Schritt-für-Schritt-Einrichtung.
+- [Dokument-Quellen](document-sources.md) – lokale PDF-Erfassung, Pending-Attachment und sichere Freigabe.
+- [Android-Share-Ziele](share-targets.md) – quellentypspezifisches Teilen für Link, Text, Bild und Dokument.
+- [Bild-Quellen und GitHub-Attachments](image-sources.md) – Eingänge, zweistufiger Upload, Wiederaufnahme und Datenschutz.
+
+## Für Entwicklung und Wartung
 
 - [Architektur](architecture.md) – Systemkontext und Container-Sicht nach dem C4-Modell.
 - [Agenten-Harness](agent-harness.md) – modulare Regelstruktur, Migrationsmatrix und deterministische Strukturprüfung.
@@ -10,8 +18,6 @@ Diese Dokumentation ergänzt die kompakte Projektübersicht in der Root-`README.
 - [App-Logo und Launcher-Icons](app-icon.md) – Masterdatei, Android-Ressourcen und reproduzierbare Ableitung.
 - [Entwicklungsumgebung und Android-Toolchain](development-environment.md) – Referenzversionen, Built-in-Kotlin-/AGP-9-Konfiguration, lokale Einrichtung und Prüfkommandos.
 - [Android-Release](android-release.md) – reproduzierbarer, signierter APK-Release über GitHub Actions.
-- [Bild-Quellen und GitHub-Attachments](image-sources.md) – Eingänge,
-  zweistufiger Upload, Wiederaufnahme und Datenschutz.
 - [Menschliche PR-Abnahme](human-review.md) – lokale Prüfung, Rebase-Merge und Vorgehen bei gestapelten Branches.
 
 ## Dokumentationsregeln
@@ -19,3 +25,5 @@ Diese Dokumentation ergänzt die kompakte Projektübersicht in der Root-`README.
 Technische Dokumentation wird bevorzugt als Markdown gepflegt. Geeignete Abläufe und Architektursichten werden als Mermaid-Diagramme versioniert; SVG-Dateien können für Grafiken oder Diagramme verwendet werden, wenn Mermaid nicht zweckmäßig ist.
 
 Architekturdokumentation folgt dem C4-Modell. Es werden nur die Ebenen dokumentiert, die für das aktuelle Projekt einen konkreten Nutzen haben. Änderungen an Features, Bugfixes oder technischer Infrastruktur müssen die betroffene Dokumentation im selben Pull Request aktualisieren.
+
+Screenshots und Mockups ergänzen die textliche Erklärung, ersetzen sie aber nicht. Dokumentationsbilder dürfen keine echten Tokens, privaten Repositorydaten oder persönlichen Dokumentinhalte enthalten.

@@ -24,13 +24,16 @@ Der Flutter-Paketname lautet aus historischen Gründen `developer_wiki_source_ca
 
 ## Sicherheit
 
-Für den Zugriff auf GitHub wird ein **Fine-grained personal access token** verwendet. Für den aktuellen Funktionsumfang sollte das Token auf das Ziel-Wiki beschränkt werden und nur folgende Repository-Berechtigungen besitzen:
+Für den Zugriff auf GitHub wird ein **Fine-grained personal access token** verwendet. Für den aktuellen Funktionsumfang sollte das Token ausschließlich auf das persönliche Developer-Wiki beschränkt werden und nur folgende Repository-Berechtigungen besitzen:
 
 - `Actions`: Read and write
+- `Contents`: Read-only
 - `Issues`: Read and write
 - `Metadata`: Read-only
 
 Zusätzliche Account Permissions sind für den aktuellen Funktionsumfang nicht erforderlich. Das Token ausschließlich in den App-Einstellungen eingeben und niemals in Quellcode, Screenshots, Issues oder Logs ablegen. Die App speichert es über den geschützten lokalen Plattform-Speicher. Direkt am PAT-Feld kann über das Hilfe-Symbol eine Schritt-für-Schritt-Anleitung zur Erstellung und Berechtigung des Tokens geöffnet werden.
+
+Die Wiki-internen Secrets `SOURCE_IMAGE_TOKEN` und `SOURCE_ATTACHMENT_TOKEN` werden von der App nicht benötigt. Ebenso wird der Wiki-PAT nicht für Bugreports oder Zugriffe auf das App-Repository verwendet.
 
 Release-Keystores und daraus erzeugte Base64-Dateien dürfen ebenfalls nicht ins Repository eingecheckt werden.
 
@@ -42,20 +45,18 @@ Die App ist ein Client des persönlichen Developer-Wikis. Sie übernimmt die mob
 
 Der aktuelle Funktionsumfang umfasst unter anderem:
 
-- Quellenarten mit Pflichtfeldern, Auswahlwerten, Titelpräfixen und Promptergänzungen,
+- dynamisch aus dem Wiki geladene Quellenarten mit Pflichtfeldern, Auswahlwerten, Titelpräfixen und Promptergänzungen,
 - GitHub-kompatible Markdown-Issue-Beschreibungen,
 - Erstellung von Issues mit dem Label `quelle`,
 - Prüfung der Wiki-Verbindung und des PAT,
 - Start und Statusabfrage des konfigurierten GitHub-Actions-Workflows,
 - geschützte lokale Speicherung der Konfiguration,
-- Android-Share mit getrennten Zielen für Links, Text und Bilder als
-  zusätzlicher Einstieg in dieselbe Quellenerfassung,
-- appweites Menü mit About, installierter Releaseversion, offline verfügbarer
-  Barrierefreiheitserklärung und kontextbezogenem Bugreport,
-- feldnahe Validierungsfehler mit zusätzlichem Fehlersammler sowie
-  barrierefreie Restzeichenzähler an allen Texteingaben.
+- lokale Bild- und PDF-Quellen mit kontrolliertem GitHub-Attachment-Ablauf,
+- Android-Share mit getrennten Zielen für Links, Text, Bilder und PDF-Dokumente als zusätzlicher Einstieg in dieselbe Quellenerfassung,
+- appweites Menü mit About, installierter Releaseversion, offline verfügbarer Barrierefreiheitserklärung und kontextbezogenem Bugreport,
+- feldnahe Validierungsfehler mit zusätzlichem Fehlersammler sowie barrierefreie Restzeichenzähler an allen Texteingaben.
 
-Die Quellenformulare sind derzeit versioniert in `lib/models/source_template.dart` enthalten. Dadurch bleibt die App offline startbar und externe Template-Änderungen beeinflussen UI und Requests nicht ungeprüft. Eine spätere Version kann Templates lesend aus dem Wiki laden und eine geprüfte lokale Fallback-Version behalten.
+Die App lädt den versionierten Quellen-Erfassungsvertrag aus dem konfigurierten Developer-Wiki und hält den letzten kompatiblen Stand repositorybezogen im geschützten Cache. Kann weder Remote-Vertrag noch Cache verwendet werden, steht ein klar gekennzeichneter gebündelter Rückfallstand zur Verfügung. Unbekannte Feldarten oder erforderliche Fähigkeiten werden nicht stillschweigend als Textfelder interpretiert.
 
 ## Installation
 
@@ -85,24 +86,25 @@ Ein verbundenes Android-Gerät oder einen Emulator auswählen und die App starte
 flutter run
 ```
 
-Beim ersten Start das Ziel-Wiki, das Fine-grained PAT und den per `workflow_dispatch` startbaren Import-Workflow konfigurieren. Anschließend können Quellen erfasst und als Issues im Wiki gespeichert werden.
+Beim ersten Start das Ziel-Wiki, das Fine-grained PAT und den per `workflow_dispatch` startbaren Import-Workflow konfigurieren. Die vollständige Schrittfolge steht im [Benutzerhandbuch](docs/benutzerhandbuch/index.md) und in der [PAT-Einrichtung](docs/pat-setup.md).
 
-Für Bild-Quellen erstellt die App zunächst ein noch nicht importierbares
-Pending-Issue und öffnet dessen GitHub-Kommentarbereich. Dort das Bild auswählen,
-den Kommentar absenden und anschließend in der App den Upload prüfen. Der genaue
-Ablauf und die technische Begründung stehen in der
-[Bildquellen-Dokumentation](docs/image-sources.md).
+Danach können Links, Texte, Bilder und Dokumente manuell oder über Android-Teilen erfasst werden. Bild- und Dokumentquellen verwenden einen zweistufigen Pending-Attachment-Ablauf: Das Issue bleibt zunächst ohne `quelle`, bis das Attachment auf GitHub ergänzt, in der App geprüft und der finale Issue-Inhalt bestätigt wurde.
 
 ## Dokumentation
 
+**Für die Bedienung der App:** [Benutzerhandbuch – typische End-to-End-Szenarien](docs/benutzerhandbuch/index.md)
+
 Die weiterführende Projektdokumentation liegt unter [`docs/`](docs/README.md):
 
+- [Ersteinrichtung und Fine-grained PAT](docs/pat-setup.md)
+- [Dokument-Quellen und PDF-Attachments](docs/document-sources.md)
+- [Android-Share-Ziele](docs/share-targets.md)
+- [Bild-Quellen und GitHub-Attachments](docs/image-sources.md)
 - [Architektur nach dem C4-Modell](docs/architecture.md)
 - [Barrierefreiheit und UX](docs/accessibility.md)
 - [App-Logo und Launcher-Icons](docs/app-icon.md)
 - [Entwicklungsumgebung und Android-Toolchain](docs/development-environment.md)
 - [Signierter Android-Release über GitHub Actions](docs/android-release.md)
-- [Bild-Quellen und GitHub-Attachments](docs/image-sources.md)
 
 Änderungen an Features, Bugfixes oder technischer Infrastruktur aktualisieren die betroffenen Dokumentationsartefakte im selben Pull Request. Das [CHANGELOG](CHANGELOG.md) wird nach Keep a Changelog gepflegt.
 
