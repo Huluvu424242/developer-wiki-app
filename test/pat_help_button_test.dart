@@ -17,10 +17,12 @@ void main() {
 
     expect(find.text('GitHub PAT einrichten'), findsOneWidget);
     expect(find.text('• Actions: Read and write'), findsOneWidget);
+    expect(find.text('• Contents: Read-only'), findsOneWidget);
     expect(find.text('• Issues: Read and write'), findsOneWidget);
     expect(find.text('• Metadata: Read-only'), findsOneWidget);
     expect(find.textContaining('Only select repositories'), findsOneWidget);
     expect(find.textContaining('Generate new token'), findsOneWidget);
+    expect(find.textContaining('SOURCE_IMAGE_TOKEN'), findsOneWidget);
     expect(find.text('Schließen'), findsOneWidget);
   });
 }
