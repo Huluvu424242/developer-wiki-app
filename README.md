@@ -92,10 +92,15 @@ Danach können Links, Texte, Bilder und Dokumente manuell oder über Android-Tei
 
 ## Dokumentation
 
-**Für die Bedienung der App:** [Benutzerhandbuch – typische End-to-End-Szenarien](docs/benutzerhandbuch/index.md)
+Die vollständige, versionierte Projektdokumentation liegt als Markdown unter [`docs/`](docs/index.md). Daraus wird mit MkDocs Material eine durchsuchbare GitHub-Pages-Dokumentation erzeugt.
 
-Die weiterführende Projektdokumentation liegt unter [`docs/`](docs/README.md):
+**Generierte Dokumentation:** <https://huluvu424242.github.io/developer-wiki-app/>
 
+Falls GitHub Pages für das Repository noch nicht auf **GitHub Actions** als Veröffentlichungsquelle eingestellt ist, muss diese einmalige Repository-Einstellung durch den Owner erfolgen. Der Build- und Veröffentlichungsablauf ist in der [Dokumentationswerkzeugkette](docs/documentation-toolchain.md) beschrieben.
+
+Wichtige Einstiege:
+
+- [Benutzerhandbuch – typische End-to-End-Szenarien](docs/benutzerhandbuch/index.md)
 - [Ersteinrichtung und Fine-grained PAT](docs/pat-setup.md)
 - [Dokument-Quellen und PDF-Attachments](docs/document-sources.md)
 - [Android-Share-Ziele](docs/share-targets.md)
@@ -104,6 +109,7 @@ Die weiterführende Projektdokumentation liegt unter [`docs/`](docs/README.md):
 - [Barrierefreiheit und UX](docs/accessibility.md)
 - [App-Logo und Launcher-Icons](docs/app-icon.md)
 - [Entwicklungsumgebung und Android-Toolchain](docs/development-environment.md)
+- [Dokumentationswerkzeugkette und GitHub Pages](docs/documentation-toolchain.md)
 - [Signierter Android-Release über GitHub Actions](docs/android-release.md)
 
 Änderungen an Features, Bugfixes oder technischer Infrastruktur aktualisieren die betroffenen Dokumentationsartefakte im selben Pull Request. Das [CHANGELOG](CHANGELOG.md) wird nach Keep a Changelog gepflegt.
