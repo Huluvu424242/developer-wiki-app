@@ -157,9 +157,7 @@ const bundledSourceTemplates = <SourceTemplate>[
       SourceField(
           id: 'agent_notes',
           label: 'Hinweise an den KI-Agenten',
-          kind: FieldKind.textarea,
-          initialValue:
-              'Extrahiere die Informationen aus der angegebenen Quelle und arbeite diese in das Wiki ein. Stelle zusätzlich eine Zusammenfassung der extrahierten Daten bereit und arbeite diese ebenfalls in das Wiki ein.'),
+          kind: FieldKind.textarea),
       SourceField(
           id: 'prompt_additions',
           label: 'Promptergänzungen',
@@ -208,9 +206,7 @@ const bundledSourceTemplates = <SourceTemplate>[
       SourceField(
           id: 'agent_notes',
           label: 'Hinweise an den KI-Agenten',
-          kind: FieldKind.textarea,
-          initialValue:
-              'Bitte ermittle den Inhalt aus den Anhängen und integriere diesen ins Wiki. Erstelle aus der Quellenbeschreibung und den Textinhalten der Anhänge eine Zusammenfassung und arbeite diese zusätzlich ins Wiki ein.'),
+          kind: FieldKind.textarea),
       SourceField(
           id: 'prompt_additions',
           label: 'Promptergänzungen',
