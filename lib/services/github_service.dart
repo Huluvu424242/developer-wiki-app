@@ -75,7 +75,8 @@ class GitHubService {
 
   Future<String> issueBodyFor(int issueNumber) async {
     final response = await _client.get(
-      Uri.parse('https://api.github.com/repos/$owner/$repo/issues/$issueNumber'),
+      Uri.parse(
+          'https://api.github.com/repos/$owner/$repo/issues/$issueNumber'),
       headers: _headers,
     );
     if (response.statusCode != 200) {

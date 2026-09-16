@@ -53,7 +53,8 @@ class PlatformDocumentInputGateway implements DocumentInputGateway {
         document.name.isEmpty ||
         document.mimeType.isEmpty ||
         document.sizeBytes <= 0) {
-      throw const FormatException('Das ausgewählte Dokument ist unvollständig.');
+      throw const FormatException(
+          'Das ausgewählte Dokument ist unvollständig.');
     }
     if (!field.mimeTypes.contains(document.mimeType)) {
       throw FormatException(
