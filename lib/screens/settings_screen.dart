@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/wiki_configuration.dart';
 import '../services/configuration_service.dart';
+import '../services/github_access_diagnostic_service.dart';
 import '../services/github_service.dart';
 import '../services/source_template_service.dart';
 import '../widgets/app_support.dart';
@@ -33,6 +34,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _workflowController = TextEditingController();
   final _configurationService = ConfigurationService();
   final _sourceTemplateService = SourceTemplateService();
+  final _diagnosticService = GitHubAccessDiagnosticService();
 
   bool _busy = false;
   bool _obscure = true;
@@ -47,6 +49,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.initState();
     _repositoryController.addListener(_invalidateVerification);
     _tokenController.addListener(_invalidateVerification);
+    _workflowController.addListener(_invalidateVerification);
     _load();
   }
 
@@ -112,6 +115,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeOut,
     );
+    if (!mounted) {
+      return true;
+    }
     _summaryFocus.requestFocus();
     return true;
   }
@@ -151,16 +157,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _testConnection() async {
     if (await _showValidationErrors(
-      _collectErrors(includeWorkflow: false),
-      includeWorkflow: false,
+      _collectErrors(includeWorkflow: true),
+      includeWorkflow: true,
     )) {
       return;
     }
     final repository = GitHubRepository.parse(_repositoryController.text);
     final token = _tokenController.text.trim();
+    final configuration = WikiConfiguration(
+      repositoryUrl: repository.url,
+      token: token,
+      workflowFile: _workflowController.text.trim(),
+    );
     setState(() {
       _busy = true;
-      _status = 'Verbindung wird geprüft …';
+      _status = 'Verbindung und benötigte Zugriffe werden geprüft …';
       _statusIsError = false;
       _connectionVerified = false;
     });
@@ -170,25 +181,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
         owner: repository.owner,
         repo: repository.name,
       ).verifyRepositoryAccess();
-      await _sourceTemplateService.verifyRemoteAccess(
-        WikiConfiguration(
-          repositoryUrl: repository.url,
-          token: token,
-          workflowFile: _workflowController.text.trim(),
-        ),
-      );
+      await _sourceTemplateService.verifyRemoteAccess(configuration);
+      await _diagnosticService.verifyOperationalReadAccess(configuration);
       if (mounted) {
         setState(() {
           _connectionVerified = true;
-          _status = 'Verbindung erfolgreich – angemeldet als $login.';
+          _status = 'Verbindung erfolgreich – Repository, Quellenmodell, '
+              'Issues und Import-Workflow sind für $login erreichbar. '
+              'Schreibrechte werden zusätzlich bei der jeweiligen Aktion '
+              'durch GitHub geprüft.';
           _statusIsError = false;
         });
       }
     } catch (error) {
       if (mounted) {
         _setStatus(
-          'Zugriff fehlgeschlagen. Token, Repository und Berechtigungen prüfen: '
-          '$error',
+          'Zugriff fehlgeschlagen. Repository, Token und die in der PAT-Hilfe '
+          'genannten Berechtigungen prüfen: $error',
           isError: true,
         );
       }
@@ -267,7 +276,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _tokenController
       ..removeListener(_invalidateVerification)
       ..dispose();
-    _workflowController.dispose();
+    _workflowController
+      ..removeListener(_invalidateVerification)
+      ..dispose();
     _scrollController.dispose();
     _summaryFocus.dispose();
     _repositoryFocus.dispose();
@@ -308,6 +319,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   )
                   .toList(growable: false),
             ),
+            if (widget.isSetup) ...[
+              const Text(
+                'Verbinde die App mit genau deinem persönlichen Developer-Wiki. '
+                'Die folgenden drei Angaben werden gemeinsam geprüft, bevor '
+                'sie gespeichert werden.',
+              ),
+              const SizedBox(height: 16),
+            ],
             BoundedTextFormField(
               controller: _repositoryController,
               focusNode: _repositoryFocus,
@@ -318,7 +337,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               validator: _repositoryValidator,
               decoration: const InputDecoration(
                 labelText: 'GitHub Wiki',
-                helperText: 'Repository-URL oder owner/repo',
+                helperText:
+                    'Repository-URL oder owner/repo deines persönlichen Developer-Wikis.',
               ),
             ),
             const SizedBox(height: 16),
@@ -334,7 +354,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               decoration: InputDecoration(
                 labelText: 'Fine-grained PAT',
                 helperText:
-                    'Das Token wird nur im geschützten lokalen Speicher abgelegt.',
+                    'Nur für das Developer-Wiki; Speicherung ausschließlich im geschützten lokalen Speicher.',
                 suffixIcon: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -362,14 +382,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               decoration: const InputDecoration(
                 labelText: 'Import-Workflow',
                 helperText:
-                    'Dateiname des per workflow_dispatch startbaren Workflows',
+                    'Dateiname des workflow_dispatch-Workflows, den „Quellen ins Wiki importieren“ startet.',
               ),
             ),
             const SizedBox(height: 20),
             FilledButton.tonalIcon(
               onPressed: _busy ? null : _testConnection,
-              icon: const Icon(Icons.link),
-              label: const Text('Verbindung testen'),
+              icon: const Icon(Icons.verified_user_outlined),
+              label: const Text('Verbindung und Rechte testen'),
             ),
             if (_status != null) ...[
               const SizedBox(height: 16),
