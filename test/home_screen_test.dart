@@ -49,30 +49,25 @@ void main() {
     expect(find.text(template.description), findsOneWidget);
   });
 
-  testWidgets('shared content is forwarded to the selected source form', (
-    tester,
-  ) async {
+  testWidgets('shared link opens metadata source form directly', (tester) async {
     const sharedContent = SharedContent(
       kind: SharedContentKind.link,
       text: 'https://example.org/source',
     );
 
     await tester.pumpWidget(
-      const MaterialApp(home: HomeScreen(sharedContent: sharedContent)),
+      MaterialApp(
+        home: HomeScreen(
+          sharedContent: sharedContent,
+          sourceFormBuilder: (template, content) =>
+              Text('${template.id}:${content?.text}'),
+        ),
+      ),
     );
-
-    expect(find.text('Geteilten Inhalt erfassen'), findsOneWidget);
-    expect(find.text('Welche Quellenart ist das?'), findsOneWidget);
-
-    final template = sourceTemplates.first;
-    await tester.tap(find.text(template.name));
     await tester.pumpAndSettle();
 
-    expect(find.text('Geteilten Inhalt erfassen'), findsOneWidget);
     expect(
-      find.text(
-        'Geteilter Inhalt wurde vorausgefüllt und kann bearbeitet werden.',
-      ),
+      find.text('source-metadata:https://example.org/source'),
       findsOneWidget,
     );
   });
