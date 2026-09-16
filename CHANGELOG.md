@@ -9,6 +9,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Added
 
+- Einen verbindlichen Lifecycle-Wartungsvertrag für Flutter, Dart, Android-Toolchain und native Plugins ergänzt: quartalsweise Toolchain-Prüfung, höchstens sechs Monate normale Distanz zwischen bewussten Upgrade-Entscheidungen, 2–4 Wochen Stabilisierungsphase für nicht dringende Flutter-Stable-Releases sowie konkrete Mindestprüfungen und Upgrade-Governance.
 - Eine schlanke `kiagent-flutter-validation`-GitHub-Action prüft bei jeder Pull-Request-Erstellung Formatierung, statische Analyse und Tests mit minimalen Leserechten und ohne Secrets oder Repository-Schreibwirkungen.
 - Eine bei Push sowie manuell startbare `kiagent-format-and-commit`-GitHub-Action formatiert ausschließlich getrackte Python- und Dart-Dateien auf dem aktuellen Branch und committet notwendige reine Formatierungsänderungen auf denselben Branch.
 
