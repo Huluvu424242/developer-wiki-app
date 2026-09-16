@@ -3,6 +3,8 @@
 .idea/
 .metadata
 build/
+site/
+.venv/
 android/.gradle/
 android/local.properties
 *.iml
