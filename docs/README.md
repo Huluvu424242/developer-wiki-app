@@ -1,6 +1,11 @@
 # Projektdokumentation
 
-Diese Dokumentation ergänzt die kompakte Projektübersicht in der Root-`README.md`.
+Diese Dokumentation ergänzt die kompakte Projektübersicht in der Root-`README.md`. Die Markdown-Dateien unter `docs/` sind die versionierte fachliche Quelle. Aus ihnen wird mit MkDocs eine durchsuchbare GitHub-Pages-Dokumentation erzeugt.
+
+- [Einstieg für die generierte Dokumentation](index.md)
+- [Dokumentationswerkzeugkette](documentation-toolchain.md) – lokaler MkDocs-Build, CI-Validierung und GitHub-Pages-Deployment.
+
+Nach Aktivierung von GitHub Pages mit **GitHub Actions** als Veröffentlichungsquelle ist die generierte Dokumentation unter `https://huluvu424242.github.io/developer-wiki-app/` vorgesehen.
 
 ## Für Nutzer
 
@@ -13,10 +18,12 @@ Diese Dokumentation ergänzt die kompakte Projektübersicht in der Root-`README.
 ## Für Entwicklung und Wartung
 
 - [Architektur](architecture.md) – Systemkontext und Container-Sicht nach dem C4-Modell.
+- [Dynamische Quellenmodelle](dynamic-source-models.md) – versionierter Erfassungsvertrag zwischen App und Developer-Wiki.
 - [Agenten-Harness](agent-harness.md) – modulare Regelstruktur, Migrationsmatrix und deterministische Strukturprüfung.
 - [Barrierefreiheit und UX](accessibility.md) – App-Menü, Fehlersammler, Zeichenzähler, About und sicherer Bugreport.
 - [App-Logo und Launcher-Icons](app-icon.md) – Masterdatei, Android-Ressourcen und reproduzierbare Ableitung.
 - [Entwicklungsumgebung und Android-Toolchain](development-environment.md) – Referenzversionen, Built-in-Kotlin-/AGP-9-Konfiguration, lokale Einrichtung und Prüfkommandos.
+- [Dokumentationswerkzeugkette](documentation-toolchain.md) – MkDocs-Konfiguration, lokale Reproduktion, Actions-Berechtigungen und Pages-Veröffentlichung.
 - [Android-Release](android-release.md) – reproduzierbarer, signierter APK-Release über GitHub Actions.
 - [Menschliche PR-Abnahme](human-review.md) – lokale Prüfung sowie manuelle Rebase-Merges und delegierte Merge-Commit-Verfahren für gestapelte Pull Requests.
 
