@@ -93,7 +93,8 @@ class _PatHelpDialog extends StatelessWidget {
               '10. Keine zusätzlichen Account Permissions vergeben, solange '
               'sie nicht ausdrücklich benötigt werden.',
             ),
-            Text('11. Token erzeugen und den einmal angezeigten Wert kopieren.'),
+            Text(
+                '11. Token erzeugen und den einmal angezeigten Wert kopieren.'),
             Text(
               '12. In der App unter Einstellungen bzw. Ersteinrichtung in '
               'Fine-grained PAT einfügen.',

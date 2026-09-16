@@ -25,7 +25,8 @@ void main() {
     expect(find.textContaining('SOURCE_IMAGE_TOKEN'), findsWidgets);
     expect(find.textContaining('SOURCE_ATTACHMENT_TOKEN'), findsWidgets);
     expect(find.textContaining('kein PAT für das Repository'), findsOneWidget);
-    expect(find.textContaining('14. Erst nach erfolgreichem Test'), findsOneWidget);
+    expect(find.textContaining('14. Erst nach erfolgreichem Test'),
+        findsOneWidget);
     expect(find.text('Schließen'), findsOneWidget);
   });
 }
