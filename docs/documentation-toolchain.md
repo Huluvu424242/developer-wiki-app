@@ -6,7 +6,8 @@ Die vollständige Projektdokumentation wird als Markdown unter `docs/` gepflegt.
 
 - Fachliche Quelle: Markdown-Dateien unter `docs/`.
 - Navigation und Site-Konfiguration: `mkdocs.yml`.
-- Reproduzierbare Python-Abhängigkeiten: `requirements-docs.txt`.
+- Zentrale Python-Werkzeugabhängigkeiten: `pyproject.toml`.
+- Dokumentationswerkzeuge liegen dort in der PEP-735-Dependency-Group `docs`.
 - Generiertes Build-Verzeichnis: `site/`.
 - `site/` ist ausschließlich ein lokales beziehungsweise CI-Build-Artefakt und wird nicht versioniert.
 
@@ -14,11 +15,12 @@ Die Root-`README.md` bleibt die kompakte Projektübersicht. Ausführliche Benutz
 
 ## Lokaler Build
 
-Voraussetzung ist eine aktuelle Python-3-Installation. Die Dokumentationsabhängigkeiten werden bewusst getrennt von Flutter installiert.
+Voraussetzung ist Python 3.13 oder ein kompatibler neuerer Python-3-Stand. Die Dokumentationsabhängigkeiten werden bewusst getrennt von Flutter installiert. Für Dependency Groups wird `pip` ab Version 25.1 benötigt.
 
 ```bash
 python -m venv .venv
-python -m pip install --disable-pip-version-check --requirement requirements-docs.txt
+python -m pip install --upgrade "pip>=25.1,<27"
+python -m pip install --group docs
 mkdocs build --strict
 ```
 
@@ -30,6 +32,20 @@ mkdocs serve
 
 Der Strict-Build behandelt relevante MkDocs-Warnungen als Fehler. Neue oder geänderte Dokumentation sollte daher vor dem Merge möglichst mit `mkdocs build --strict` geprüft werden.
 
+## Zentrale Abhängigkeitsdefinition
+
+Die Dokumentationswerkzeuge werden nicht in einer zusätzlichen `requirements-*.txt` gepflegt. Stattdessen enthält `pyproject.toml` die Gruppe:
+
+```toml
+[dependency-groups]
+docs = [
+  "mkdocs==1.6.1",
+  "mkdocs-material==9.7.7",
+]
+```
+
+Weitere Python-Werkzeuggruppen können später im selben `pyproject.toml` ergänzt werden. Dadurch bleibt die TOML-Datei der zentrale Einstiegspunkt für Python-basierte Entwicklungs- und Dokumentationswerkzeuge, ohne die Flutter-Abhängigkeiten aus `pubspec.yaml` zu vermischen.
+
 ## GitHub Action
 
 `.github/workflows/kiagent-documentation-pages.yml` baut und veröffentlicht die Dokumentation.
@@ -38,7 +54,7 @@ Der Strict-Build behandelt relevante MkDocs-Warnungen als Fehler. Neue oder geä
 
 Der Workflow reagiert nur auf dokumentationsrelevante Änderungen:
 
-- Pull Requests mit Änderungen unter `docs/**`, an `mkdocs.yml`, `requirements-docs.txt` oder der Workflow-Datei selbst;
+- Pull Requests mit Änderungen unter `docs/**`, an `mkdocs.yml`, `pyproject.toml` oder der Workflow-Datei selbst;
 - Pushes auf `master` mit denselben Pfadfiltern;
 - manueller Start über `workflow_dispatch`.
 
@@ -55,7 +71,7 @@ Der Build-Job besitzt ausschließlich `contents: read`. Erst der getrennte Deplo
 - `pages: write`
 - `id-token: write`
 
-Die Werkzeugkette liest den Repository-Inhalt, installiert die in `requirements-docs.txt` festgelegten Dokumentationswerkzeuge und übergibt ausschließlich das generierte `site/`-Verzeichnis an GitHub Pages. Es gibt keine Repository-Schreibwirkung.
+Die Werkzeugkette liest den Repository-Inhalt, installiert die in der Dependency-Group `docs` aus `pyproject.toml` festgelegten Dokumentationswerkzeuge und übergibt ausschließlich das generierte `site/`-Verzeichnis an GitHub Pages. Es gibt keine Repository-Schreibwirkung.
 
 Externe GitHub Actions werden auf unveränderliche Commit-SHAs gepinnt. Verwendet werden ausschließlich offizielle Actions der GitHub-Organisation `actions` für Checkout, Python-Setup, Pages-Konfiguration, Pages-Artefakt und Deployment. Die Python-Pakete dienen nur dem Dokumentationsbuild und werden nicht mit der Flutter-App ausgeliefert.
 
