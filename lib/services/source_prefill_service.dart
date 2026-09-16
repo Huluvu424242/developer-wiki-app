@@ -9,7 +9,10 @@ class SourcePrefillService {
     SharedContent content,
   ) {
     if (content.kind == SharedContentKind.image ||
-        content.kind == SharedContentKind.imageError) {
+        content.kind == SharedContentKind.document ||
+        content.kind == SharedContentKind.imageError ||
+        content.kind == SharedContentKind.documentError ||
+        content.kind == SharedContentKind.unsupportedFile) {
       return const {};
     }
     final text = content.text.trim();
