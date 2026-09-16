@@ -20,18 +20,20 @@ Stand: 2026-09-16
 
 AGP 9.0.1 benötigt mindestens Gradle 9.1.0 und JDK 17. Das Projekt verwendet JDK 21 für die Build-JVM; `sourceCompatibility`, `targetCompatibility` und Kotlin-`jvmTarget` bleiben auf 17.
 
-## AGP 9 mit Built-in Kotlin und moderner DSL
+## AGP 9 mit Built-in Kotlin und Flutter-kompatibler DSL
 
-Die App ist vollständig auf den von Flutter 3.47 unterstützten AGP-9-Pfad mit Built-in Kotlin migriert. Das frühere Plugin `org.jetbrains.kotlin.android` wird nicht mehr angewendet. Die Kotlin-Compilerkonfiguration liegt außerhalb des `android`-Blocks in der modernen `kotlin.compilerOptions`-DSL.
+Die App ist auf den von Flutter 3.47 unterstützten AGP-9-Pfad mit Built-in Kotlin migriert. Das frühere Plugin `org.jetbrains.kotlin.android` wird nicht mehr angewendet. Die Kotlin-Compilerkonfiguration liegt außerhalb des `android`-Blocks in der modernen `kotlin.compilerOptions`-DSL.
 
-In `android/gradle.properties` sind die Zielmodi explizit aktiviert:
+Für die AGP-DSL gilt bei Flutter 3.47.4 jedoch weiterhin der von Flutter bereitgestellte Legacy-Kompatibilitätsmodus. Der Flutter-Gradle-Plugin-Code verwendet intern noch Legacy-AGP-Typen; mit `android.newDsl=true` kann deshalb bereits beim Anwenden von `dev.flutter.flutter-gradle-plugin` ein Typ-Cast fehlschlagen.
+
+In `android/gradle.properties` ist daher bewusst folgende Kombination versioniert:
 
 ```properties
 android.builtInKotlin=true
-android.newDsl=true
+android.newDsl=false
 ```
 
-Diese expliziten Werte verhindern, dass die Flutter-AGP-Migrationsguards das Projekt wieder auf den temporären Legacy-KGP-/Legacy-DSL-Modus zurückstellen. Sie können erst entfallen, wenn Flutter für AGP-9-Projekte keine entsprechenden Migrationsguards mehr benötigt.
+Damit wird Built-in Kotlin bereits verwendet, während Flutter für die Android-DSL weiterhin die kompatible Brücke bereitstellt. `android.newDsl` darf erst auf `true` umgestellt werden, wenn der verwendete Flutter-Stand und alle beteiligten Plugins den neuen AGP-DSL-Pfad vollständig unterstützen.
 
 ## Windows: lokale Umgebung aktualisieren
 
@@ -115,13 +117,13 @@ Ein erfolgreicher Gradle-Sync in Android Studio und ein erfolgreicher `flutter r
 
 Symptome sind unterschiedliche Ergebnisse zwischen IDE-Sync und `flutter build` beziehungsweise Meldungen zu nicht unterstützten Java-/Gradle-Versionen. `flutter doctor -v`, `java -version` und die Android-Studio-Einstellung `Gradle JDK` auf denselben JDK-21-Stand bringen.
 
-### Flutter ergänzt Legacy-Flags für AGP 9
+### `android.newDsl=true` führt zu einem Typ-Cast im Flutter-Gradle-Plugin
 
-Flutter besitzt Migrationsguards für AGP-9-Projekte. Für dieses Repository sind `android.builtInKotlin=true` und `android.newDsl=true` bewusst versioniert. Werden sie unerwartet wieder auf `false` gesetzt, ist zunächst zu prüfen, ob der verwendete Flutter-Stand vom vorgesehenen Projektstand abweicht oder ein Plugin noch nicht Built-in-Kotlin-/New-DSL-kompatibel ist.
+Flutter 3.47 unterstützt Built-in Kotlin, nutzt für AGP 9 aber weiterhin eine Legacy-kompatible DSL-Brücke. Ein Fehler wie `ApplicationExtensionImpl... cannot be cast to ... AbstractAppExtension` beim Anwenden von `dev.flutter.flutter-gradle-plugin` weist darauf hin, dass die neue AGP-DSL zu früh aktiviert wurde. Für diesen Projektstand muss `android.newDsl=false` bleiben.
 
 ### Ein Plugin verwendet noch `org.jetbrains.kotlin.android`
 
-Built-in Kotlin funktioniert nur, wenn die App und die beteiligten Flutter-Plugins mit dem AGP-9-Modell kompatibel sind. Meldet der Android-Build ein Plugin, das weiterhin das alte Kotlin-Gradle-Plugin anwendet, wird nicht global auf den Legacy-Modus zurückgeschaltet. Stattdessen wird geprüft, ob eine kompatible Plugin-Version verfügbar ist; andernfalls wird der konkrete Plugin-Konflikt separat behandelt.
+Built-in Kotlin funktioniert nur, wenn die App und die beteiligten Flutter-Plugins mit dem AGP-9-Modell kompatibel sind. Meldet der Android-Build ein Plugin, das weiterhin das alte Kotlin-Gradle-Plugin anwendet, wird nicht global auf den Legacy-Kotlin-Modus zurückgeschaltet. Stattdessen wird geprüft, ob eine kompatible Plugin-Version verfügbar ist; andernfalls wird der konkrete Plugin-Konflikt separat behandelt.
 
 ### Lokale Gradle-Installation ist veraltet
 
