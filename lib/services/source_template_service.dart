@@ -49,8 +49,7 @@ class SourceTemplateService implements SourceTemplateLoader {
           templates: definition.templates,
           issueLabel: definition.issueLabel,
           origin: SourceTemplateOrigin.cache,
-          warning:
-              'Aktuelles Quellenmodell konnte nicht geladen werden. '
+          warning: 'Aktuelles Quellenmodell konnte nicht geladen werden. '
               'Die letzte kompatible lokale Version wird verwendet: $remoteError',
         );
       }
@@ -90,7 +89,8 @@ class SourceTemplateService implements SourceTemplateLoader {
     }
     final data = jsonDecode(response.body);
     if (data is! Map<String, dynamic> || data['content'] is! String) {
-      throw const FormatException('GitHub lieferte kein lesbares Quellenmodell.');
+      throw const FormatException(
+          'GitHub lieferte kein lesbares Quellenmodell.');
     }
     final encoding = data['encoding']?.toString();
     if (encoding != 'base64') {
