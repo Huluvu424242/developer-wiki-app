@@ -16,8 +16,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  create-lifecycle-story:
-    name: Create quarterly lifecycle story
+  create-or-update-lifecycle-story:
+    name: Create or update quarterly lifecycle story
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
@@ -27,7 +27,7 @@ jobs:
       - name: Show GitHub CLI version
         run: gh --version
 
-      - name: Create lifecycle story if missing
+      - name: Create lifecycle story or append quarterly reminder
         shell: bash
         run: |
           set -euo pipefail
@@ -36,28 +36,81 @@ jobs:
           month="$(date -u +%-m)"
           quarter="$(( (month - 1) / 3 + 1 ))"
           period="${year}-Q${quarter}"
+          due_date="$(date -u +%F)"
           title="Lifecycle-Wartung ${period}"
+          reminder_marker="<!-- kiagent-quarterly-lifecycle-reminder:${period} -->"
 
           echo "Lifecycle period: ${period}"
-          echo "Expected issue title: ${title}"
+          echo "Due date: ${due_date}"
 
-          existing_url="$(
+          open_issue="$(
             gh api --paginate \
-              "repos/${GITHUB_REPOSITORY}/issues?state=all&per_page=100" \
-              --jq ".[] | select(.pull_request == null and .title == \"${title}\") | .html_url" \
+              "repos/${GITHUB_REPOSITORY}/issues?state=open&labels=story&per_page=100" \
+              --jq '.[] | select(.pull_request == null and (.title | startswith("Lifecycle-Wartung "))) | [.number, .html_url] | @tsv' \
+              | sort -n \
               | sed -n '1p'
           )"
 
-          if [[ -n "${existing_url}" ]]; then
-            echo "Lifecycle story already exists for ${period}: ${existing_url}"
+          if [[ -n "${open_issue}" ]]; then
+            issue_number="${open_issue%%$'\t'*}"
+            issue_url="${open_issue#*$'\t'}"
+
+            echo "Open lifecycle story found: ${issue_url}"
+
+            reminder_exists="$(
+              gh api --paginate \
+                "repos/${GITHUB_REPOSITORY}/issues/${issue_number}/comments?per_page=100" \
+                --jq ".[] | select(.body | contains(\"${reminder_marker}\")) | .html_url" \
+                | sed -n '1p'
+            )"
+
+            if [[ -n "${reminder_exists}" ]]; then
+              echo "Quarterly reminder already exists for ${period}: ${reminder_exists}"
+              exit 0
+            fi
+
+            comment_file="$(mktemp)"
+            trap 'rm -f "${comment_file}"' EXIT
+
+            cat >"${comment_file}" <<'EOF'
+          __REMINDER_MARKER__
+
+          ## Weiterer Lifecycle-Wartungszeitpunkt fällig
+
+          **Fällig am:** __DUE_DATE__  
+          **Kalenderquartal:** __PERIOD__
+
+          Diese Lifecycle-Story ist weiterhin offen. Deshalb wurde bewusst **keine neue parallele Lifecycle-Story** angelegt.
+
+          Seit dem vorherigen Wartungszeitpunkt ist ein weiterer quartalsweiser Lifecycle-Check fällig geworden. Bei der Bearbeitung ist der inzwischen aktuelle `AGENTS.md` einschließlich der aktuellen `agent-rules/09-lifecycle-maintenance.md` erneut vollständig anzuwenden. Der konkrete Prüf- und Umsetzungsumfang ist aus diesem aktuellen Harness abzuleiten; dieser Kommentar enthält absichtlich keine kopierte technische Checkliste und keine festen Versionsstände.
+
+          Der zusätzliche Wartungszeitpunkt erweitert den offenen Lifecycle-Auftrag um den inzwischen neu entstandenen Handlungsbedarf. Bestehende ältere Quartalshinweise bleiben als Audit-Trail erhalten.
+          EOF
+
+            sed -i \
+              -e "s|__REMINDER_MARKER__|${reminder_marker}|g" \
+              -e "s|__DUE_DATE__|${due_date}|g" \
+              -e "s|__PERIOD__|${period}|g" \
+              "${comment_file}"
+
+            comment_url="$(
+              gh issue comment "${issue_number}" \
+                --repo "${GITHUB_REPOSITORY}" \
+                --body-file "${comment_file}"
+            )"
+
+            echo "Added quarterly lifecycle reminder for ${period}: ${comment_url}"
             exit 0
           fi
+
+          echo "No open lifecycle story found; creating ${title}."
 
           body_file="$(mktemp)"
           trap 'rm -f "${body_file}"' EXIT
 
           cat >"${body_file}" <<'EOF'
-          <!-- kiagent-quarterly-lifecycle-story:__PERIOD__ -->
+          <!-- kiagent-quarterly-lifecycle-story -->
+          <!-- kiagent-quarterly-lifecycle-origin:__PERIOD__ -->
 
           ## Auftrag
 
@@ -89,7 +142,7 @@ jobs:
           - [ ] Erforderliche separate Stories/PRs aus speziellerer Governance wurden verlinkt.
           - [ ] Dokumentation und Changelog wurden soweit durch die tatsächlich vorgenommenen Änderungen erforderlich aktualisiert.
 
-          > Diese Story enthält bewusst keine kopierte technische Lifecycle-Checkliste und keine festen Versionsnummern. Maßgeblich ist immer der aktuelle Harness zum Bearbeitungszeitpunkt.
+          > Diese Story enthält bewusst keine kopierte technische Lifecycle-Checkliste und keine festen Versionsnummern. Maßgeblich ist immer der aktuelle Harness zum Bearbeitungszeitpunkt. Bleibt sie über weitere Quartale offen, ergänzt die Automatisierung datierte Quartalshinweise statt paralleler Lifecycle-Stories.
           EOF
 
           sed -i "s/__PERIOD__/${period}/g" "${body_file}"
