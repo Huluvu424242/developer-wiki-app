@@ -14,7 +14,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Changed
 
-- Die Android-Build-Toolchain auf Flutter 3.47.4-kompatible Versionen angehoben: Gradle 9.1.0 und Android Gradle Plugin 9.0.1; zugleich die App auf AGP-9-Built-in-Kotlin mit expliziter KGP-Runtime 2.2.20 und `kotlin.compilerOptions` migriert, die von Flutter 3.47.4 weiterhin benötigte Legacy-kompatible AGP-DSL-Brücke (`android.newDsl=false`) beibehalten und JDK 21 als lokalen und Release-Referenzstand dokumentiert.
+- Die Android-Build-Toolchain auf den aktuellen Flutter-3.47.4-Template-Stand angehoben: Gradle 9.3.1, Android Gradle Plugin 9.1.0 und Kotlin Gradle Plugin 2.4.0; die App verwendet bereits `kotlin.compilerOptions`, während die von Flutter Stable weiterhin erzeugten AGP-9-Kompatibilitätsflags `android.newDsl=false` und `android.builtInKotlin=false` bewusst beibehalten werden. JDK 21 ist als lokaler und Release-Referenzstand dokumentiert.
 - `kiagent-format-and-commit` und `kiagent-flutter-validation` verwenden für Dart einheitlich Flutter 3.47.4 sowie denselben Bereich `lib test`; die Formatierungsaction verifiziert nach `dart format lib test` zusätzlich mit exakt `dart format --set-exit-if-changed lib test` den späteren Validation-Check.
 - Den Agenten-Harness von einer monolithischen `AGENTS.md` auf einen verbindlichen Einstiegspunkt mit thematischen Regelmodulen unter `agent-rules/` umgestellt; Regelpriorität, Wiki-/App-Verantwortungsgrenze und deterministische Harness-Strukturprüfung ergänzt.
 - Flutter-, Architektur-, UX-, Barrierefreiheits- und Qualitätsregeln mit den passenden Erkenntnissen aus dem Taugt’s-Harness harmonisiert; insbesondere Lebenszyklusprüfungen nach `await`, sichere `const`-Widgetbäume, Lazy-Formularvalidierung, Scroll-Widgettests, robuste Fehlersammler-Navigation und einheitliche Abschlussstatus präzisiert.
@@ -61,7 +61,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 - Dokumentationsregeln für Changelog, README und technische Dokumentation im Implementierungsworkflow.
 - Direkt in den Einstellungen aufrufbare Hilfe zum Erstellen eines Fine-grained GitHub PAT mit den benötigten Least-Privilege-Berechtigungen.
 - Dokumentierter Prozess für die menschliche PR-Abnahme und das schrittweise Prüfen und Rebasen gestapelter Branches.
-- Verbindliche PR-Regel zur Verknüpfung vollständig erledigter Stories und Bugs mit GitHub-Closing-Keywords.
+- Verbindliche PR-Regel zur Verknüfung vollständig erledigter Stories und Bugs mit GitHub-Closing-Keywords.
 
 ### Changed
 
