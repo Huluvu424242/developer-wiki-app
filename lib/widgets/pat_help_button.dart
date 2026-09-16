@@ -43,8 +43,16 @@ class _PatHelpDialog extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text('• Actions: Read and write'),
+            Text('• Contents: Read-only'),
             Text('• Issues: Read and write'),
             Text('• Metadata: Read-only'),
+            SizedBox(height: 8),
+            Text(
+              'Contents wird benötigt, um den versionierten Quellen-'
+              'Erfassungsvertrag aus dem privaten Wiki zu laden. Die internen '
+              'Wiki-Secrets SOURCE_IMAGE_TOKEN und SOURCE_ATTACHMENT_TOKEN '
+              'werden von der App weder benötigt noch verwendet.',
+            ),
             SizedBox(height: 8),
             Text(
               'Zusätzliche Account Permissions sind für den aktuellen '
@@ -71,7 +79,8 @@ class _PatHelpDialog extends StatelessWidget {
             ),
             Text(
               '5. Unter Repository permissions Actions und Issues auf '
-              '„Read and write“ setzen; Metadata bleibt „Read-only“.',
+              '„Read and write“, Contents auf „Read-only“ setzen; Metadata '
+              'bleibt „Read-only“.',
             ),
             Text('6. Token erzeugen und einmalig in diese App kopieren.'),
             SizedBox(height: 16),
