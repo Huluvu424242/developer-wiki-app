@@ -59,7 +59,9 @@ Die Quellenformulare sind derzeit versioniert in `lib/models/source_template.dar
 
 ## Installation
 
-Vorausgesetzt werden Flutter mit passender Android-Toolchain sowie ein Android-Gerät oder Emulator. Repository klonen und Abhängigkeiten laden:
+Vorausgesetzt werden Flutter mit passender Android-Toolchain sowie ein Android-Gerät oder Emulator. Der aktuell vorgesehene lokale Toolchain-Stand einschließlich Flutter-, JDK-, Android-Studio-, Gradle-, AGP- und Kotlin-Versionen ist in [Entwicklungsumgebung und Android-Toolchain](docs/development-environment.md) dokumentiert.
+
+Repository klonen und Abhängigkeiten laden:
 
 ```bash
 git clone https://github.com/Huluvu424242/developer-wiki-app.git
@@ -98,6 +100,7 @@ Die weiterführende Projektdokumentation liegt unter [`docs/`](docs/README.md):
 - [Architektur nach dem C4-Modell](docs/architecture.md)
 - [Barrierefreiheit und UX](docs/accessibility.md)
 - [App-Logo und Launcher-Icons](docs/app-icon.md)
+- [Entwicklungsumgebung und Android-Toolchain](docs/development-environment.md)
 - [Signierter Android-Release über GitHub Actions](docs/android-release.md)
 - [Bild-Quellen und GitHub-Attachments](docs/image-sources.md)
 
@@ -118,7 +121,7 @@ Für einen lokalen Release-Build:
 flutter build apk --release
 ```
 
-Die verbindlichen Arbeits-, Architektur-, Test- und Dokumentationsregeln für Implementierungen stehen in [`AGENTS.md`](AGENTS.md).
+Die verbindlichen Arbeits-, Architektur-, Test- und Dokumentationsregeln für Implementierungen stehen in [`AGENTS.md`](AGENTS.md). Den reproduzierbaren lokalen Toolchain-Stand und die Upgrade-Schritte beschreibt [`docs/development-environment.md`](docs/development-environment.md).
 
 ## Android-Release
 
