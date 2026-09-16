@@ -34,6 +34,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Fixed
 
+- Den MkDocs-Strict-Build der Projektdokumentation repariert: `docs/index.md` ist nun der einzige Root-Einstieg, kollidierende `docs/README.md`-Navigation wurde entfernt und Verweise auf Repository-Dateien außerhalb von `docs/` erzeugen keine Build-Warnungen mehr.
 - Den Widgettest für Android-Share-Links an das direkte Routing auf die Quellenmetadaten angepasst und die unveränderte Weitergabe der geteilten URL abgesichert.
 - „Verbindung testen“ prüft nun auch den tatsächlich benötigten Zugriff auf `src/config/source-capture.json`; bei fehlendem `Contents: Read-only` wird die Verbindung nicht als erfolgreich markiert und der 403-Hinweis nennt die benötigte Fine-grained-PAT-Berechtigung konkret.
 
