@@ -59,7 +59,7 @@ Die Quellenformulare sind derzeit versioniert in `lib/models/source_template.dar
 
 ## Installation
 
-Vorausgesetzt werden Flutter mit passender Android-Toolchain sowie ein Android-Gerät oder Emulator. Der aktuell vorgesehene lokale Toolchain-Stand einschließlich Flutter-, JDK-, Android-Studio-, Gradle-, AGP- und Kotlin-Versionen ist in [Entwicklungsumgebung und Android-Toolchain](docs/development-environment.md) dokumentiert.
+Vorausgesetzt werden Flutter mit passender Android-Toolchain sowie ein Android-Gerät oder Emulator. Der aktuell vorgesehene lokale Toolchain-Stand einschließlich Flutter-, JDK-, Android-Studio-, Gradle-, AGP- und Kotlin-Konfiguration ist in [Entwicklungsumgebung und Android-Toolchain](docs/development-environment.md) dokumentiert.
 
 Repository klonen und Abhängigkeiten laden:
 
