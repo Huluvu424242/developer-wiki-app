@@ -99,7 +99,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (content == null || content.isEmpty) {
       return;
     }
-    final key = '${content.kind}:${content.image?.path ?? content.document?.path ?? content.text}';
+    final key =
+        '${content.kind}:${content.image?.path ?? content.document?.path ?? content.text}';
     if (key == _openedSharedKey) {
       return;
     }
@@ -122,9 +123,10 @@ class _HomeScreenState extends State<HomeScreen> {
         MaterialPageRoute(
           builder: (_) => DocumentSourceScreen(
             template: template,
-            initialDocument: widget.sharedContent?.kind == SharedContentKind.document
-                ? widget.sharedContent?.document
-                : null,
+            initialDocument:
+                widget.sharedContent?.kind == SharedContentKind.document
+                    ? widget.sharedContent?.document
+                    : null,
           ),
         ),
       );
@@ -208,7 +210,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ).dispatchWorkflow(workflow: configuration.workflowFile);
       if (mounted) {
         setState(() {
-          _lastDispatchAt = dispatchStartedAt.subtract(const Duration(seconds: 5));
+          _lastDispatchAt =
+              dispatchStartedAt.subtract(const Duration(seconds: 5));
           _importMessage = 'Import gestartet. Status kann aktualisiert werden.';
           _importFailed = false;
         });
@@ -253,7 +256,8 @@ class _HomeScreenState extends State<HomeScreen> {
       }
       setState(() {
         _workflowRun = run;
-        _importMessage = run == null ? 'Noch kein passender Workflow-Lauf gefunden.' : null;
+        _importMessage =
+            run == null ? 'Noch kein passender Workflow-Lauf gefunden.' : null;
       });
     } catch (error) {
       if (mounted) {
@@ -288,7 +292,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   GitHubRepository _repositoryFrom(WikiConfiguration configuration) {
     if (!configuration.isComplete) {
-      throw const FormatException('Wiki-Konfiguration ist unvollständig. Einstellungen prüfen.');
+      throw const FormatException(
+          'Wiki-Konfiguration ist unvollständig. Einstellungen prüfen.');
     }
     if (configuration.workflowFile.trim().isEmpty) {
       throw const FormatException('Import-Workflow ist nicht konfiguriert.');
@@ -302,9 +307,12 @@ class _HomeScreenState extends State<HomeScreen> {
       return null;
     }
     return switch (content.kind) {
-      SharedContentKind.imageError => 'Geteiltes Bild konnte nicht übernommen werden: ${content.text}',
-      SharedContentKind.documentError => 'Geteiltes Dokument konnte nicht übernommen werden: ${content.text}',
-      SharedContentKind.unsupportedFile => 'Diese Datei kann mit der aktuellen Wiki-Konfiguration nicht als Quelle erfasst werden. ${content.text}',
+      SharedContentKind.imageError =>
+        'Geteiltes Bild konnte nicht übernommen werden: ${content.text}',
+      SharedContentKind.documentError =>
+        'Geteiltes Dokument konnte nicht übernommen werden: ${content.text}',
+      SharedContentKind.unsupportedFile =>
+        'Diese Datei kann mit der aktuellen Wiki-Konfiguration nicht als Quelle erfasst werden. ${content.text}',
       SharedContentKind.link ||
       SharedContentKind.text ||
       SharedContentKind.image ||
@@ -339,7 +347,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ListTile(
                 key: const Key('pending-image-upload'),
                 leading: const Icon(Icons.cloud_upload_outlined),
-                title: Text('Bild-Upload #${_pendingImageUpload!.issueNumber} fortsetzen'),
+                title: Text(
+                    'Bild-Upload #${_pendingImageUpload!.issueNumber} fortsetzen'),
                 subtitle: Text(_pendingImageUpload!.image.name),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: _openPendingImageUpload,
@@ -392,7 +401,9 @@ class _HomeScreenState extends State<HomeScreen> {
           FilledButton.tonalIcon(
             onPressed: _importBusy ? null : _requestImport,
             icon: const Icon(Icons.sync),
-            label: Text(_importBusy ? 'Import wird gestartet …' : 'Quellen ins Wiki importieren'),
+            label: Text(_importBusy
+                ? 'Import wird gestartet …'
+                : 'Quellen ins Wiki importieren'),
           ),
           if (_lastDispatchAt != null) ...[
             const SizedBox(height: 16),
@@ -405,7 +416,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Text(
                 _importMessage!,
                 style: TextStyle(
-                  color: _importFailed ? Theme.of(context).colorScheme.error : null,
+                  color: _importFailed
+                      ? Theme.of(context).colorScheme.error
+                      : null,
                 ),
               ),
             ),
@@ -423,7 +436,8 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Letzter gestarteter Import', style: Theme.of(context).textTheme.titleMedium),
+            Text('Letzter gestarteter Import',
+                style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             Text(run?.label ?? 'gestartet / wartet'),
             if (run != null) Text('GitHub Actions #${run.id}'),
@@ -435,7 +449,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 OutlinedButton.icon(
                   onPressed: _statusBusy ? null : _refreshImportStatus,
                   icon: const Icon(Icons.refresh),
-                  label: Text(_statusBusy ? 'Wird aktualisiert …' : 'Status aktualisieren'),
+                  label: Text(_statusBusy
+                      ? 'Wird aktualisiert …'
+                      : 'Status aktualisieren'),
                 ),
                 if (run != null)
                   OutlinedButton.icon(

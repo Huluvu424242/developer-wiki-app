@@ -18,7 +18,9 @@ const _templates = [
     name: 'Text',
     titlePrefix: '',
     description: 'Text',
-    fields: [SourceField(id: 'description', label: 'Text', kind: FieldKind.textarea)],
+    fields: [
+      SourceField(id: 'description', label: 'Text', kind: FieldKind.textarea)
+    ],
   ),
   SourceTemplate(
     id: 'image-source',
