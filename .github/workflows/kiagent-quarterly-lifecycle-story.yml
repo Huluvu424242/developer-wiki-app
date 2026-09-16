@@ -45,7 +45,7 @@ jobs:
             gh api --paginate \
               "repos/${GITHUB_REPOSITORY}/issues?state=all&per_page=100" \
               --jq ".[] | select(.pull_request == null and .title == \"${title}\") | .html_url" \
-              | head -n 1
+              | sed -n '1p'
           )"
 
           if [[ -n "${existing_url}" ]]; then
@@ -56,12 +56,12 @@ jobs:
           body_file="$(mktemp)"
           trap 'rm -f "${body_file}"' EXIT
 
-          cat >"${body_file}" <<EOF
-          <!-- kiagent-quarterly-lifecycle-story:${period} -->
+          cat >"${body_file}" <<'EOF'
+          <!-- kiagent-quarterly-lifecycle-story:__PERIOD__ -->
 
           ## Auftrag
 
-          Führe die quartalsweise Lifecycle-Wartung für **${period}** vollständig aus.
+          Führe die quartalsweise Lifecycle-Wartung für **__PERIOD__** vollständig aus.
 
           ## Verbindliche Quelle
 
@@ -91,6 +91,8 @@ jobs:
 
           > Diese Story enthält bewusst keine kopierte technische Lifecycle-Checkliste und keine festen Versionsnummern. Maßgeblich ist immer der aktuelle Harness zum Bearbeitungszeitpunkt.
           EOF
+
+          sed -i "s/__PERIOD__/${period}/g" "${body_file}"
 
           issue_url="$(
             gh issue create \
