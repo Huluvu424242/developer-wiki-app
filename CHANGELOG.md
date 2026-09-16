@@ -14,7 +14,7 @@ und dieses Projekt verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Changed
 
-- Die Android-Build-Toolchain auf Flutter 3.47.4-kompatible Versionen angehoben: Gradle 9.1.0, Android Gradle Plugin 9.0.1 und Kotlin Gradle Plugin 2.3.20; der bewusste AGP-9-Übergangsmodus mit legacy KGP/DSL sowie der lokale Referenzstand mit JDK 21 sind dokumentiert.
+- Die Android-Build-Toolchain auf Flutter 3.47.4-kompatible Versionen angehoben: Gradle 9.1.0 und Android Gradle Plugin 9.0.1; zugleich die App auf AGP-9-Built-in-Kotlin, `kotlin.compilerOptions` und die moderne AGP-DSL migriert sowie JDK 21 als lokalen und Release-Referenzstand dokumentiert.
 - `kiagent-format-and-commit` und `kiagent-flutter-validation` verwenden für Dart einheitlich Flutter 3.47.4 sowie denselben Bereich `lib test`; die Formatierungsaction verifiziert nach `dart format lib test` zusätzlich mit exakt `dart format --set-exit-if-changed lib test` den späteren Validation-Check.
 - Den Agenten-Harness von einer monolithischen `AGENTS.md` auf einen verbindlichen Einstiegspunkt mit thematischen Regelmodulen unter `agent-rules/` umgestellt; Regelpriorität, Wiki-/App-Verantwortungsgrenze und deterministische Harness-Strukturprüfung ergänzt.
 - Flutter-, Architektur-, UX-, Barrierefreiheits- und Qualitätsregeln mit den passenden Erkenntnissen aus dem Taugt’s-Harness harmonisiert; insbesondere Lebenszyklusprüfungen nach `await`, sichere `const`-Widgetbäume, Lazy-Formularvalidierung, Scroll-Widgettests, robuste Fehlersammler-Navigation und einheitliche Abschlussstatus präzisiert.
