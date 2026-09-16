@@ -17,6 +17,7 @@ void main() {
     'agent-rules/06-documentation.md',
     'agent-rules/07-release.md',
     'agent-rules/08-wiki-integration.md',
+    'agent-rules/09-lifecycle-maintenance.md',
   ];
 
   test('AGENTS lists every mandatory module once and in order', () {
